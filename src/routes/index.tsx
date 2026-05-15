@@ -1,8 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Search, Truck, Shield, Users, FileText, RotateCw, MapPin, ArrowRight, Zap, Package, Headphones, Upload, Layers, CheckCircle2 } from "lucide-react";
+import { Search, Truck, Shield, Users, FileText, RotateCw, MapPin, ArrowRight, ArrowUpRight, Zap, Package, Headphones, Upload, Layers, CheckCircle2, Activity, Radio, Cpu, Boxes } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { warehouses, brands, reviews, blogPosts } from "@/data/mock";
 import { formatNumber, formatDate } from "@/lib/format";
+import heroImage from "@/assets/hero-hitech.jpg";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -15,285 +16,399 @@ export const Route = createFileRoute("/")({
 });
 
 const trustItems = [
-  { icon: Package, title: "40 000+ позиций", text: "Прямые поставки от производителей Китая" },
-  { icon: Truck, title: "8 складов по РФ", text: "Самара, Москва, СПб, Новосибирск, Екатеринбург, Челябинск, Краснодар" },
-  { icon: Shield, title: "Персональные скидки", text: "По договору для юрлиц — цены в кабинете" },
-  { icon: Users, title: "Закреплённый менеджер", text: "Один контакт по всем вопросам" },
-  { icon: FileText, title: "Документы в кабинете", text: "Счёт, счёт-фактура — в день заказа" },
-  { icon: RotateCw, title: "Повтор заказа в 1 клик", text: "Шаблоны для регулярных закупок" },
+  { icon: Package, title: "40 000+ позиций", text: "Прямые поставки от производителей Китая", code: "SKU.40K" },
+  { icon: Truck, title: "8 складов по РФ", text: "Самара, Москва, СПб, Новосибирск, Екатеринбург", code: "WH.08" },
+  { icon: Shield, title: "Персональные скидки", text: "По договору для юрлиц — цены в кабинете", code: "B2B.PRC" },
+  { icon: Users, title: "Закреплённый менеджер", text: "Один контакт по всем вопросам", code: "PM.01" },
+  { icon: FileText, title: "Документы в день заказа", text: "Счёт, счёт-фактура — в личный кабинет", code: "DOC.D0" },
+  { icon: RotateCw, title: "Повтор заказа в 1 клик", text: "Шаблоны для регулярных закупок", code: "TPL.X1" },
 ];
 
-const quickButtons = [
-  { icon: Search, label: "Ищу по артикулу", to: "/catalog" },
-  { icon: Layers, label: "Подобрать по бренду", to: "/catalog" },
-  { icon: Headphones, label: "Помощь менеджера", to: "/contacts" },
-  { icon: Upload, label: "Загрузить список", to: "/catalog" },
-  { icon: Truck, label: "Под заказ из другого склада", to: "/catalog" },
-];
-
-const ctaCards = [
-  { title: "Оформи договор сегодня", text: "Получи персональную скидку до 18% уже на первом заказе.", action: "Стать клиентом" },
-  { title: "Стать партнёром", text: "Опт от 500 000 ₽ — индивидуальные условия и приоритетная отгрузка.", action: "Узнать детали" },
-  { title: "Нужна консультация", text: "Подберём аналог или оригинал по фото / артикулу / VIN.", action: "Связаться" },
+const tickerItems = [
+  "SDLG · в наличии 4 218 поз.",
+  "XCMG · в наличии 3 904 поз.",
+  "SHANTUI · в наличии 2 117 поз.",
+  "SHACMAN · в наличии 5 442 поз.",
+  "HOWO · в наличии 6 081 поз.",
+  "LIUGONG · в наличии 1 873 поз.",
+  "ZOOMLION · в наличии 992 поз.",
+  "FOTON · в наличии 2 055 поз.",
 ];
 
 function HomePage() {
   return (
-    <div>
-      {/* HERO */}
-      <section className="relative border-b border-border/60 overflow-hidden">
-        <div className="absolute inset-0 grid-bg opacity-50" />
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/40 to-background" />
-        <div className="absolute -top-40 -right-40 h-[500px] w-[500px] rounded-full bg-brand/10 blur-3xl" />
+    <div className="overflow-hidden">
+      {/* ============== HI-TECH HERO ============== */}
+      <section className="relative">
+        {/* Фоновая подложка */}
+        <div className="absolute inset-0">
+          <img
+            src={heroImage}
+            alt=""
+            aria-hidden
+            className="h-full w-full object-cover object-right"
+          />
+          {/* Светлый градиент-вуаль слева, чтобы текст читался */}
+          <div className="absolute inset-0 bg-[linear-gradient(90deg,oklch(0.99_0.002_240/0.97)_0%,oklch(0.99_0.002_240/0.85)_45%,oklch(0.99_0.002_240/0.35)_75%,oklch(0.99_0.002_240/0.1)_100%)]" />
+          <div className="absolute inset-0 grid-bg opacity-40" />
+        </div>
 
-        <div className="relative mx-auto max-w-[1400px] px-4 py-20 lg:py-28 grid lg:grid-cols-[1.3fr_1fr] gap-12 items-center">
-          <div className="space-y-8">
-            <div className="inline-flex items-center gap-2 rounded-full border border-border bg-surface/60 px-3 py-1 text-xs font-mono text-muted-foreground">
-              <span className="h-1.5 w-1.5 rounded-full bg-status-in-stock animate-pulse" />
-              СИСТЕМА ОНЛАЙН · 8 СКЛАДОВ
-            </div>
+        {/* HUD-углы */}
+        <Corner className="top-4 left-4" pos="tl" />
+        <Corner className="top-4 right-4" pos="tr" />
 
-            <h1 className="font-display text-5xl lg:text-7xl font-bold leading-[0.95] tracking-tight">
-              Запчасти для<br />
-              <span className="text-brand">китайской спецтехники</span><br />
-              без ручного поиска
-            </h1>
+        {/* Координаты-метки */}
+        <div className="absolute top-6 right-1/2 translate-x-1/2 hidden lg:flex items-center gap-3 font-mono text-[10px] tracking-[0.3em] text-muted-foreground uppercase">
+          <span className="h-px w-8 bg-brand" />
+          <span>SYS · РДЭ · v2026.05</span>
+          <span className="h-px w-8 bg-brand" />
+        </div>
 
-            <p className="text-lg text-muted-foreground max-w-xl leading-relaxed">
-              SDLG, XCMG, Shantui, Shacman, HOWO, LiuGong. Введите артикул — увидите наличие, склад и цену с вашей скидкой. Заявка менеджеру за 30 секунд.
-            </p>
+        <div className="relative mx-auto max-w-[1480px] px-6 pt-20 pb-32 lg:pt-28 lg:pb-40">
+          {/* Метка-чип */}
+          <div className="inline-flex items-center gap-3 rounded-full border border-brand/40 bg-background/80 backdrop-blur px-4 py-1.5 text-xs font-mono tracking-widest uppercase">
+            <span className="relative flex h-2 w-2">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-status-in-stock opacity-75" />
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-status-in-stock" />
+            </span>
+            <span className="text-foreground/70">live</span>
+            <span className="h-3 w-px bg-border" />
+            <span className="text-brand">8 СКЛАДОВ ОНЛАЙН</span>
+          </div>
 
-            {/* Поисковая строка */}
-            <div className="flex flex-col sm:flex-row gap-2 max-w-2xl">
-              <div className="flex-1 flex items-center gap-2 rounded-md border-2 border-border bg-surface px-4 h-14 focus-within:border-brand transition-colors">
-                <Search className="h-5 w-5 text-muted-foreground shrink-0" />
-                <input
-                  type="text"
-                  placeholder="Артикул или наименование детали"
-                  className="flex-1 bg-transparent outline-none text-base placeholder:text-muted-foreground"
-                />
+          {/* Гигантский заголовок */}
+          <h1 className="mt-10 font-display font-bold leading-[0.85] tracking-tight">
+            <span className="block text-[clamp(3.5rem,9vw,9.5rem)]">ЗАПЧАСТИ</span>
+            <span className="block text-[clamp(2.2rem,5.5vw,5.5rem)] text-muted-foreground/70 mt-2">
+              для китайской<span className="text-brand"> спецтехники</span>
+            </span>
+            <span className="block text-[clamp(2rem,4.5vw,4.5rem)] mt-4">
+              в один экран. <span className="font-mono text-brand text-[0.7em] align-middle">/</span> в одну минуту.
+            </span>
+          </h1>
+
+          {/* Подзаголовок + поиск */}
+          <div className="mt-12 grid lg:grid-cols-[1.4fr_auto] gap-10 items-end max-w-[1100px]">
+            <div>
+              <p className="text-base lg:text-lg text-muted-foreground max-w-2xl leading-relaxed">
+                <span className="font-mono text-brand">→</span> SDLG, XCMG, Shantui, Shacman, HOWO, LiuGong. Введите артикул — получите наличие, склад и цену с вашей договорной скидкой.
+              </p>
+
+              {/* Поисковая строка */}
+              <div className="mt-7 flex flex-col sm:flex-row gap-2 max-w-2xl">
+                <div className="flex-1 flex items-center gap-3 rounded-none border-b-2 border-foreground bg-background/70 backdrop-blur px-4 h-16 focus-within:border-brand transition-colors">
+                  <span className="font-mono text-xs text-muted-foreground tracking-widest">01</span>
+                  <span className="h-6 w-px bg-border" />
+                  <Search className="h-5 w-5 text-foreground shrink-0" />
+                  <input
+                    type="text"
+                    placeholder="Артикул, OEM-номер или название"
+                    className="flex-1 bg-transparent outline-none text-base placeholder:text-muted-foreground/60"
+                  />
+                </div>
+                <Button asChild size="lg" className="h-16 px-8 rounded-none bg-foreground text-background hover:bg-brand hover:text-brand-foreground font-display tracking-wide text-base group">
+                  <Link to="/catalog">
+                    НАЙТИ
+                    <ArrowUpRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                  </Link>
+                </Button>
               </div>
-              <Button asChild size="lg" className="h-14 px-8 bg-brand text-brand-foreground hover:bg-brand/90 font-semibold text-base">
-                <Link to="/catalog">Найти<ArrowRight className="ml-2 h-4 w-4" /></Link>
-              </Button>
+
+              <div className="mt-5 flex flex-wrap gap-x-6 gap-y-2 text-xs font-mono text-muted-foreground uppercase tracking-wider">
+                <span><span className="text-brand">⌘K</span> быстрый поиск</span>
+                <span><span className="text-brand">↵</span> отправить</span>
+                <span><span className="text-brand">●</span> 40 132 SKU индексировано</span>
+              </div>
             </div>
 
-            <div className="flex flex-wrap gap-2">
-              {quickButtons.map((b) => (
-                <Link key={b.label} to={b.to} className="inline-flex items-center gap-2 rounded-md border border-border bg-surface/60 px-3 py-2 text-sm hover:border-brand/60 hover:bg-surface transition-colors">
-                  <b.icon className="h-4 w-4 text-brand" />
-                  {b.label}
-                </Link>
-              ))}
+            {/* Боковая статистика — стек */}
+            <div className="hidden lg:flex flex-col gap-1 font-mono text-right">
+              <div className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground">в реальном времени</div>
+              <div className="font-display text-6xl font-bold tabular-nums text-brand leading-none">40K+</div>
+              <div className="text-xs text-muted-foreground">позиций в наличии</div>
+              <div className="mt-3 h-px w-full bg-border" />
+              <div className="font-display text-3xl font-bold tabular-nums leading-none mt-3">~ 30 сек</div>
+              <div className="text-xs text-muted-foreground">от запроса до КП</div>
             </div>
           </div>
+        </div>
 
-          {/* «Нашёл за 30 секунд» */}
-          <div className="rounded-lg border border-border bg-surface/80 p-6 lg:p-8 backdrop-blur shadow-2xl shadow-black/40">
-            <div className="flex items-center gap-2 mb-6">
-              <Zap className="h-5 w-5 text-brand" />
-              <span className="font-display tracking-wide uppercase text-sm">Нашёл за 30 секунд</span>
+        {/* TICKER-лента */}
+        <div className="relative border-y border-foreground/15 bg-foreground/[0.03] backdrop-blur overflow-hidden">
+          <div className="flex items-center">
+            <div className="shrink-0 border-r border-foreground/15 bg-brand text-brand-foreground px-4 py-3 font-mono text-xs uppercase tracking-widest flex items-center gap-2">
+              <Radio className="h-3.5 w-3.5 animate-pulse" /> live · stock
             </div>
-            <ol className="space-y-5">
-              {[
-                { n: "01", t: "Введите артикул или название", d: "Каталог 40 000+ позиций, поиск по любому фрагменту" },
-                { n: "02", t: "Сразу увидьте наличие и цену", d: "Со склада, с вашей персональной скидкой по договору" },
-                { n: "03", t: "Отправьте заказ менеджеру", d: "Заявка уходит в CRM, документы — в личный кабинет" },
-              ].map((s) => (
-                <li key={s.n} className="flex gap-4">
-                  <span className="font-display text-2xl text-brand font-bold w-10 shrink-0">{s.n}</span>
-                  <div>
-                    <div className="font-semibold">{s.t}</div>
-                    <div className="text-sm text-muted-foreground mt-0.5">{s.d}</div>
-                  </div>
-                </li>
-              ))}
-            </ol>
+            <div className="relative flex-1 overflow-hidden">
+              <div className="flex gap-10 whitespace-nowrap py-3 animate-[ticker_40s_linear_infinite] font-mono text-sm">
+                {[...tickerItems, ...tickerItems, ...tickerItems].map((t, i) => (
+                  <span key={i} className="flex items-center gap-3">
+                    <span className="text-brand">▸</span>
+                    {t}
+                  </span>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Статистика */}
-      <section className="border-b border-border/60 bg-surface/30">
-        <div className="mx-auto max-w-[1400px] px-4 py-10 grid grid-cols-2 md:grid-cols-4 gap-6">
+      {/* ============== BENTO: «Нашёл за 30 секунд» + сценарии ============== */}
+      <section className="relative mx-auto max-w-[1480px] px-6 py-24 lg:py-32">
+        <div className="grid lg:grid-cols-12 gap-4">
+          {/* Заголовок секции — большой */}
+          <div className="lg:col-span-12 mb-6 flex items-end justify-between gap-6 flex-wrap">
+            <div>
+              <div className="font-mono text-[11px] text-brand uppercase tracking-[0.3em] mb-3">/ 02 · workflow</div>
+              <h2 className="font-display text-4xl lg:text-6xl font-bold leading-[0.95]">
+                Минимум кликов.<br />
+                <span className="text-muted-foreground/60">Максимум фактов.</span>
+              </h2>
+            </div>
+            <div className="font-mono text-xs text-muted-foreground uppercase tracking-widest hidden md:block">
+              [ 03 / шага ]
+            </div>
+          </div>
+
+          {/* 3 шага */}
           {[
-            { v: "40 000+", l: "позиций в каталоге" },
-            { v: "8", l: "собственных складов" },
-            { v: "10 000", l: "м² складских площадей" },
-            { v: "10+", l: "брендов спецтехники" },
-          ].map((s) => (
-            <div key={s.l} className="text-center md:text-left">
-              <div className="font-display text-4xl lg:text-5xl text-brand font-bold tabular-nums">{s.v}</div>
-              <div className="text-sm text-muted-foreground mt-1">{s.l}</div>
+            { n: "01", t: "Поиск", d: "Артикул, OEM или название. Каталог 40 000+ позиций.", icon: Search },
+            { n: "02", t: "Наличие", d: "Сразу: склад, цена с вашей скидкой, срок отгрузки.", icon: Activity },
+            { n: "03", t: "Заявка", d: "Один клик — менеджер, документы и счёт в кабинете.", icon: Send },
+          ].map((s, idx) => (
+            <div
+              key={s.n}
+              className="lg:col-span-4 group relative border border-border bg-background hover:bg-surface transition-colors p-8 lg:p-10 overflow-hidden"
+            >
+              <div className="absolute -top-10 -right-10 h-40 w-40 rounded-full bg-brand/0 group-hover:bg-brand/10 blur-3xl transition-all duration-500" />
+              <div className="flex items-start justify-between mb-12">
+                <span className="font-mono text-xs tracking-[0.3em] text-muted-foreground uppercase">шаг · {s.n}</span>
+                <s.icon className="h-5 w-5 text-foreground/40 group-hover:text-brand transition-colors" />
+              </div>
+              <div className="font-display text-7xl lg:text-8xl font-bold text-foreground/10 group-hover:text-brand/30 transition-colors leading-none mb-6 tabular-nums">
+                {s.n}
+              </div>
+              <h3 className="font-display text-2xl mb-2">{s.t}</h3>
+              <p className="text-sm text-muted-foreground leading-relaxed">{s.d}</p>
+              {idx < 2 && (
+                <div className="hidden lg:block absolute top-1/2 -right-2 z-10 h-3 w-3 rotate-45 border-r border-t border-brand bg-background" />
+              )}
             </div>
           ))}
         </div>
       </section>
 
-      {/* Почему нам доверяют */}
-      <section className="mx-auto max-w-[1400px] px-4 py-20">
-        <div className="flex items-end justify-between mb-10 gap-4 flex-wrap">
+      {/* ============== ASYMMETRIC: бренды + большая цифра ============== */}
+      <section className="relative border-y border-border bg-surface/50">
+        <div className="mx-auto max-w-[1480px] px-6 py-20 grid lg:grid-cols-[auto_1fr] gap-12 items-center">
+          <div className="space-y-3">
+            <div className="font-mono text-[11px] text-brand uppercase tracking-[0.3em]">/ 03 · partners</div>
+            <div className="font-display font-bold leading-[0.85]">
+              <div className="text-7xl lg:text-9xl tabular-nums">10<span className="text-brand">+</span></div>
+              <div className="text-xl lg:text-2xl text-muted-foreground mt-2">брендов · прямые поставки</div>
+            </div>
+          </div>
+          <div className="relative">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-px bg-border border border-border">
+              {brands.slice(0, 10).map((b) => (
+                <div key={b.id} className="bg-background flex items-center justify-center h-24 group hover:bg-surface transition-colors">
+                  <span className="font-display text-xl tracking-wider text-muted-foreground group-hover:text-foreground transition-colors">
+                    {b.name}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ============== «Почему нам доверяют» — терминал-стиль ============== */}
+      <section className="mx-auto max-w-[1480px] px-6 py-24 lg:py-32">
+        <div className="flex items-end justify-between mb-12 gap-6 flex-wrap">
           <div>
-            <div className="font-mono text-xs text-brand uppercase tracking-widest mb-2">// почему нам доверяют</div>
-            <h2 className="font-display text-3xl lg:text-5xl font-bold">Конкретика, а не обещания</h2>
+            <div className="font-mono text-[11px] text-brand uppercase tracking-[0.3em] mb-3">/ 04 · why us</div>
+            <h2 className="font-display text-4xl lg:text-6xl font-bold leading-[0.95]">
+              Конкретика,<br />не обещания.
+            </h2>
           </div>
-          <Button asChild variant="outline"><Link to="/contacts">Связаться<ArrowRight className="ml-2 h-4 w-4" /></Link></Button>
+          <Button asChild variant="outline" className="rounded-none border-foreground hover:bg-foreground hover:text-background h-12 px-6">
+            <Link to="/contacts">Связаться <ArrowUpRight className="ml-2 h-4 w-4" /></Link>
+          </Button>
         </div>
 
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-px bg-border/60 border border-border/60 rounded-lg overflow-hidden">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-px bg-border border border-border">
           {trustItems.map((t) => (
-            <div key={t.title} className="bg-surface/60 p-6 hover:bg-surface transition-colors">
-              <t.icon className="h-7 w-7 text-brand mb-4" />
-              <div className="font-display text-lg mb-1">{t.title}</div>
+            <div key={t.title} className="bg-background p-8 group hover:bg-surface transition-colors relative">
+              <div className="absolute top-4 right-4 font-mono text-[10px] tracking-widest text-muted-foreground/60">
+                {t.code}
+              </div>
+              <t.icon className="h-7 w-7 text-foreground group-hover:text-brand transition-colors mb-6" strokeWidth={1.5} />
+              <div className="font-display text-xl mb-2">{t.title}</div>
               <div className="text-sm text-muted-foreground leading-relaxed">{t.text}</div>
+              <div className="absolute bottom-0 left-0 h-px w-0 bg-brand group-hover:w-full transition-all duration-500" />
             </div>
           ))}
         </div>
       </section>
 
-      {/* Бренды */}
-      <section className="border-y border-border/60 bg-surface/30">
-        <div className="mx-auto max-w-[1400px] px-4 py-12">
-          <div className="font-mono text-xs text-muted-foreground uppercase tracking-widest mb-6 text-center">
-            Работаем с производителями
-          </div>
-          <div className="flex flex-wrap items-center justify-center gap-x-10 gap-y-4">
-            {brands.map((b) => (
-              <span key={b.id} className="font-display text-2xl text-muted-foreground/70 hover:text-foreground transition-colors">
-                {b.name}
-              </span>
-            ))}
-          </div>
-        </div>
-      </section>
+      {/* ============== «Не нашли деталь?» — split panel ============== */}
+      <section className="relative border-y border-border bg-foreground text-background overflow-hidden">
+        <div className="absolute inset-0 opacity-[0.07]"
+          style={{
+            backgroundImage: 'radial-gradient(circle at 1px 1px, white 1px, transparent 0)',
+            backgroundSize: '24px 24px',
+          }}
+        />
+        <div className="absolute -top-20 -right-20 h-[500px] w-[500px] rounded-full bg-brand/20 blur-3xl" />
 
-      {/* «Не нашли деталь?» */}
-      <section className="mx-auto max-w-[1400px] px-4 py-20">
-        <div className="grid lg:grid-cols-[1.2fr_1fr] gap-10 items-center rounded-xl border border-brand/30 bg-gradient-to-br from-surface to-surface-2 p-8 lg:p-12">
-          <div className="space-y-5">
-            <div className="font-mono text-xs text-brand uppercase tracking-widest">// конверсионный блок</div>
-            <h3 className="font-display text-3xl lg:text-4xl font-bold">Не нашли деталь?</h3>
-            <p className="text-muted-foreground text-lg">
+        <div className="relative mx-auto max-w-[1480px] px-6 py-24 grid lg:grid-cols-[1.2fr_1fr] gap-14 items-center">
+          <div className="space-y-6">
+            <div className="font-mono text-[11px] text-brand uppercase tracking-[0.3em]">/ 05 · custom request</div>
+            <h2 className="font-display text-4xl lg:text-6xl font-bold leading-[0.95]">
+              Не нашли деталь?<br />
+              <span className="text-brand">Найдём за вас.</span>
+            </h2>
+            <p className="text-lg text-background/70 max-w-xl leading-relaxed">
               Загрузите артикул, список или фото — менеджер подберёт оригинал или аналог в течение рабочего дня.
             </p>
-            <ul className="space-y-2 text-sm">
-              {["Подбор по фото и серийному номеру", "Сравнение оригинала и аналогов", "Расчёт логистики до вашего города"].map((x) => (
-                <li key={x} className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-brand" />{x}</li>
+            <ul className="space-y-3 text-sm text-background/85">
+              {["Подбор по фото и серийному номеру", "Сравнение оригинал ↔ аналог", "Расчёт логистики до вашего города"].map((x) => (
+                <li key={x} className="flex items-center gap-3">
+                  <span className="h-px w-6 bg-brand" />{x}
+                </li>
               ))}
             </ul>
           </div>
-          <form className="space-y-3" onSubmit={(e) => e.preventDefault()}>
-            <input type="text" placeholder="Артикул или название детали" className="w-full h-12 rounded-md border border-input bg-background px-4 text-sm focus:outline-none focus:border-brand" />
-            <input type="tel" placeholder="Ваш телефон" className="w-full h-12 rounded-md border border-input bg-background px-4 text-sm focus:outline-none focus:border-brand" />
-            <button type="button" className="w-full h-12 rounded-md border-2 border-dashed border-border bg-background/50 text-sm text-muted-foreground hover:border-brand hover:text-brand transition-colors flex items-center justify-center gap-2">
+
+          <form className="relative space-y-3 bg-background text-foreground p-8 border border-brand/30 shadow-[0_30px_80px_-20px_oklch(0.7_0.14_220/0.4)]" onSubmit={(e) => e.preventDefault()}>
+            <div className="flex items-center justify-between mb-4">
+              <span className="font-mono text-xs uppercase tracking-widest text-muted-foreground">// заявка</span>
+              <span className="font-mono text-xs text-brand">REQ-{Math.floor(Math.random() * 9000 + 1000)}</span>
+            </div>
+            <input type="text" placeholder="Артикул или название детали" className="w-full h-12 border border-border bg-background px-4 text-sm focus:outline-none focus:border-brand rounded-none" />
+            <input type="tel" placeholder="Ваш телефон" className="w-full h-12 border border-border bg-background px-4 text-sm focus:outline-none focus:border-brand rounded-none" />
+            <button type="button" className="w-full h-12 border border-dashed border-border bg-background text-sm text-muted-foreground hover:border-brand hover:text-brand transition-colors flex items-center justify-center gap-2 rounded-none">
               <Upload className="h-4 w-4" />Прикрепить файл или фото
             </button>
-            <Button type="submit" size="lg" className="w-full bg-brand text-brand-foreground hover:bg-brand/90 font-semibold">
-              Получить подбор от менеджера
+            <Button type="submit" size="lg" className="w-full rounded-none bg-foreground text-background hover:bg-brand hover:text-brand-foreground font-display tracking-wide h-12">
+              ОТПРАВИТЬ → МЕНЕДЖЕР
             </Button>
           </form>
         </div>
       </section>
 
-      {/* CTA сетка */}
-      <section className="mx-auto max-w-[1400px] px-4 pb-20 grid md:grid-cols-3 gap-4">
-        {ctaCards.map((c) => (
-          <div key={c.title} className="rounded-lg border border-border bg-surface/60 p-6 flex flex-col gap-4 hover:border-brand/60 transition-colors">
-            <h4 className="font-display text-xl">{c.title}</h4>
-            <p className="text-sm text-muted-foreground flex-1">{c.text}</p>
-            <Button variant="outline" className="w-full justify-between">
-              {c.action}<ArrowRight className="h-4 w-4" />
-            </Button>
+      {/* ============== ОТЗЫВЫ ============== */}
+      <section className="mx-auto max-w-[1480px] px-6 py-24 lg:py-32">
+        <div className="flex items-end justify-between mb-12 gap-6 flex-wrap">
+          <div>
+            <div className="font-mono text-[11px] text-brand uppercase tracking-[0.3em] mb-3">/ 06 · feedback</div>
+            <h2 className="font-display text-4xl lg:text-6xl font-bold leading-[0.95]">Что говорят<br/>покупатели</h2>
           </div>
-        ))}
+          <Button asChild variant="outline" className="rounded-none border-foreground hover:bg-foreground hover:text-background h-12 px-6">
+            <Link to="/reviews">Все отзывы <ArrowUpRight className="ml-2 h-4 w-4" /></Link>
+          </Button>
+        </div>
+        <div className="grid md:grid-cols-3 gap-px bg-border border border-border">
+          {reviews.slice(0, 3).map((r) => (
+            <div key={r.id} className="bg-background p-8 space-y-5">
+              <div className="flex items-center justify-between">
+                <div className="flex gap-0.5 text-brand text-lg">{Array.from({ length: r.rating }).map((_, i) => <span key={i}>★</span>)}</div>
+                <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">verified</span>
+              </div>
+              <p className="text-base leading-relaxed text-foreground/90">«{r.text}»</p>
+              <div className="pt-4 border-t border-border flex items-center justify-between">
+                <div>
+                  <div className="font-medium text-sm">{r.author}</div>
+                  {r.company && <div className="text-xs text-muted-foreground">{r.company}</div>}
+                </div>
+                <span className="text-xs font-mono text-muted-foreground">{formatDate(r.date)}</span>
+              </div>
+            </div>
+          ))}
+        </div>
       </section>
 
-      {/* Отзывы превью */}
-      <section className="border-t border-border/60 bg-surface/30">
-        <div className="mx-auto max-w-[1400px] px-4 py-20">
-          <div className="flex items-end justify-between mb-10 gap-4 flex-wrap">
+      {/* ============== БЛОГ ============== */}
+      <section className="border-t border-border bg-surface/50">
+        <div className="mx-auto max-w-[1480px] px-6 py-24">
+          <div className="flex items-end justify-between mb-12 gap-6 flex-wrap">
             <div>
-              <div className="font-mono text-xs text-brand uppercase tracking-widest mb-2">// отзывы клиентов</div>
-              <h2 className="font-display text-3xl lg:text-5xl font-bold">Что говорят покупатели</h2>
+              <div className="font-mono text-[11px] text-brand uppercase tracking-[0.3em] mb-3">/ 07 · journal</div>
+              <h2 className="font-display text-4xl lg:text-6xl font-bold leading-[0.95]">Экспертный<br/>блог</h2>
             </div>
-            <Button asChild variant="outline"><Link to="/reviews">Все отзывы<ArrowRight className="ml-2 h-4 w-4" /></Link></Button>
+            <Button asChild variant="outline" className="rounded-none border-foreground hover:bg-foreground hover:text-background h-12 px-6">
+              <Link to="/blog">Все статьи <ArrowUpRight className="ml-2 h-4 w-4" /></Link>
+            </Button>
           </div>
-          <div className="grid md:grid-cols-3 gap-4">
-            {reviews.slice(0, 3).map((r) => (
-              <div key={r.id} className="rounded-lg border border-border bg-background p-6 space-y-4">
-                <div className="flex gap-0.5">{Array.from({ length: r.rating }).map((_, i) => <span key={i} className="text-brand">★</span>)}</div>
-                <p className="text-sm leading-relaxed text-foreground/90">«{r.text}»</p>
-                <div className="pt-3 border-t border-border/60 flex items-center justify-between">
-                  <div>
-                    <div className="font-medium text-sm">{r.author}</div>
-                    {r.company && <div className="text-xs text-muted-foreground">{r.company}</div>}
+          <div className="grid md:grid-cols-3 gap-px bg-border border border-border">
+            {blogPosts.map((p, i) => (
+              <Link key={p.slug} to="/blog/$slug" params={{ slug: p.slug }} className="group bg-background overflow-hidden flex flex-col">
+                <div className="relative aspect-[16/10] bg-cover bg-center overflow-hidden" style={{ backgroundImage: `url(${p.cover})` }}>
+                  <div className="absolute inset-0 bg-gradient-to-t from-foreground/40 to-transparent" />
+                  <div className="absolute top-4 left-4 font-mono text-[10px] uppercase tracking-widest text-background bg-foreground/70 backdrop-blur px-2 py-1">
+                    /{String(i + 1).padStart(2, '0')} · {p.category}
                   </div>
-                  <span className="text-xs font-mono text-muted-foreground">{formatDate(r.date)}</span>
                 </div>
-              </div>
+                <div className="p-6 space-y-3 flex-1 flex flex-col">
+                  <h4 className="font-display text-xl leading-tight group-hover:text-brand transition-colors flex-1">{p.title}</h4>
+                  <p className="text-sm text-muted-foreground line-clamp-2">{p.excerpt}</p>
+                  <div className="text-xs font-mono text-muted-foreground pt-2 flex items-center justify-between">
+                    <span>{formatDate(p.date)} · {p.readTime} мин</span>
+                    <ArrowUpRight className="h-4 w-4 group-hover:text-brand transition-colors" />
+                  </div>
+                </div>
+              </Link>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Блог превью */}
-      <section className="mx-auto max-w-[1400px] px-4 py-20">
-        <div className="flex items-end justify-between mb-10 gap-4 flex-wrap">
-          <div>
-            <div className="font-mono text-xs text-brand uppercase tracking-widest mb-2">// экспертный блог</div>
-            <h2 className="font-display text-3xl lg:text-5xl font-bold">Полезные материалы</h2>
-          </div>
-          <Button asChild variant="outline"><Link to="/blog">Все статьи<ArrowRight className="ml-2 h-4 w-4" /></Link></Button>
-        </div>
-        <div className="grid md:grid-cols-3 gap-4">
-          {blogPosts.map((p) => (
-            <Link key={p.slug} to="/blog/$slug" params={{ slug: p.slug }} className="group rounded-lg border border-border bg-surface/60 overflow-hidden hover:border-brand/60 transition-colors">
-              <div className="aspect-[16/10] bg-cover bg-center" style={{ backgroundImage: `url(${p.cover})` }} />
-              <div className="p-5 space-y-2">
-                <div className="text-xs font-mono text-brand uppercase tracking-wider">{p.category}</div>
-                <h4 className="font-display text-lg leading-tight group-hover:text-brand transition-colors">{p.title}</h4>
-                <p className="text-sm text-muted-foreground line-clamp-2">{p.excerpt}</p>
-                <div className="text-xs font-mono text-muted-foreground pt-2">{formatDate(p.date)} · {p.readTime} мин</div>
-              </div>
-            </Link>
-          ))}
-        </div>
-      </section>
-
-      {/* Контакты + карта */}
-      <section className="border-t border-border/60 bg-surface/30">
-        <div className="mx-auto max-w-[1400px] px-4 py-20 grid lg:grid-cols-[1fr_1.5fr] gap-10">
-          <div className="space-y-6">
-            <div>
-              <div className="font-mono text-xs text-brand uppercase tracking-widest mb-2">// контакты</div>
-              <h2 className="font-display text-3xl lg:text-4xl font-bold">8 складов по России</h2>
-              <p className="text-muted-foreground mt-3">Прямая отгрузка с ближайшего к вам склада. Самовывоз или транспортная компания на ваш выбор.</p>
-            </div>
-            <ul className="space-y-3">
-              {warehouses.slice(0, 6).map((w) => (
-                <li key={w.id} className="flex items-start gap-3 text-sm">
-                  <MapPin className="h-4 w-4 text-brand mt-0.5 shrink-0" />
-                  <div>
-                    <div className="font-medium">{w.city}</div>
-                    <div className="text-muted-foreground text-xs">{w.address}</div>
-                  </div>
-                </li>
-              ))}
-            </ul>
-            <Button asChild className="bg-brand text-brand-foreground hover:bg-brand/90"><Link to="/contacts">Все контакты<ArrowRight className="ml-2 h-4 w-4" /></Link></Button>
+      {/* ============== КОНТАКТЫ + СКЛАДЫ ============== */}
+      <section className="border-t border-border">
+        <div className="mx-auto max-w-[1480px] px-6 py-24 grid lg:grid-cols-[1fr_1.5fr] gap-12">
+          <div className="space-y-7">
+            <div className="font-mono text-[11px] text-brand uppercase tracking-[0.3em]">/ 08 · network</div>
+            <h2 className="font-display text-4xl lg:text-6xl font-bold leading-[0.95]">8 складов<br/>по России</h2>
+            <p className="text-muted-foreground text-lg max-w-md">
+              Прямая отгрузка с ближайшего склада. Самовывоз или транспортная компания на ваш выбор.
+            </p>
+            <Button asChild className="rounded-none bg-foreground text-background hover:bg-brand hover:text-brand-foreground h-12 px-6">
+              <Link to="/contacts">Все контакты <ArrowUpRight className="ml-2 h-4 w-4" /></Link>
+            </Button>
           </div>
 
-          {/* Заглушка карты */}
-          <div className="relative rounded-lg border border-border bg-surface overflow-hidden min-h-[400px] grid-bg flex items-center justify-center">
-            <div className="absolute inset-0 bg-gradient-to-br from-brand/5 via-transparent to-brand/10" />
-            <div className="text-center space-y-2 relative">
-              <MapPin className="h-12 w-12 text-brand mx-auto" />
-              <div className="font-display text-xl">Яндекс.Карта</div>
-              <div className="text-sm text-muted-foreground max-w-xs">Интерактивная карта складов будет подключена на этапе бизнес-логики</div>
-            </div>
-          </div>
+          <ul className="grid sm:grid-cols-2 gap-px bg-border border border-border">
+            {warehouses.slice(0, 8).map((w, i) => (
+              <li key={w.id} className="bg-background p-6 flex items-start gap-4 group hover:bg-surface transition-colors">
+                <div className="font-mono text-xs text-muted-foreground tabular-nums">/{String(i + 1).padStart(2, '0')}</div>
+                <div className="flex-1">
+                  <div className="font-display text-xl mb-1 group-hover:text-brand transition-colors">{w.city}</div>
+                  <div className="text-xs text-muted-foreground leading-relaxed">{w.address}</div>
+                </div>
+                <MapPin className="h-4 w-4 text-foreground/30 group-hover:text-brand transition-colors mt-1" />
+              </li>
+            ))}
+          </ul>
         </div>
       </section>
     </div>
   );
+}
+
+/* HUD-уголки */
+function Corner({ className = "", pos }: { className?: string; pos: "tl" | "tr" | "bl" | "br" }) {
+  const map = {
+    tl: "border-l border-t",
+    tr: "border-r border-t",
+    bl: "border-l border-b",
+    br: "border-r border-b",
+  };
+  return (
+    <div className={`pointer-events-none absolute z-10 h-6 w-6 border-brand ${map[pos]} ${className}`} />
+  );
+}
+
+/* Иконка-плейсхолдер для шагов */
+function Send(props: { className?: string }) {
+  return <ArrowUpRight {...props} />;
 }
