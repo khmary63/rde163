@@ -39,11 +39,11 @@ export function SiteHeader() {
 
       {/* Main nav */}
       <div className="mx-auto flex h-16 max-w-[1400px] items-center gap-6 px-4">
-        <Link to="/" className="flex items-center gap-2 shrink-0">
-          <div className="flex h-9 w-9 items-center justify-center bg-brand text-brand-foreground font-display font-bold text-lg">Г</div>
+        <Link to="/" className="flex items-center gap-2.5 shrink-0">
+          <div className="flex h-10 w-10 items-center justify-center bg-brand text-brand-foreground font-display font-bold text-base rounded-sm">РДЭ</div>
           <div className="hidden sm:flex flex-col leading-tight">
-            <span className="font-display font-bold text-lg tracking-wide">ГРОСС</span>
-            <span className="text-[10px] text-muted-foreground tracking-[0.2em]">ЗАПЧАСТИ</span>
+            <span className="font-display font-bold text-base tracking-wide uppercase">Русский Дом Экспорта</span>
+            <span className="text-[10px] text-muted-foreground tracking-[0.18em] uppercase">Запчасти для спецтехники</span>
           </div>
         </Link>
 

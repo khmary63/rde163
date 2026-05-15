@@ -7,7 +7,7 @@ import { formatNumber, formatDate } from "@/lib/format";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "ГРОСС Запчасти — B2B каталог запчастей для китайской спецтехники" },
+      { title: "Русский Дом Экспорта — B2B каталог запчастей для китайской спецтехники" },
       { name: "description", content: "40 000+ позиций в наличии на 8 складах по РФ. Персональные цены для юрлиц, заявка менеджеру за 30 секунд." },
     ],
   }),
