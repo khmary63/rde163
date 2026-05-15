@@ -43,47 +43,49 @@ function HomePage() {
     <div className="overflow-hidden">
       {/* ============== HI-TECH HERO ============== */}
       <section className="relative">
-        {/* Фоновая подложка */}
+        {/* Фоновая подложка — Sitrak C7H */}
         <div className="absolute inset-0">
           <img
-            src={heroImage}
-            alt=""
-            aria-hidden
+            src={sitrakTruck1}
+            alt="Грузовик SITRAK C7H"
             className="h-full w-full object-cover object-right"
           />
           {/* Светлый градиент-вуаль слева, чтобы текст читался */}
-          <div className="absolute inset-0 bg-[linear-gradient(90deg,oklch(0.99_0.002_240/0.97)_0%,oklch(0.99_0.002_240/0.85)_45%,oklch(0.99_0.002_240/0.35)_75%,oklch(0.99_0.002_240/0.1)_100%)]" />
-          <div className="absolute inset-0 grid-bg opacity-40" />
+          <div className="absolute inset-0 bg-[linear-gradient(95deg,oklch(0.99_0.002_240/0.98)_0%,oklch(0.99_0.002_240/0.92)_38%,oklch(0.99_0.002_240/0.55)_62%,oklch(0.99_0.002_240/0.05)_100%)]" />
+          <div className="absolute inset-0 grid-bg opacity-30" />
+          {/* Оранжевый блик-акцент */}
+          <div className="absolute -bottom-32 -left-32 h-[420px] w-[420px] rounded-full bg-accent-orange/25 blur-3xl" />
+          <div className="absolute top-10 right-1/3 h-[300px] w-[300px] rounded-full bg-brand/20 blur-3xl" />
         </div>
 
         {/* HUD-углы */}
-        <Corner className="top-4 left-4" pos="tl" />
-        <Corner className="top-4 right-4" pos="tr" />
+        <Corner className="top-4 left-4" pos="tl" color="orange" />
+        <Corner className="top-4 right-4" pos="tr" color="brand" />
 
         {/* Координаты-метки */}
         <div className="absolute top-6 right-1/2 translate-x-1/2 hidden lg:flex items-center gap-3 font-mono text-[10px] tracking-[0.3em] text-muted-foreground uppercase">
-          <span className="h-px w-8 bg-brand" />
+          <span className="h-px w-8 bg-accent-orange" />
           <span>SYS · РДЭ · v2026.05</span>
           <span className="h-px w-8 bg-brand" />
         </div>
 
         <div className="relative mx-auto max-w-[1480px] px-6 pt-20 pb-32 lg:pt-28 lg:pb-40">
           {/* Метка-чип */}
-          <div className="inline-flex items-center gap-3 rounded-full border border-brand/40 bg-background/80 backdrop-blur px-4 py-1.5 text-xs font-mono tracking-widest uppercase">
+          <div className="inline-flex items-center gap-3 rounded-full border-2 border-accent-orange bg-background/90 backdrop-blur px-4 py-1.5 text-xs font-mono tracking-widest uppercase shadow-[0_8px_30px_-10px_oklch(0.72_0.19_45/0.6)]">
             <span className="relative flex h-2 w-2">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-status-in-stock opacity-75" />
-              <span className="relative inline-flex h-2 w-2 rounded-full bg-status-in-stock" />
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent-orange opacity-75" />
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-accent-orange" />
             </span>
-            <span className="text-foreground/70">live</span>
+            <span className="text-foreground">live</span>
             <span className="h-3 w-px bg-border" />
-            <span className="text-brand">8 СКЛАДОВ ОНЛАЙН</span>
+            <span className="text-accent-orange font-bold">8 СКЛАДОВ ОНЛАЙН</span>
           </div>
 
           {/* Гигантский заголовок */}
           <h1 className="mt-10 font-display font-bold leading-[0.85] tracking-tight">
             <span className="block text-[clamp(3.5rem,9vw,9.5rem)]">ЗАПЧАСТИ</span>
             <span className="block text-[clamp(2.2rem,5.5vw,5.5rem)] text-muted-foreground/70 mt-2">
-              для китайской<span className="text-brand"> спецтехники</span>
+              для <span className="text-accent-orange font-extrabold">SITRAK</span>, SDLG,<br className="hidden lg:block"/> XCMG, HOWO и других
             </span>
             <span className="block text-[clamp(2rem,4.5vw,4.5rem)] mt-4">
               в один экран. <span className="font-mono text-brand text-[0.7em] align-middle">/</span> в одну минуту.
@@ -93,14 +95,14 @@ function HomePage() {
           {/* Подзаголовок + поиск */}
           <div className="mt-12 grid lg:grid-cols-[1.4fr_auto] gap-10 items-end max-w-[1100px]">
             <div>
-              <p className="text-base lg:text-lg text-muted-foreground max-w-2xl leading-relaxed">
-                <span className="font-mono text-brand">→</span> SDLG, XCMG, Shantui, Shacman, HOWO, LiuGong. Введите артикул — получите наличие, склад и цену с вашей договорной скидкой.
+              <p className="text-base lg:text-lg text-foreground/80 max-w-2xl leading-relaxed">
+                <span className="font-mono text-accent-orange font-bold">→</span> Официальный спрос на SITRAK · оригинал и аналоги. Введите артикул — получите наличие, склад и цену с вашей договорной скидкой.
               </p>
 
               {/* Поисковая строка */}
               <div className="mt-7 flex flex-col sm:flex-row gap-2 max-w-2xl">
-                <div className="flex-1 flex items-center gap-3 rounded-none border-b-2 border-foreground bg-background/70 backdrop-blur px-4 h-16 focus-within:border-brand transition-colors">
-                  <span className="font-mono text-xs text-muted-foreground tracking-widest">01</span>
+                <div className="flex-1 flex items-center gap-3 rounded-none border-b-2 border-foreground bg-background/80 backdrop-blur px-4 h-16 focus-within:border-accent-orange transition-colors">
+                  <span className="font-mono text-xs text-accent-orange tracking-widest font-bold">01</span>
                   <span className="h-6 w-px bg-border" />
                   <Search className="h-5 w-5 text-foreground shrink-0" />
                   <input
@@ -109,7 +111,7 @@ function HomePage() {
                     className="flex-1 bg-transparent outline-none text-base placeholder:text-muted-foreground/60"
                   />
                 </div>
-                <Button asChild size="lg" className="h-16 px-8 rounded-none bg-foreground text-background hover:bg-brand hover:text-brand-foreground font-display tracking-wide text-base group">
+                <Button asChild size="lg" className="h-16 px-8 rounded-none bg-accent-orange text-accent-orange-foreground hover:bg-foreground hover:text-background font-display tracking-wide text-base group shadow-[0_15px_40px_-10px_oklch(0.72_0.19_45/0.6)]">
                   <Link to="/catalog">
                     НАЙТИ
                     <ArrowUpRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
@@ -118,35 +120,35 @@ function HomePage() {
               </div>
 
               <div className="mt-5 flex flex-wrap gap-x-6 gap-y-2 text-xs font-mono text-muted-foreground uppercase tracking-wider">
-                <span><span className="text-brand">⌘K</span> быстрый поиск</span>
-                <span><span className="text-brand">↵</span> отправить</span>
-                <span><span className="text-brand">●</span> 40 132 SKU индексировано</span>
+                <span><span className="text-accent-orange font-bold">⌘K</span> быстрый поиск</span>
+                <span><span className="text-accent-orange font-bold">↵</span> отправить</span>
+                <span><span className="text-brand font-bold">●</span> 40 132 SKU индексировано</span>
               </div>
             </div>
 
             {/* Боковая статистика — стек */}
             <div className="hidden lg:flex flex-col gap-1 font-mono text-right">
               <div className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground">в реальном времени</div>
-              <div className="font-display text-6xl font-bold tabular-nums text-brand leading-none">40K+</div>
+              <div className="font-display text-6xl font-bold tabular-nums text-accent-orange leading-none">40K+</div>
               <div className="text-xs text-muted-foreground">позиций в наличии</div>
               <div className="mt-3 h-px w-full bg-border" />
-              <div className="font-display text-3xl font-bold tabular-nums leading-none mt-3">~ 30 сек</div>
+              <div className="font-display text-3xl font-bold tabular-nums leading-none mt-3 text-brand">~ 30 сек</div>
               <div className="text-xs text-muted-foreground">от запроса до КП</div>
             </div>
           </div>
         </div>
 
         {/* TICKER-лента */}
-        <div className="relative border-y border-foreground/15 bg-foreground/[0.03] backdrop-blur overflow-hidden">
+        <div className="relative border-y-2 border-foreground bg-foreground text-background overflow-hidden">
           <div className="flex items-center">
-            <div className="shrink-0 border-r border-foreground/15 bg-brand text-brand-foreground px-4 py-3 font-mono text-xs uppercase tracking-widest flex items-center gap-2">
+            <div className="shrink-0 border-r border-background/20 bg-accent-orange text-accent-orange-foreground px-5 py-3 font-mono text-xs uppercase tracking-widest flex items-center gap-2 font-bold">
               <Radio className="h-3.5 w-3.5 animate-pulse" /> live · stock
             </div>
             <div className="relative flex-1 overflow-hidden">
               <div className="flex gap-10 whitespace-nowrap py-3 animate-[ticker_40s_linear_infinite] font-mono text-sm">
                 {[...tickerItems, ...tickerItems, ...tickerItems].map((t, i) => (
                   <span key={i} className="flex items-center gap-3">
-                    <span className="text-brand">▸</span>
+                    <span className="text-accent-orange">▸</span>
                     {t}
                   </span>
                 ))}
