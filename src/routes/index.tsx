@@ -4,6 +4,9 @@ import { Button } from "@/components/ui/button";
 import { warehouses, brands, reviews, blogPosts } from "@/data/mock";
 import { formatNumber, formatDate } from "@/lib/format";
 import heroImage from "@/assets/hero-hitech.jpg";
+import sitrakTruck1 from "@/assets/sitrak-truck-1.jpg";
+import sitrakTruck2 from "@/assets/sitrak-truck-2.jpg";
+import sitrakFleet from "@/assets/sitrak-fleet.jpg";
 
 export const Route = createFileRoute("/")({
   head: () => ({
