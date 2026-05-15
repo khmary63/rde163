@@ -7,6 +7,7 @@ import heroImage from "@/assets/hero-hitech.jpg";
 import sitrakTruck1 from "@/assets/sitrak-truck-1.jpg";
 import sitrakTruck2 from "@/assets/sitrak-truck-2.jpg";
 import sitrakFleet from "@/assets/sitrak-fleet.jpg";
+import sitrakRoadVideo from "@/assets/sitrak-road.mp4.asset.json";
 
 export const Route = createFileRoute("/")({
   head: () => ({
