@@ -275,7 +275,7 @@ function HomePage() {
           <div className="space-y-3">
             <div className="font-mono text-[11px] text-brand uppercase tracking-[0.3em]">/ 03 · partners</div>
             <div className="font-display font-bold leading-[0.85]">
-              <div className="text-7xl lg:text-9xl tabular-nums">10<span className="text-brand">+</span></div>
+              <div className="text-7xl lg:text-9xl tabular-nums">10<span className="text-accent-blue">+</span></div>
               <div className="text-xl lg:text-2xl text-muted-foreground mt-2">брендов · прямые поставки</div>
             </div>
           </div>
