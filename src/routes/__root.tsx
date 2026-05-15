@@ -4,11 +4,16 @@ import {
   Link,
   createRootRouteWithContext,
   useRouter,
+  useRouterState,
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
 
 import appCss from "../styles.css?url";
+import { SiteHeader } from "@/components/site/SiteHeader";
+import { SiteFooter } from "@/components/site/SiteFooter";
+import { FeedbackWidget } from "@/components/site/FeedbackWidget";
+import { Toaster } from "@/components/ui/sonner";
 
 function NotFoundComponent() {
   return (
@@ -72,11 +77,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
-      { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { title: "ГРОСС Запчасти — запчасти для китайской спецтехники и грузовиков" },
+      { name: "description", content: "Каталог 40 000+ позиций, 8 складов по РФ, персональные цены для юрлиц. Заявка менеджеру за 30 секунд." },
+      { name: "author", content: "ООО «Русский дом экспорта»" },
+      { property: "og:title", content: "ГРОСС Запчасти — B2B каталог запчастей" },
+      { property: "og:description", content: "Запчасти для SDLG, XCMG, Shantui, Shacman, HOWO. Наличие, сроки, персональные скидки." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
@@ -96,7 +101,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="ru" className="dark">
       <head>
         <HeadContent />
       </head>
@@ -110,10 +115,21 @@ function RootShell({ children }: { children: React.ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const isAdmin = pathname.startsWith("/admin");
+  const isAuth = pathname === "/login" || pathname === "/register";
 
   return (
     <QueryClientProvider client={queryClient}>
-      <Outlet />
+      <div className="flex min-h-screen flex-col bg-background">
+        {!isAdmin && !isAuth && <SiteHeader />}
+        <main className="flex-1">
+          <Outlet />
+        </main>
+        {!isAdmin && !isAuth && <SiteFooter />}
+        {!isAdmin && <FeedbackWidget />}
+        <Toaster />
+      </div>
     </QueryClientProvider>
   );
 }
