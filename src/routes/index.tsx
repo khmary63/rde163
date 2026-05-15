@@ -7,6 +7,7 @@ import heroImage from "@/assets/hero-hitech.jpg";
 import sitrakTruck1 from "@/assets/sitrak-truck-1.jpg";
 import sitrakTruck2 from "@/assets/sitrak-truck-2.jpg";
 import sitrakFleet from "@/assets/sitrak-fleet.jpg";
+import sitrakRoadVideo from "@/assets/sitrak-road.mp4.asset.json";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -43,19 +44,23 @@ function HomePage() {
     <div className="overflow-hidden">
       {/* ============== HI-TECH HERO ============== */}
       <section className="relative">
-        {/* Фоновая подложка — Sitrak C7H */}
-        <div className="absolute inset-0">
-          <img
-            src={sitrakTruck1}
-            alt="Грузовик SITRAK C7H"
-            className="h-full w-full object-cover object-right"
+        {/* Динамическая видео-подложка — SITRAK на горной дороге */}
+        <div className="absolute inset-0 overflow-hidden bg-accent-blue">
+          <video
+            src={sitrakRoadVideo.url}
+            autoPlay
+            muted
+            loop
+            playsInline
+            poster={sitrakTruck1}
+            className="h-full w-full object-cover"
           />
           {/* Светлый градиент-вуаль слева, чтобы текст читался */}
-          <div className="absolute inset-0 bg-[linear-gradient(95deg,oklch(0.99_0.002_240/0.98)_0%,oklch(0.99_0.002_240/0.92)_38%,oklch(0.99_0.002_240/0.55)_62%,oklch(0.99_0.002_240/0.05)_100%)]" />
-          <div className="absolute inset-0 grid-bg opacity-30" />
-          {/* Оранжевый блик-акцент */}
+          <div className="absolute inset-0 bg-[linear-gradient(95deg,oklch(0.99_0.002_240/0.96)_0%,oklch(0.99_0.002_240/0.85)_38%,oklch(0.99_0.002_240/0.4)_62%,oklch(0.42_0.18_258/0.2)_100%)]" />
+          <div className="absolute inset-0 grid-bg opacity-25" />
+          {/* Цветные блики */}
           <div className="absolute -bottom-32 -left-32 h-[420px] w-[420px] rounded-full bg-accent-orange/25 blur-3xl" />
-          <div className="absolute top-10 right-1/3 h-[300px] w-[300px] rounded-full bg-brand/20 blur-3xl" />
+          <div className="absolute top-10 right-1/4 h-[340px] w-[340px] rounded-full bg-accent-blue/35 blur-3xl" />
         </div>
 
         {/* HUD-углы */}
@@ -132,7 +137,7 @@ function HomePage() {
               <div className="font-display text-6xl font-bold tabular-nums text-accent-orange leading-none">40K+</div>
               <div className="text-xs text-muted-foreground">позиций в наличии</div>
               <div className="mt-3 h-px w-full bg-border" />
-              <div className="font-display text-3xl font-bold tabular-nums leading-none mt-3 text-brand">~ 30 сек</div>
+              <div className="font-display text-3xl font-bold tabular-nums leading-none mt-3 text-accent-blue">~ 30 сек</div>
               <div className="text-xs text-muted-foreground">от запроса до КП</div>
             </div>
           </div>
@@ -270,7 +275,7 @@ function HomePage() {
           <div className="space-y-3">
             <div className="font-mono text-[11px] text-brand uppercase tracking-[0.3em]">/ 03 · partners</div>
             <div className="font-display font-bold leading-[0.85]">
-              <div className="text-7xl lg:text-9xl tabular-nums">10<span className="text-brand">+</span></div>
+              <div className="text-7xl lg:text-9xl tabular-nums">10<span className="text-accent-blue">+</span></div>
               <div className="text-xl lg:text-2xl text-muted-foreground mt-2">брендов · прямые поставки</div>
             </div>
           </div>
