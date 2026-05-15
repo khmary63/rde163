@@ -1,0 +1,63 @@
+import { Link } from "@tanstack/react-router";
+import { Phone, Mail, MapPin, Send, MessageCircle } from "lucide-react";
+import { adminContact } from "@/data/mock";
+
+export function SiteFooter() {
+  return (
+    <footer className="border-t border-border/60 bg-surface/40 mt-24">
+      <div className="mx-auto max-w-[1400px] px-4 py-14 grid gap-10 md:grid-cols-4">
+        <div className="space-y-4">
+          <div className="flex items-center gap-2">
+            <div className="flex h-9 w-9 items-center justify-center bg-brand text-brand-foreground font-display font-bold text-lg">Г</div>
+            <div className="flex flex-col leading-tight">
+              <span className="font-display font-bold text-lg tracking-wide">ГРОСС</span>
+              <span className="text-[10px] text-muted-foreground tracking-[0.2em]">ЗАПЧАСТИ</span>
+            </div>
+          </div>
+          <p className="text-sm text-muted-foreground leading-relaxed">
+            ООО «Русский дом экспорта». Запчасти для китайской спецтехники и грузовиков. 8 складов по РФ, 40 000+ позиций, прямые поставки.
+          </p>
+        </div>
+
+        <div className="space-y-3">
+          <h4 className="font-display text-sm tracking-wide text-foreground/80 uppercase">Магазин</h4>
+          <ul className="space-y-2 text-sm">
+            <li><Link to="/catalog" className="text-muted-foreground hover:text-brand transition-colors">Каталог</Link></li>
+            <li><Link to="/cart" className="text-muted-foreground hover:text-brand transition-colors">Корзина</Link></li>
+            <li><Link to="/account" className="text-muted-foreground hover:text-brand transition-colors">Личный кабинет</Link></li>
+            <li><Link to="/login" className="text-muted-foreground hover:text-brand transition-colors">Войти / Регистрация</Link></li>
+          </ul>
+        </div>
+
+        <div className="space-y-3">
+          <h4 className="font-display text-sm tracking-wide text-foreground/80 uppercase">Информация</h4>
+          <ul className="space-y-2 text-sm">
+            <li><Link to="/blog" className="text-muted-foreground hover:text-brand transition-colors">Блог</Link></li>
+            <li><Link to="/reviews" className="text-muted-foreground hover:text-brand transition-colors">Отзывы</Link></li>
+            <li><Link to="/contacts" className="text-muted-foreground hover:text-brand transition-colors">Контакты</Link></li>
+          </ul>
+        </div>
+
+        <div className="space-y-3">
+          <h4 className="font-display text-sm tracking-wide text-foreground/80 uppercase">Контакты</h4>
+          <ul className="space-y-2 text-sm text-muted-foreground">
+            <li className="flex items-start gap-2"><Phone className="h-4 w-4 text-brand mt-0.5 shrink-0" /><a href={`tel:${adminContact.phone}`} className="hover:text-brand">{adminContact.phone}</a></li>
+            <li className="flex items-start gap-2"><Mail className="h-4 w-4 text-brand mt-0.5 shrink-0" /><a href={`mailto:${adminContact.email}`} className="hover:text-brand">{adminContact.email}</a></li>
+            <li className="flex items-start gap-2"><MapPin className="h-4 w-4 text-brand mt-0.5 shrink-0" /><span>Самара, ул. Демократическая, 63а</span></li>
+          </ul>
+          <div className="flex items-center gap-3 pt-1">
+            <a href="#" aria-label="Telegram" className="text-muted-foreground hover:text-brand transition-colors"><Send className="h-4 w-4" /></a>
+            <a href="#" aria-label="WhatsApp" className="text-muted-foreground hover:text-brand transition-colors"><MessageCircle className="h-4 w-4" /></a>
+          </div>
+        </div>
+      </div>
+
+      <div className="border-t border-border/40">
+        <div className="mx-auto max-w-[1400px] px-4 py-5 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-muted-foreground">
+          <span>© 2026 ООО «Русский дом экспорта». Все права защищены.</span>
+          <span className="font-mono">ИНН 6315000000 · ОГРН 1156315000000</span>
+        </div>
+      </div>
+    </footer>
+  );
+}
