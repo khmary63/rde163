@@ -77,10 +77,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "ГРОСС Запчасти — запчасти для китайской спецтехники и грузовиков" },
+      { title: "Русский Дом Экспорта — запчасти для китайской спецтехники и грузовиков" },
       { name: "description", content: "Каталог 40 000+ позиций, 8 складов по РФ, персональные цены для юрлиц. Заявка менеджеру за 30 секунд." },
-      { name: "author", content: "ООО «Русский дом экспорта»" },
-      { property: "og:title", content: "ГРОСС Запчасти — B2B каталог запчастей" },
+      { name: "author", content: "ООО «Русский Дом Экспорта»" },
+      { property: "og:title", content: "Русский Дом Экспорта — B2B каталог запчастей" },
       { property: "og:description", content: "Запчасти для SDLG, XCMG, Shantui, Shacman, HOWO. Наличие, сроки, персональные скидки." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -101,7 +101,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="ru" className="dark">
+    <html lang="ru">
       <head>
         <HeadContent />
       </head>
