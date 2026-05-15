@@ -44,19 +44,23 @@ function HomePage() {
     <div className="overflow-hidden">
       {/* ============== HI-TECH HERO ============== */}
       <section className="relative">
-        {/* Фоновая подложка — Sitrak C7H */}
-        <div className="absolute inset-0">
-          <img
-            src={sitrakTruck1}
-            alt="Грузовик SITRAK C7H"
-            className="h-full w-full object-cover object-right"
+        {/* Динамическая видео-подложка — SITRAK на горной дороге */}
+        <div className="absolute inset-0 overflow-hidden bg-accent-blue">
+          <video
+            src={sitrakRoadVideo.url}
+            autoPlay
+            muted
+            loop
+            playsInline
+            poster={sitrakTruck1}
+            className="h-full w-full object-cover"
           />
           {/* Светлый градиент-вуаль слева, чтобы текст читался */}
-          <div className="absolute inset-0 bg-[linear-gradient(95deg,oklch(0.99_0.002_240/0.98)_0%,oklch(0.99_0.002_240/0.92)_38%,oklch(0.99_0.002_240/0.55)_62%,oklch(0.99_0.002_240/0.05)_100%)]" />
-          <div className="absolute inset-0 grid-bg opacity-30" />
-          {/* Оранжевый блик-акцент */}
+          <div className="absolute inset-0 bg-[linear-gradient(95deg,oklch(0.99_0.002_240/0.96)_0%,oklch(0.99_0.002_240/0.85)_38%,oklch(0.99_0.002_240/0.4)_62%,oklch(0.42_0.18_258/0.2)_100%)]" />
+          <div className="absolute inset-0 grid-bg opacity-25" />
+          {/* Цветные блики */}
           <div className="absolute -bottom-32 -left-32 h-[420px] w-[420px] rounded-full bg-accent-orange/25 blur-3xl" />
-          <div className="absolute top-10 right-1/3 h-[300px] w-[300px] rounded-full bg-brand/20 blur-3xl" />
+          <div className="absolute top-10 right-1/4 h-[340px] w-[340px] rounded-full bg-accent-blue/35 blur-3xl" />
         </div>
 
         {/* HUD-углы */}
