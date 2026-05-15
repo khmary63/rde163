@@ -401,15 +401,16 @@ function HomePage() {
 }
 
 /* HUD-уголки */
-function Corner({ className = "", pos }: { className?: string; pos: "tl" | "tr" | "bl" | "br" }) {
+function Corner({ className = "", pos, color = "brand" }: { className?: string; pos: "tl" | "tr" | "bl" | "br"; color?: "brand" | "orange" }) {
   const map = {
     tl: "border-l border-t",
     tr: "border-r border-t",
     bl: "border-l border-b",
     br: "border-r border-b",
   };
+  const colorClass = color === "orange" ? "border-accent-orange" : "border-brand";
   return (
-    <div className={`pointer-events-none absolute z-10 h-6 w-6 border-brand ${map[pos]} ${className}`} />
+    <div className={`pointer-events-none absolute z-10 h-6 w-6 ${colorClass} ${map[pos]} ${className}`} />
   );
 }
 
