@@ -148,8 +148,8 @@
 @layer utilities {
   .grid-bg {
     background-image:
-      linear-gradient(to right, oklch(0.30 0.013 250 / 18%) 1px, transparent 1px),
-      linear-gradient(to bottom, oklch(0.30 0.013 250 / 18%) 1px, transparent 1px);
+      linear-gradient(to right, oklch(0.20 0.013 250 / 8%) 1px, transparent 1px),
+      linear-gradient(to bottom, oklch(0.20 0.013 250 / 8%) 1px, transparent 1px);
     background-size: 48px 48px;
   }
 
