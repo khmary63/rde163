@@ -169,7 +169,7 @@ function HomePage() {
           {/* Заголовок секции — большой */}
           <div className="lg:col-span-12 mb-6 flex items-end justify-between gap-6 flex-wrap">
             <div>
-              <div className="font-mono text-[11px] text-brand uppercase tracking-[0.3em] mb-3">/ 02 · workflow</div>
+              <div className="font-mono text-[11px] text-accent-blue uppercase tracking-[0.3em] mb-3">/ 02 · workflow</div>
               <h2 className="font-display text-4xl lg:text-6xl font-bold leading-[0.95]">
                 Минимум кликов.<br />
                 <span className="text-muted-foreground/60">Максимум фактов.</span>
@@ -273,7 +273,7 @@ function HomePage() {
       <section className="relative border-y border-border bg-surface/50">
         <div className="mx-auto max-w-[1480px] px-6 py-20 grid lg:grid-cols-[auto_1fr] gap-12 items-center">
           <div className="space-y-3">
-            <div className="font-mono text-[11px] text-brand uppercase tracking-[0.3em]">/ 03 · partners</div>
+            <div className="font-mono text-[11px] text-accent-blue uppercase tracking-[0.3em]">/ 03 · partners</div>
             <div className="font-display font-bold leading-[0.85]">
               <div className="text-7xl lg:text-9xl tabular-nums">10<span className="text-accent-blue">+</span></div>
               <div className="text-xl lg:text-2xl text-muted-foreground mt-2">брендов · прямые поставки</div>
@@ -297,7 +297,7 @@ function HomePage() {
       <section className="mx-auto max-w-[1480px] px-6 py-24 lg:py-32">
         <div className="flex items-end justify-between mb-12 gap-6 flex-wrap">
           <div>
-            <div className="font-mono text-[11px] text-brand uppercase tracking-[0.3em] mb-3">/ 04 · why us</div>
+            <div className="font-mono text-[11px] text-accent-blue uppercase tracking-[0.3em] mb-3">/ 04 · why us</div>
             <h2 className="font-display text-4xl lg:text-6xl font-bold leading-[0.95]">
               Конкретика,<br />не обещания.
             </h2>
@@ -313,10 +313,10 @@ function HomePage() {
               <div className="absolute top-4 right-4 font-mono text-[10px] tracking-widest text-muted-foreground/60">
                 {t.code}
               </div>
-              <t.icon className="h-7 w-7 text-foreground group-hover:text-brand transition-colors mb-6" strokeWidth={1.5} />
+              <t.icon className="h-7 w-7 text-foreground group-hover:text-accent-blue transition-colors mb-6" strokeWidth={1.5} />
               <div className="font-display text-xl mb-2">{t.title}</div>
               <div className="text-sm text-muted-foreground leading-relaxed">{t.text}</div>
-              <div className="absolute bottom-0 left-0 h-px w-0 bg-brand group-hover:w-full transition-all duration-500" />
+              <div className="absolute bottom-0 left-0 h-px w-0 bg-accent-blue group-hover:w-full transition-all duration-500" />
             </div>
           ))}
         </div>
@@ -330,14 +330,14 @@ function HomePage() {
             backgroundSize: '24px 24px',
           }}
         />
-        <div className="absolute -top-20 -right-20 h-[500px] w-[500px] rounded-full bg-brand/20 blur-3xl" />
+        <div className="absolute -top-20 -right-20 h-[500px] w-[500px] rounded-full bg-accent-blue/30 blur-3xl" />
 
         <div className="relative mx-auto max-w-[1480px] px-6 py-24 grid lg:grid-cols-[1.2fr_1fr] gap-14 items-center">
           <div className="space-y-6">
-            <div className="font-mono text-[11px] text-brand uppercase tracking-[0.3em]">/ 05 · custom request</div>
+            <div className="font-mono text-[11px] text-accent-blue uppercase tracking-[0.3em]">/ 05 · custom request</div>
             <h2 className="font-display text-4xl lg:text-6xl font-bold leading-[0.95]">
               Не нашли деталь?<br />
-              <span className="text-brand">Найдём за вас.</span>
+              <span className="text-accent-blue">Найдём за вас.</span>
             </h2>
             <p className="text-lg text-background/70 max-w-xl leading-relaxed">
               Загрузите артикул, список или фото — менеджер подберёт оригинал или аналог в течение рабочего дня.
@@ -345,23 +345,23 @@ function HomePage() {
             <ul className="space-y-3 text-sm text-background/85">
               {["Подбор по фото и серийному номеру", "Сравнение оригинал ↔ аналог", "Расчёт логистики до вашего города"].map((x) => (
                 <li key={x} className="flex items-center gap-3">
-                  <span className="h-px w-6 bg-brand" />{x}
+                  <span className="h-px w-6 bg-accent-blue" />{x}
                 </li>
               ))}
             </ul>
           </div>
 
-          <form className="relative space-y-3 bg-background text-foreground p-8 border border-brand/30 shadow-[0_30px_80px_-20px_oklch(0.7_0.14_220/0.4)]" onSubmit={(e) => e.preventDefault()}>
+          <form className="relative space-y-3 bg-background text-foreground p-8 border border-accent-blue/40 shadow-[0_30px_80px_-20px_oklch(0.42 0.18 258 / 0.5)]" onSubmit={(e) => e.preventDefault()}>
             <div className="flex items-center justify-between mb-4">
               <span className="font-mono text-xs uppercase tracking-widest text-muted-foreground">// заявка</span>
               <span className="font-mono text-xs text-brand">REQ-{Math.floor(Math.random() * 9000 + 1000)}</span>
             </div>
-            <input type="text" placeholder="Артикул или название детали" className="w-full h-12 border border-border bg-background px-4 text-sm focus:outline-none focus:border-brand rounded-none" />
-            <input type="tel" placeholder="Ваш телефон" className="w-full h-12 border border-border bg-background px-4 text-sm focus:outline-none focus:border-brand rounded-none" />
-            <button type="button" className="w-full h-12 border border-dashed border-border bg-background text-sm text-muted-foreground hover:border-brand hover:text-brand transition-colors flex items-center justify-center gap-2 rounded-none">
+            <input type="text" placeholder="Артикул или название детали" className="w-full h-12 border border-border bg-background px-4 text-sm focus:outline-none focus:border-accent-blue rounded-none" />
+            <input type="tel" placeholder="Ваш телефон" className="w-full h-12 border border-border bg-background px-4 text-sm focus:outline-none focus:border-accent-blue rounded-none" />
+            <button type="button" className="w-full h-12 border border-dashed border-border bg-background text-sm text-muted-foreground hover:border-accent-blue hover:text-accent-blue transition-colors flex items-center justify-center gap-2 rounded-none">
               <Upload className="h-4 w-4" />Прикрепить файл или фото
             </button>
-            <Button type="submit" size="lg" className="w-full rounded-none bg-foreground text-background hover:bg-brand hover:text-brand-foreground font-display tracking-wide h-12">
+            <Button type="submit" size="lg" className="w-full rounded-none bg-foreground text-background hover:bg-accent-blue hover:text-accent-blue-foreground font-display tracking-wide h-12">
               ОТПРАВИТЬ → МЕНЕДЖЕР
             </Button>
           </form>
@@ -372,7 +372,7 @@ function HomePage() {
       <section className="mx-auto max-w-[1480px] px-6 py-24 lg:py-32">
         <div className="flex items-end justify-between mb-12 gap-6 flex-wrap">
           <div>
-            <div className="font-mono text-[11px] text-brand uppercase tracking-[0.3em] mb-3">/ 06 · feedback</div>
+            <div className="font-mono text-[11px] text-accent-blue uppercase tracking-[0.3em] mb-3">/ 06 · feedback</div>
             <h2 className="font-display text-4xl lg:text-6xl font-bold leading-[0.95]">Что говорят<br/>покупатели</h2>
           </div>
           <Button asChild variant="outline" className="rounded-none border-foreground hover:bg-foreground hover:text-background h-12 px-6">
@@ -383,7 +383,7 @@ function HomePage() {
           {reviews.slice(0, 3).map((r) => (
             <div key={r.id} className="bg-background p-8 space-y-5">
               <div className="flex items-center justify-between">
-                <div className="flex gap-0.5 text-brand text-lg">{Array.from({ length: r.rating }).map((_, i) => <span key={i}>★</span>)}</div>
+                <div className="flex gap-0.5 text-accent-orange text-lg">{Array.from({ length: r.rating }).map((_, i) => <span key={i}>★</span>)}</div>
                 <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">verified</span>
               </div>
               <p className="text-base leading-relaxed text-foreground/90">«{r.text}»</p>
@@ -404,7 +404,7 @@ function HomePage() {
         <div className="mx-auto max-w-[1480px] px-6 py-24">
           <div className="flex items-end justify-between mb-12 gap-6 flex-wrap">
             <div>
-              <div className="font-mono text-[11px] text-brand uppercase tracking-[0.3em] mb-3">/ 07 · journal</div>
+              <div className="font-mono text-[11px] text-accent-blue uppercase tracking-[0.3em] mb-3">/ 07 · journal</div>
               <h2 className="font-display text-4xl lg:text-6xl font-bold leading-[0.95]">Экспертный<br/>блог</h2>
             </div>
             <Button asChild variant="outline" className="rounded-none border-foreground hover:bg-foreground hover:text-background h-12 px-6">
@@ -421,7 +421,7 @@ function HomePage() {
                   </div>
                 </div>
                 <div className="p-6 space-y-3 flex-1 flex flex-col">
-                  <h4 className="font-display text-xl leading-tight group-hover:text-brand transition-colors flex-1">{p.title}</h4>
+                  <h4 className="font-display text-xl leading-tight group-hover:text-accent-blue transition-colors flex-1">{p.title}</h4>
                   <p className="text-sm text-muted-foreground line-clamp-2">{p.excerpt}</p>
                   <div className="text-xs font-mono text-muted-foreground pt-2 flex items-center justify-between">
                     <span>{formatDate(p.date)} · {p.readTime} мин</span>
@@ -438,12 +438,12 @@ function HomePage() {
       <section className="border-t border-border">
         <div className="mx-auto max-w-[1480px] px-6 py-24 grid lg:grid-cols-[1fr_1.5fr] gap-12">
           <div className="space-y-7">
-            <div className="font-mono text-[11px] text-brand uppercase tracking-[0.3em]">/ 08 · network</div>
+            <div className="font-mono text-[11px] text-accent-blue uppercase tracking-[0.3em]">/ 08 · network</div>
             <h2 className="font-display text-4xl lg:text-6xl font-bold leading-[0.95]">8 складов<br/>по России</h2>
             <p className="text-muted-foreground text-lg max-w-md">
               Прямая отгрузка с ближайшего склада. Самовывоз или транспортная компания на ваш выбор.
             </p>
-            <Button asChild className="rounded-none bg-foreground text-background hover:bg-brand hover:text-brand-foreground h-12 px-6">
+            <Button asChild className="rounded-none bg-foreground text-background hover:bg-accent-blue hover:text-accent-blue-foreground h-12 px-6">
               <Link to="/contacts">Все контакты <ArrowUpRight className="ml-2 h-4 w-4" /></Link>
             </Button>
           </div>
@@ -453,10 +453,10 @@ function HomePage() {
               <li key={w.id} className="bg-background p-6 flex items-start gap-4 group hover:bg-surface transition-colors">
                 <div className="font-mono text-xs text-muted-foreground tabular-nums">/{String(i + 1).padStart(2, '0')}</div>
                 <div className="flex-1">
-                  <div className="font-display text-xl mb-1 group-hover:text-brand transition-colors">{w.city}</div>
+                  <div className="font-display text-xl mb-1 group-hover:text-accent-blue transition-colors">{w.city}</div>
                   <div className="text-xs text-muted-foreground leading-relaxed">{w.address}</div>
                 </div>
-                <MapPin className="h-4 w-4 text-foreground/30 group-hover:text-brand transition-colors mt-1" />
+                <MapPin className="h-4 w-4 text-foreground/30 group-hover:text-accent-blue transition-colors mt-1" />
               </li>
             ))}
           </ul>
