@@ -165,6 +165,10 @@
   .text-brand { color: var(--brand); }
   .bg-brand { background-color: var(--brand); }
   .border-brand { border-color: var(--brand); }
+  .text-accent-orange { color: var(--accent-orange); }
+  .bg-accent-orange { background-color: var(--accent-orange); }
+  .border-accent-orange { border-color: var(--accent-orange); }
+  .text-accent-orange-foreground { color: var(--accent-orange-foreground); }
 }
 
 @keyframes ticker {
