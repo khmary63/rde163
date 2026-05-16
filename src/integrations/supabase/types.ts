@@ -364,6 +364,38 @@ export type Database = {
           },
         ]
       }
+      product_crosses: {
+        Row: {
+          created_at: string
+          cross_number: string
+          id: string
+          note: string | null
+          product_id: string
+        }
+        Insert: {
+          created_at?: string
+          cross_number: string
+          id?: string
+          note?: string | null
+          product_id: string
+        }
+        Update: {
+          created_at?: string
+          cross_number?: string
+          id?: string
+          note?: string | null
+          product_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_crosses_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       products: {
         Row: {
           base_price: number
