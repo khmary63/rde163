@@ -2,7 +2,7 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { blogPosts } from "@/data/mock";
 import { formatDate } from "@/lib/format";
 
-const BASE = "https://rde163.lovable.app";
+const BASE = "https://rde163.ru";
 
 export const Route = createFileRoute("/blog/$slug")({
   head: ({ params }) => {
@@ -35,9 +35,11 @@ export const Route = createFileRoute("/blog/$slug")({
         { property: "og:title", content: post.title },
         { property: "og:description", content: post.excerpt },
         { property: "og:type", content: "article" },
+        { property: "og:url", content: `${BASE}/blog/${post.slug}` },
         { property: "og:image", content: post.cover },
         { name: "twitter:image", content: post.cover },
       ],
+      links: [{ rel: "canonical", href: `${BASE}/blog/${post.slug}` }],
       scripts: [
         { type: "application/ld+json", children: JSON.stringify(jsonLd) },
         { type: "application/ld+json", children: JSON.stringify(breadcrumbs) },

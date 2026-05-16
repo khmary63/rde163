@@ -3,7 +3,16 @@ import { blogPosts } from "@/data/mock";
 import { formatDate } from "@/lib/format";
 
 export const Route = createFileRoute("/blog/")({
-  head: () => ({ meta: [{ title: "Блог — ГРОСС Запчасти" }] }),
+  head: () => ({
+    meta: [
+      { title: "Блог РДЭ — обзоры техники и запчастей" },
+      { name: "description", content: "Статьи о китайской спецтехнике и грузовиках: разборы моделей, советы по эксплуатации, обновления каталога РДЭ." },
+      { property: "og:title", content: "Блог РДЭ" },
+      { property: "og:description", content: "Обзоры техники, советы по эксплуатации и новости каталога." },
+      { property: "og:url", content: "https://rde163.ru/blog" },
+    ],
+    links: [{ rel: "canonical", href: "https://rde163.ru/blog" }],
+  }),
   component: () => (
     <div className="mx-auto max-w-[1400px] px-4 py-16">
       <h1 className="font-display text-4xl mb-8">Блог</h1>
