@@ -81,18 +81,10 @@ function CatalogUploadPage() {
 
   const warehouseCodes = useMemo(() => (warehousesQ.data ?? []).map((w) => w.code), [warehousesQ.data]);
 
-  const handleFile = async (file: File) => {
-    const text = await file.text();
+  const parseRows = (header: string[], dataRows: string[][]) => {
     const errors: string[] = [];
-    const firstLine = text.split(/\r?\n/, 1)[0] ?? "";
-    const delim = firstLine.includes(";") && !firstLine.includes(",") ? ";" : ",";
-    const lines = text.split(/\r?\n/).filter((l) => l.trim().length > 0);
-    if (lines.length < 2) {
-      toast.error("Файл пустой или только заголовок");
-      return;
-    }
-    const header = splitLine(lines[0], delim).map((h) => h.toLowerCase().replace(/^\ufeff/, "").trim());
-    const idx = (names: string[]) => header.findIndex((h) => names.includes(h));
+    const idx = (names: string[]) =>
+      header.findIndex((h) => names.includes(h.toLowerCase().replace(/^\ufeff/, "").trim()));
 
     const skuI = idx(["sku", "артикул"]);
     const nameI = idx(["name", "наименование", "название"]);
@@ -103,50 +95,90 @@ function CatalogUploadPage() {
     const catI = idx(["category", "категория"]);
     const descI = idx(["description", "описание"]);
 
+    const lowerHeader = header.map((h) => h.toLowerCase().replace(/^\ufeff/, "").trim());
     const whIndexMap = new Map<string, number>();
     for (const code of warehouseCodes) {
-      const i = header.findIndex((h) => h === `qty_${code}` || h === code);
+      const i = lowerHeader.findIndex((h) => h === `qty_${code}` || h === code);
       if (i >= 0) whIndexMap.set(code, i);
     }
 
     if (skuI === -1 || nameI === -1 || brandI === -1 || priceI === -1) {
       toast.error("Не найдены обязательные колонки", { description: "Нужны: sku, name, brand, price" });
-      return;
+      return null;
     }
 
     const rows: ParsedRow[] = [];
-    for (let li = 1; li < lines.length; li++) {
-      const cols = splitLine(lines[li], delim);
-      const sku = (cols[skuI] ?? "").trim();
-      const name = (cols[nameI] ?? "").trim();
-      const brand = (cols[brandI] ?? "").trim();
-      const price = normNum(cols[priceI] ?? "0");
+    for (let li = 0; li < dataRows.length; li++) {
+      const cols = dataRows[li];
+      const sku = (cols[skuI] ?? "").toString().trim();
+      const name = (cols[nameI] ?? "").toString().trim();
+      const brand = (cols[brandI] ?? "").toString().trim();
+      const price = normNum((cols[priceI] ?? "0").toString());
       if (!sku || !name || !brand) {
-        errors.push(`Строка ${li + 1}: пустой sku / name / brand`);
+        errors.push(`Строка ${li + 2}: пустой sku / name / brand`);
         continue;
       }
-      const origRaw = origI >= 0 ? (cols[origI] ?? "").trim().toLowerCase() : "original";
+      const origRaw = origI >= 0 ? (cols[origI] ?? "").toString().trim().toLowerCase() : "original";
       const isOriginal = !["analog", "аналог", "false", "0", "no", "нет"].includes(origRaw);
       const stocks: Record<string, number> = {};
       whIndexMap.forEach((colIdx, code) => {
-        const q = normNum(cols[colIdx] ?? "0");
+        const q = normNum((cols[colIdx] ?? "0").toString());
         if (q > 0) stocks[code] = Math.floor(q);
       });
       rows.push({
-        line: li + 1,
+        line: li + 2,
         sku,
         name,
         brand,
         is_original: isOriginal,
         base_price: price,
-        oem: oemI >= 0 ? (cols[oemI] ?? "").trim() || null : null,
-        category: catI >= 0 ? (cols[catI] ?? "").trim() || null : null,
-        description: descI >= 0 ? (cols[descI] ?? "").trim() || null : null,
+        oem: oemI >= 0 ? (cols[oemI] ?? "").toString().trim() || null : null,
+        category: catI >= 0 ? (cols[catI] ?? "").toString().trim() || null : null,
+        description: descI >= 0 ? (cols[descI] ?? "").toString().trim() || null : null,
         stocks,
       });
     }
 
-    setParsed({ rows, errors, whCodes: Array.from(whIndexMap.keys()) });
+    return { rows, errors, whCodes: Array.from(whIndexMap.keys()) };
+  };
+
+  const handleFile = async (file: File) => {
+    const lower = file.name.toLowerCase();
+    const isExcel = lower.endsWith(".xlsx") || lower.endsWith(".xls");
+
+    let header: string[] = [];
+    let dataRows: string[][] = [];
+
+    if (isExcel) {
+      const buf = await file.arrayBuffer();
+      const wb = XLSX.read(buf, { type: "array" });
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      if (!ws) {
+        toast.error("Не удалось прочитать первый лист Excel");
+        return;
+      }
+      const aoa = XLSX.utils.sheet_to_json<unknown[]>(ws, { header: 1, blankrows: false, defval: "" });
+      if (aoa.length < 2) {
+        toast.error("Файл пустой или только заголовок");
+        return;
+      }
+      header = (aoa[0] as unknown[]).map((c) => (c ?? "").toString());
+      dataRows = aoa.slice(1).map((row) => (row as unknown[]).map((c) => (c ?? "").toString()));
+    } else {
+      const text = await file.text();
+      const firstLine = text.split(/\r?\n/, 1)[0] ?? "";
+      const delim = firstLine.includes(";") && !firstLine.includes(",") ? ";" : ",";
+      const lines = text.split(/\r?\n/).filter((l) => l.trim().length > 0);
+      if (lines.length < 2) {
+        toast.error("Файл пустой или только заголовок");
+        return;
+      }
+      header = splitLine(lines[0], delim);
+      dataRows = lines.slice(1).map((l) => splitLine(l, delim));
+    }
+
+    const result = parseRows(header, dataRows);
+    if (result) setParsed(result);
   };
 
   const handleImport = async () => {
