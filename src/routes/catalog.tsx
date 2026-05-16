@@ -95,7 +95,22 @@ function useProducts(filters: Filters) {
 
       if (filters.search.trim()) {
         const s = filters.search.trim().replace(/[%_]/g, " ");
-        q = q.or(`name.ilike.%${s}%,sku.ilike.%${s}%`);
+        // Параллельно ищем совпадения в кросс-номерах
+        const { data: crossMatches } = await supabase
+          .from("product_crosses")
+          .select("product_id")
+          .ilike("cross_number", `%${s}%`)
+          .limit(500);
+        const crossIds = (crossMatches ?? []).map((r) => r.product_id).filter(Boolean);
+        const orParts = [
+          `name.ilike.%${s}%`,
+          `sku.ilike.%${s}%`,
+          `oem.ilike.%${s}%`,
+        ];
+        if (crossIds.length > 0) {
+          orParts.push(`id.in.(${crossIds.join(",")})`);
+        }
+        q = q.or(orParts.join(","));
       }
       if (filters.brandIds.length > 0) {
         q = q.in("brand_id", filters.brandIds);
@@ -170,7 +185,7 @@ function CatalogPage() {
               setSearch(e.target.value);
               setPage(0);
             }}
-            placeholder="Поиск по артикулу или названию"
+            placeholder="Артикул, OEM, кросс-номер или название"
             className="pl-9"
           />
         </div>
