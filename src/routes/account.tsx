@@ -1,8 +1,9 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { LogOut, User as UserIcon, Building2, Phone, Mail, Percent, ShoppingBag, FileText, Repeat, BarChart3, Headset } from "lucide-react";
+import { LogOut, User as UserIcon, Building2, Phone, Mail, Percent, ShoppingBag, FileText, Repeat, BarChart3, Headset, ChevronDown, ChevronUp, Package } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 
@@ -84,16 +85,16 @@ function AccountPage() {
             </div>
           </div>
 
+          {/* Мои заявки */}
+          <OrdersSection userId={user.id} />
+
           {/* Разделы */}
           <div className="grid sm:grid-cols-2 gap-3">
-            <NavTile to="/account" icon={ShoppingBag} title="Текущие заказы" desc="Активные заявки и статусы" />
-            <NavTile to="/account" icon={Repeat} title="Покупки" desc="История заказов" />
-            <NavTile to="/account" icon={FileText} title="Документы" desc="Счета и счёт-фактуры" />
-            <NavTile to="/account" icon={Repeat} title="Шаблоны" desc="Повторные заказы в один клик" />
-            <NavTile to="/account" icon={BarChart3} title="Дашборд" desc="Статистика и аналитика" />
-            <NavTile to="/account" icon={Headset} title="Личный менеджер" desc="Связь и запросы" />
+            <NavTile to="/catalog" icon={ShoppingBag} title="Каталог" desc="40 000+ позиций" />
+            <NavTile to="/cart" icon={Repeat} title="Корзина" desc="Активная заявка" />
+            <NavTile to="/account" icon={FileText} title="Документы" desc="Скоро" />
+            <NavTile to="/account" icon={BarChart3} title="Дашборд" desc="Скоро" />
           </div>
-          <p className="text-xs text-muted-foreground">Разделы наполняются на следующем этапе.</p>
         </div>
 
         {/* Менеджер */}
@@ -150,6 +151,144 @@ function ManagerCard({ manager }: { manager?: { full_name: string; phone?: strin
         <div className="text-sm text-background/70">
           Менеджер пока не закреплён. Мы свяжемся с вами после первой заявки.
         </div>
+      )}
+    </div>
+  );
+}
+
+const STATUS_LABEL: Record<string, { label: string; cls: string }> = {
+  draft: { label: "Черновик", cls: "bg-muted text-muted-foreground" },
+  submitted: { label: "Отправлена", cls: "bg-brand/15 text-brand" },
+  in_progress: { label: "В работе", cls: "bg-accent-orange/15 text-accent-orange" },
+  invoiced: { label: "Счёт выставлен", cls: "bg-accent-orange/15 text-accent-orange" },
+  paid: { label: "Оплачена", cls: "bg-[oklch(0.70_0.18_145)]/15 text-[oklch(0.55_0.18_145)]" },
+  shipped: { label: "Отгружена", cls: "bg-[oklch(0.70_0.18_145)]/15 text-[oklch(0.55_0.18_145)]" },
+  completed: { label: "Завершена", cls: "bg-[oklch(0.70_0.18_145)]/15 text-[oklch(0.55_0.18_145)]" },
+  cancelled: { label: "Отменена", cls: "bg-destructive/15 text-destructive" },
+};
+
+function OrdersSection({ userId }: { userId: string }) {
+  const [openId, setOpenId] = useState<string | null>(null);
+
+  const { data: orders, isLoading } = useQuery({
+    queryKey: ["orders", userId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("orders")
+        .select("id, number, status, total_amount, created_at, submitted_at, notes, invoice_grouping")
+        .eq("user_id", userId)
+        .order("created_at", { ascending: false })
+        .limit(50);
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  return (
+    <div className="border border-border bg-surface p-6 rounded-md">
+      <div className="flex items-center gap-3 mb-5">
+        <ShoppingBag className="h-5 w-5 text-brand" />
+        <h2 className="font-display text-xl">Мои заявки</h2>
+        {orders && orders.length > 0 && (
+          <span className="ml-auto text-xs text-muted-foreground">{orders.length}</span>
+        )}
+      </div>
+
+      {isLoading ? (
+        <div className="py-8 text-center text-sm text-muted-foreground">Загрузка…</div>
+      ) : !orders || orders.length === 0 ? (
+        <div className="py-8 text-center">
+          <Package className="mx-auto h-10 w-10 text-muted-foreground/50" />
+          <p className="mt-3 text-sm text-muted-foreground">Заявок пока нет</p>
+          <Button asChild size="sm" className="mt-4 bg-brand text-brand-foreground hover:bg-brand/90">
+            <Link to="/catalog">Перейти в каталог</Link>
+          </Button>
+        </div>
+      ) : (
+        <div className="divide-y divide-border rounded-md border border-border bg-background">
+          {orders.map((o) => {
+            const st = STATUS_LABEL[o.status] ?? { label: o.status, cls: "bg-muted" };
+            const isOpen = openId === o.id;
+            return (
+              <div key={o.id}>
+                <button
+                  onClick={() => setOpenId(isOpen ? null : o.id)}
+                  className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-surface/60"
+                >
+                  <div className="font-mono text-xs sm:text-sm font-semibold">{o.number}</div>
+                  <Badge className={`${st.cls} border-0 font-normal`}>{st.label}</Badge>
+                  <div className="ml-auto flex items-center gap-4">
+                    <div className="text-xs text-muted-foreground hidden sm:block">
+                      {new Date(o.created_at).toLocaleDateString("ru-RU", { day: "2-digit", month: "short", year: "numeric" })}
+                    </div>
+                    <div className="font-display text-sm font-semibold whitespace-nowrap">
+                      {Number(o.total_amount).toLocaleString("ru-RU", { maximumFractionDigits: 0 })} ₽
+                    </div>
+                    {isOpen ? <ChevronUp className="h-4 w-4 text-muted-foreground" /> : <ChevronDown className="h-4 w-4 text-muted-foreground" />}
+                  </div>
+                </button>
+                {isOpen && <OrderDetails orderId={o.id} notes={o.notes} />}
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function OrderDetails({ orderId, notes }: { orderId: string; notes: string | null }) {
+  const { data, isLoading } = useQuery({
+    queryKey: ["order-items", orderId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("order_items")
+        .select("id, qty, unit_price, line_total, product:products(name, sku), warehouse:warehouses(name, city)")
+        .eq("order_id", orderId);
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  return (
+    <div className="border-t border-border bg-surface/40 px-4 py-3">
+      {isLoading ? (
+        <div className="py-4 text-center text-xs text-muted-foreground">Загрузка позиций…</div>
+      ) : (
+        <>
+          <div className="overflow-x-auto">
+            <table className="w-full text-xs">
+              <thead className="text-muted-foreground">
+                <tr className="text-left">
+                  <th className="pb-2 pr-3 font-normal">Позиция</th>
+                  <th className="pb-2 pr-3 font-normal">Склад</th>
+                  <th className="pb-2 pr-3 text-right font-normal">Кол-во</th>
+                  <th className="pb-2 pr-3 text-right font-normal">Цена</th>
+                  <th className="pb-2 text-right font-normal">Сумма</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border/60">
+                {data?.map((it) => (
+                  <tr key={it.id}>
+                    <td className="py-2 pr-3">
+                      <div className="font-medium text-foreground">{it.product?.name}</div>
+                      <div className="font-mono text-[11px] text-muted-foreground">{it.product?.sku}</div>
+                    </td>
+                    <td className="py-2 pr-3 text-muted-foreground">{it.warehouse?.city ?? it.warehouse?.name ?? "—"}</td>
+                    <td className="py-2 pr-3 text-right">{it.qty}</td>
+                    <td className="py-2 pr-3 text-right">{Number(it.unit_price).toLocaleString("ru-RU", { maximumFractionDigits: 0 })} ₽</td>
+                    <td className="py-2 text-right font-semibold">{Number(it.line_total).toLocaleString("ru-RU", { maximumFractionDigits: 0 })} ₽</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          {notes && (
+            <div className="mt-3 rounded border border-border/60 bg-background p-2 text-xs">
+              <span className="text-muted-foreground">Комментарий:</span> {notes}
+            </div>
+          )}
+        </>
       )}
     </div>
   );
