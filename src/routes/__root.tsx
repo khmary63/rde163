@@ -15,6 +15,7 @@ import { SiteFooter } from "@/components/site/SiteFooter";
 import { FeedbackWidget } from "@/components/site/FeedbackWidget";
 import { Toaster } from "@/components/ui/sonner";
 import { AuthProvider } from "@/hooks/use-auth";
+import { CartProvider } from "@/hooks/use-cart";
 
 function NotFoundComponent() {
   return (
@@ -127,15 +128,17 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <div className="flex min-h-screen flex-col bg-background">
-          {!isAdmin && !isAuth && <SiteHeader />}
-          <main className="flex-1">
-            <Outlet />
-          </main>
-          {!isAdmin && !isAuth && <SiteFooter />}
-          {!isAdmin && <FeedbackWidget />}
-          <Toaster />
-        </div>
+        <CartProvider>
+          <div className="flex min-h-screen flex-col bg-background">
+            {!isAdmin && !isAuth && <SiteHeader />}
+            <main className="flex-1">
+              <Outlet />
+            </main>
+            {!isAdmin && !isAuth && <SiteFooter />}
+            {!isAdmin && <FeedbackWidget />}
+            <Toaster />
+          </div>
+        </CartProvider>
       </AuthProvider>
     </QueryClientProvider>
   );
