@@ -69,12 +69,12 @@ function CatalogUploadPage() {
   const statsQ = useQuery({
     queryKey: ["catalog-stats"],
     queryFn: async () => {
-      const [{ count: products }, { count: stockRows }, { data: lastLog }] = await Promise.all([
+      const [{ count: products }, { count: stockRows }, lastLogRes] = await Promise.all([
         supabase.from("products").select("*", { count: "exact", head: true }),
         supabase.from("stock").select("*", { count: "exact", head: true }),
         supabase.from("sync_logs").select("*").eq("source", "catalog_csv").order("started_at", { ascending: false }).limit(1).maybeSingle(),
       ]);
-      return { products: products ?? 0, stockRows: stockRows ?? 0, lastLog: lastLog.data };
+      return { products: products ?? 0, stockRows: stockRows ?? 0, lastLog: lastLogRes.data };
     },
   });
 
