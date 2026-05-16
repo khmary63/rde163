@@ -1,8 +1,9 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { LogOut, User as UserIcon, Building2, Phone, Mail, Percent, ShoppingBag, FileText, Repeat, BarChart3, Headset } from "lucide-react";
+import { LogOut, User as UserIcon, Building2, Phone, Mail, Percent, ShoppingBag, FileText, Repeat, BarChart3, Headset, ChevronDown, ChevronUp, Package } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 
@@ -84,16 +85,16 @@ function AccountPage() {
             </div>
           </div>
 
+          {/* Мои заявки */}
+          <OrdersSection userId={user.id} />
+
           {/* Разделы */}
           <div className="grid sm:grid-cols-2 gap-3">
-            <NavTile to="/account" icon={ShoppingBag} title="Текущие заказы" desc="Активные заявки и статусы" />
-            <NavTile to="/account" icon={Repeat} title="Покупки" desc="История заказов" />
-            <NavTile to="/account" icon={FileText} title="Документы" desc="Счета и счёт-фактуры" />
-            <NavTile to="/account" icon={Repeat} title="Шаблоны" desc="Повторные заказы в один клик" />
-            <NavTile to="/account" icon={BarChart3} title="Дашборд" desc="Статистика и аналитика" />
-            <NavTile to="/account" icon={Headset} title="Личный менеджер" desc="Связь и запросы" />
+            <NavTile to="/catalog" icon={ShoppingBag} title="Каталог" desc="40 000+ позиций" />
+            <NavTile to="/cart" icon={Repeat} title="Корзина" desc="Активная заявка" />
+            <NavTile to="/account" icon={FileText} title="Документы" desc="Скоро" />
+            <NavTile to="/account" icon={BarChart3} title="Дашборд" desc="Скоро" />
           </div>
-          <p className="text-xs text-muted-foreground">Разделы наполняются на следующем этапе.</p>
         </div>
 
         {/* Менеджер */}
