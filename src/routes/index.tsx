@@ -134,7 +134,7 @@ function HomePage() {
               <div className="font-display text-6xl font-bold tabular-nums text-accent-orange leading-none">40K+</div>
               <div className="text-xs text-muted-foreground">позиций в наличии</div>
               <div className="mt-3 h-px w-full bg-border" />
-              <div className="font-display text-3xl font-bold tabular-nums leading-none mt-3 text-accent-blue">~ 30 сек</div>
+              <div className="font-display text-3xl font-bold tabular-nums leading-none mt-3 text-accent-teal">~ 30 сек</div>
               <div className="text-xs text-muted-foreground">от запроса до КП</div>
             </div>
           </div>
