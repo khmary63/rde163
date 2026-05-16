@@ -12,7 +12,7 @@ const OrderItemInput = z.object({
 const SubmitInput = z.object({
   items: z.array(OrderItemInput).min(1).max(500),
   notes: z.string().max(2000).optional(),
-  invoice_grouping: z.enum(["single", "by_warehouse"]).default("single"),
+  invoice_grouping: z.enum(["single", "per_warehouse"]).default("single"),
 });
 
 export const submitOrder = createServerFn({ method: "POST" })
