@@ -185,7 +185,7 @@ function CatalogPage() {
               setSearch(e.target.value);
               setPage(0);
             }}
-            placeholder="Поиск по артикулу или названию"
+            placeholder="Артикул, OEM, кросс-номер или название"
             className="pl-9"
           />
         </div>
