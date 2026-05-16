@@ -55,7 +55,7 @@ export const Route = createFileRoute("/contacts")({
         <h2 className="font-display text-2xl mb-4">Главный офис: г. Самара, ул. Демократическая, 63А</h2>
         <div className="rounded-lg overflow-hidden border border-border bg-surface">
           <iframe
-            src="https://yandex.ru/map-widget/v1/?ll=50.157936%2C53.262687&pt=50.157936,53.262687,pm2rdm&z=17&l=map"
+            src="https://yandex.ru/map-widget/v1/?ll=50.157936%2C53.262687&z=17&l=map&pt=50.157936%2C53.262687%2Cpm2rdl"
             width="100%"
             height="450"
             frameBorder={0}
