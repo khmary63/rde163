@@ -51,11 +51,19 @@ export const Route = createFileRoute("/contacts")({
         </div>
       </div>
 
-      <div className="rounded-lg border border-border bg-surface grid-bg min-h-[400px] flex items-center justify-center">
-        <div className="text-center space-y-2">
-          <MapPin className="h-12 w-12 text-brand mx-auto" />
-          <div className="font-display text-xl">Яндекс.Карта</div>
-          <div className="text-sm text-muted-foreground">Будет подключена на этапе бизнес-логики</div>
+      <div>
+        <h2 className="font-display text-2xl mb-4">Главный офис: г. Самара, ул. Демократическая, 63А</h2>
+        <div className="rounded-lg overflow-hidden border border-border bg-surface">
+          <iframe
+            src="https://yandex.ru/map-widget/v1/?ll=50.157936%2C53.262687&mode=search&sctx=ZAAAAAgBEAAaKAoSCb4kSdF6XklAEbpbnHRPgEpAEhIJ%2FjzNVc%2BiwT8R3O%2FwwgMVwj8iBgABAgMEBSgKOABAtaUHSAFqAnJ1nQHNzMw9oAEAqAEAvQGZkbAcwgEFx9OQ%2BeUF6gEA8gEA%2BAEAggIu0YPQuy4g0JTQtdC80L7QutGA0LDRgtC40YfQtdGB0LrQsNGPLCA2M9CQiAIBkgIAmgIMZGVza3RvcC1tYXBz&sll=50.157936%2C53.262687&source=serp_navig&sspn=0.010073%2C0.004299&text=%D1%83%D0%BB.%20%D0%94%D0%B5%D0%BC%D0%BE%D0%BA%D1%80%D0%B0%D1%82%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%B0%D1%8F%2C%2063%D0%90%20%D0%A1%D0%B0%D0%BC%D0%B0%D1%80%D0%B0&z=17"
+            width="100%"
+            height="450"
+            frameBorder={0}
+            allowFullScreen
+            loading="lazy"
+            title="РДЭ — Самара, ул. Демократическая, 63А"
+            style={{ border: 0, display: "block" }}
+          />
         </div>
       </div>
     </div>
