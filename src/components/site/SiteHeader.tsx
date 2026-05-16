@@ -4,6 +4,7 @@ import { useState } from "react";
 import { adminContact } from "@/data/mock";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
+import { useCart } from "@/hooks/use-cart";
 import logoRde from "@/assets/logo-rde.png";
 
 const nav = [
@@ -16,6 +17,7 @@ const nav = [
 export function SiteHeader() {
   const [open, setOpen] = useState(false);
   const { user } = useAuth();
+  const { count } = useCart();
 
   return (
     <header className="sticky top-0 z-40 border-b border-border/60 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
@@ -73,7 +75,11 @@ export function SiteHeader() {
 
         <Link to="/cart" className="relative inline-flex h-9 w-9 items-center justify-center rounded-md hover:bg-surface transition-colors">
           <ShoppingCart className="h-5 w-5" />
-          <span className="absolute -top-0.5 -right-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-brand px-1 text-[10px] font-bold text-brand-foreground">3</span>
+          {count > 0 && (
+            <span className="absolute -top-0.5 -right-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-brand px-1 text-[10px] font-bold text-brand-foreground">
+              {count}
+            </span>
+          )}
         </Link>
 
         <Link to={user ? "/account" : "/login"} className="inline-flex h-9 w-9 items-center justify-center rounded-md hover:bg-surface transition-colors" aria-label="Личный кабинет">

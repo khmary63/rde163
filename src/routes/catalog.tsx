@@ -10,6 +10,8 @@ import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
+import { useCart } from "@/hooks/use-cart";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/catalog")({
   head: () => ({
@@ -124,6 +126,7 @@ function CatalogPage() {
   const [originality, setOriginality] = useState<Filters["originality"]>("original");
   const [inStockOnly, setInStockOnly] = useState(true);
   const [page, setPage] = useState(0);
+  const cart = useCart();
 
   const filters: Filters = { search, brandIds, warehouseIds, originality, inStockOnly, page };
 
@@ -336,7 +339,30 @@ function CatalogPage() {
                             <div className="text-[11px] text-muted-foreground">с учётом скидки</div>
                           </td>
                           <td className="px-4 py-3 text-right align-top">
-                            <Button size="sm" variant="outline" className="gap-1.5" disabled={status === "out"}>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="gap-1.5"
+                              disabled={status === "out"}
+                              onClick={() => {
+                                const best = [...p.stock]
+                                  .filter((s) => s.qty > 0)
+                                  .sort((a, b) => b.qty - a.qty)[0];
+                                if (!best) return;
+                                const w = wareById.get(best.warehouse_id);
+                                cart.add({
+                                  productId: p.id,
+                                  sku: p.sku,
+                                  name: p.name,
+                                  brand: p.brand?.name ?? "",
+                                  price: Number(p.base_price),
+                                  warehouseId: best.warehouse_id,
+                                  warehouseName: w?.city ?? w?.name ?? "—",
+                                  maxQty: best.qty,
+                                });
+                                toast.success("Добавлено в корзину", { description: p.name });
+                              }}
+                            >
                               <ShoppingCart className="h-3.5 w-3.5" /> В корзину
                             </Button>
                           </td>
