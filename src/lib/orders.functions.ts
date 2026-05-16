@@ -74,7 +74,21 @@ export const submitOrder = createServerFn({ method: "POST" })
       `Сумма: ${total.toLocaleString("ru-RU")} ₽`,
       data.notes ? `\nКомментарий: ${data.notes}` : null,
     ].filter(Boolean) as string[];
-    await sendMaxMessage(lines.join("\n"));
+    await Promise.allSettled([
+      sendMaxMessage(lines.join("\n")),
+      sendInternalTransactionalEmail({
+        templateName: "new-order",
+        idempotencyKey: `new-order-${order.number}`,
+        templateData: {
+          number: order.number,
+          customer,
+          phone: profile?.phone ?? undefined,
+          itemsCount: data.items.length,
+          total,
+          notes: data.notes ?? undefined,
+        },
+      }),
+    ]);
 
     return { id: order.id, number: order.number };
   });
