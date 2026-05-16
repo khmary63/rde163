@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Upload, FileSpreadsheet, CheckCircle2, AlertTriangle, Loader2, Download } from "lucide-react";
+import * as XLSX from "xlsx";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -80,18 +81,10 @@ function CatalogUploadPage() {
 
   const warehouseCodes = useMemo(() => (warehousesQ.data ?? []).map((w) => w.code), [warehousesQ.data]);
 
-  const handleFile = async (file: File) => {
-    const text = await file.text();
+  const parseRows = (header: string[], dataRows: string[][]) => {
     const errors: string[] = [];
-    const firstLine = text.split(/\r?\n/, 1)[0] ?? "";
-    const delim = firstLine.includes(";") && !firstLine.includes(",") ? ";" : ",";
-    const lines = text.split(/\r?\n/).filter((l) => l.trim().length > 0);
-    if (lines.length < 2) {
-      toast.error("Файл пустой или только заголовок");
-      return;
-    }
-    const header = splitLine(lines[0], delim).map((h) => h.toLowerCase().replace(/^\ufeff/, "").trim());
-    const idx = (names: string[]) => header.findIndex((h) => names.includes(h));
+    const idx = (names: string[]) =>
+      header.findIndex((h) => names.includes(h.toLowerCase().replace(/^\ufeff/, "").trim()));
 
     const skuI = idx(["sku", "артикул"]);
     const nameI = idx(["name", "наименование", "название"]);
@@ -102,50 +95,90 @@ function CatalogUploadPage() {
     const catI = idx(["category", "категория"]);
     const descI = idx(["description", "описание"]);
 
+    const lowerHeader = header.map((h) => h.toLowerCase().replace(/^\ufeff/, "").trim());
     const whIndexMap = new Map<string, number>();
     for (const code of warehouseCodes) {
-      const i = header.findIndex((h) => h === `qty_${code}` || h === code);
+      const i = lowerHeader.findIndex((h) => h === `qty_${code}` || h === code);
       if (i >= 0) whIndexMap.set(code, i);
     }
 
     if (skuI === -1 || nameI === -1 || brandI === -1 || priceI === -1) {
       toast.error("Не найдены обязательные колонки", { description: "Нужны: sku, name, brand, price" });
-      return;
+      return null;
     }
 
     const rows: ParsedRow[] = [];
-    for (let li = 1; li < lines.length; li++) {
-      const cols = splitLine(lines[li], delim);
-      const sku = (cols[skuI] ?? "").trim();
-      const name = (cols[nameI] ?? "").trim();
-      const brand = (cols[brandI] ?? "").trim();
-      const price = normNum(cols[priceI] ?? "0");
+    for (let li = 0; li < dataRows.length; li++) {
+      const cols = dataRows[li];
+      const sku = (cols[skuI] ?? "").toString().trim();
+      const name = (cols[nameI] ?? "").toString().trim();
+      const brand = (cols[brandI] ?? "").toString().trim();
+      const price = normNum((cols[priceI] ?? "0").toString());
       if (!sku || !name || !brand) {
-        errors.push(`Строка ${li + 1}: пустой sku / name / brand`);
+        errors.push(`Строка ${li + 2}: пустой sku / name / brand`);
         continue;
       }
-      const origRaw = origI >= 0 ? (cols[origI] ?? "").trim().toLowerCase() : "original";
+      const origRaw = origI >= 0 ? (cols[origI] ?? "").toString().trim().toLowerCase() : "original";
       const isOriginal = !["analog", "аналог", "false", "0", "no", "нет"].includes(origRaw);
       const stocks: Record<string, number> = {};
       whIndexMap.forEach((colIdx, code) => {
-        const q = normNum(cols[colIdx] ?? "0");
+        const q = normNum((cols[colIdx] ?? "0").toString());
         if (q > 0) stocks[code] = Math.floor(q);
       });
       rows.push({
-        line: li + 1,
+        line: li + 2,
         sku,
         name,
         brand,
         is_original: isOriginal,
         base_price: price,
-        oem: oemI >= 0 ? (cols[oemI] ?? "").trim() || null : null,
-        category: catI >= 0 ? (cols[catI] ?? "").trim() || null : null,
-        description: descI >= 0 ? (cols[descI] ?? "").trim() || null : null,
+        oem: oemI >= 0 ? (cols[oemI] ?? "").toString().trim() || null : null,
+        category: catI >= 0 ? (cols[catI] ?? "").toString().trim() || null : null,
+        description: descI >= 0 ? (cols[descI] ?? "").toString().trim() || null : null,
         stocks,
       });
     }
 
-    setParsed({ rows, errors, whCodes: Array.from(whIndexMap.keys()) });
+    return { rows, errors, whCodes: Array.from(whIndexMap.keys()) };
+  };
+
+  const handleFile = async (file: File) => {
+    const lower = file.name.toLowerCase();
+    const isExcel = lower.endsWith(".xlsx") || lower.endsWith(".xls");
+
+    let header: string[] = [];
+    let dataRows: string[][] = [];
+
+    if (isExcel) {
+      const buf = await file.arrayBuffer();
+      const wb = XLSX.read(buf, { type: "array" });
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      if (!ws) {
+        toast.error("Не удалось прочитать первый лист Excel");
+        return;
+      }
+      const aoa = XLSX.utils.sheet_to_json<unknown[]>(ws, { header: 1, blankrows: false, defval: "" });
+      if (aoa.length < 2) {
+        toast.error("Файл пустой или только заголовок");
+        return;
+      }
+      header = (aoa[0] as unknown[]).map((c) => (c ?? "").toString());
+      dataRows = aoa.slice(1).map((row) => (row as unknown[]).map((c) => (c ?? "").toString()));
+    } else {
+      const text = await file.text();
+      const firstLine = text.split(/\r?\n/, 1)[0] ?? "";
+      const delim = firstLine.includes(";") && !firstLine.includes(",") ? ";" : ",";
+      const lines = text.split(/\r?\n/).filter((l) => l.trim().length > 0);
+      if (lines.length < 2) {
+        toast.error("Файл пустой или только заголовок");
+        return;
+      }
+      header = splitLine(lines[0], delim);
+      dataRows = lines.slice(1).map((l) => splitLine(l, delim));
+    }
+
+    const result = parseRows(header, dataRows);
+    if (result) setParsed(result);
   };
 
   const handleImport = async () => {
@@ -251,15 +284,19 @@ function CatalogUploadPage() {
     }
   };
 
-  const downloadTemplate = () => {
-    const whCols = warehouseCodes.map((c) => `qty_${c}`).join(",");
-    const header = `sku,name,brand,is_original,price,oem,category,description,${whCols}`;
-    const sample = [
-      `VG1540080110,Фильтр топливный WD615,CNHTC,original,1850,VG1540080110,Фильтры,Оригинал. фильтр для двигателя WD615,${warehouseCodes.map((c) => (c === "msk" ? "12" : c === "samara_addr" ? "8" : "0")).join(",")}`,
-      `WG9112550110,Фильтр воздушный HOWO,HOWO,original,2400,WG9112550110,Фильтры,,${warehouseCodes.map(() => "5").join(",")}`,
-      `MANN-WK9165,Фильтр аналог Mann WK9165,Mann,analog,1200,,Фильтры,Аналог,${warehouseCodes.map((c, i) => (i < 2 ? "3" : "0")).join(",")}`,
-    ].join("\n");
-    const csv = `${header}\n${sample}\n`;
+  const buildTemplateRows = () => {
+    const header = ["sku", "name", "brand", "is_original", "price", "oem", "category", "description", ...warehouseCodes.map((c) => `qty_${c}`)];
+    const samples = [
+      ["VG1540080110", "Фильтр топливный WD615", "CNHTC", "original", "1850", "VG1540080110", "Фильтры", "Оригинал. фильтр для двигателя WD615", ...warehouseCodes.map((c) => (c === "msk" ? "12" : c === "samara_addr" ? "8" : "0"))],
+      ["WG9112550110", "Фильтр воздушный HOWO", "HOWO", "original", "2400", "WG9112550110", "Фильтры", "", ...warehouseCodes.map(() => "5")],
+      ["MANN-WK9165", "Фильтр аналог Mann WK9165", "Mann", "analog", "1200", "", "Фильтры", "Аналог", ...warehouseCodes.map((_c, i) => (i < 2 ? "3" : "0"))],
+    ];
+    return { header, samples };
+  };
+
+  const downloadTemplateCsv = () => {
+    const { header, samples } = buildTemplateRows();
+    const csv = [header.join(","), ...samples.map((r) => r.join(","))].join("\n") + "\n";
     const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -267,6 +304,15 @@ function CatalogUploadPage() {
     a.download = "price-template.csv";
     a.click();
     URL.revokeObjectURL(url);
+  };
+
+  const downloadTemplateXlsx = () => {
+    const { header, samples } = buildTemplateRows();
+    const aoa = [header, ...samples];
+    const ws = XLSX.utils.aoa_to_sheet(aoa);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Прайс");
+    XLSX.writeFile(wb, "price-template.xlsx");
   };
 
   return (
@@ -281,15 +327,20 @@ function CatalogUploadPage() {
             )}
           </p>
         </div>
-        <Button variant="outline" size="sm" onClick={downloadTemplate} className="gap-1.5" disabled={!warehousesQ.data}>
-          <Download className="h-3.5 w-3.5" /> Скачать шаблон
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" size="sm" onClick={downloadTemplateXlsx} className="gap-1.5" disabled={!warehousesQ.data}>
+            <Download className="h-3.5 w-3.5" /> Шаблон .xlsx
+          </Button>
+          <Button variant="outline" size="sm" onClick={downloadTemplateCsv} className="gap-1.5" disabled={!warehousesQ.data}>
+            <Download className="h-3.5 w-3.5" /> Шаблон .csv
+          </Button>
+        </div>
       </div>
 
       {/* Spec */}
       <Card className="p-5">
         <h2 className="font-display text-sm uppercase tracking-wider text-muted-foreground">Формат файла</h2>
-        <p className="mt-2 text-sm">CSV (UTF-8, разделитель — запятая или точка с запятой). Первая строка — заголовки.</p>
+        <p className="mt-2 text-sm">Принимаются файлы <strong>Excel (.xlsx, .xls)</strong> и <strong>CSV</strong> (UTF-8, разделитель — запятая или точка с запятой). Первая строка — заголовки.</p>
 
         <div className="mt-3 overflow-hidden rounded border border-border">
           <table className="w-full text-sm">
@@ -351,13 +402,13 @@ function CatalogUploadPage() {
         <label className="mt-3 flex cursor-pointer items-center justify-center gap-3 rounded-lg border-2 border-dashed border-border bg-surface/50 px-6 py-10 hover:border-brand">
           <Upload className="h-5 w-5 text-muted-foreground" />
           <div className="text-sm">
-            <div className="font-medium">Выберите CSV-файл прайса</div>
+            <div className="font-medium">Выберите файл прайса (.xlsx, .xls или .csv)</div>
             <div className="text-xs text-muted-foreground">Рекомендуется до 50 000 строк за раз.</div>
           </div>
           <input
             ref={fileRef}
             type="file"
-            accept=".csv,text/csv"
+            accept=".csv,text/csv,.xlsx,.xls,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel"
             className="hidden"
             onChange={(e) => {
               const f = e.target.files?.[0];
