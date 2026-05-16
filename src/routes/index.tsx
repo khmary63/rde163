@@ -254,13 +254,6 @@ function HomePage() {
             <div className="absolute -top-3 -left-3 right-3 bottom-3 border-2 border-accent-orange" />
             <div className="relative overflow-hidden">
               <img src={sitrakFleet} alt="Линейка SITRAK" loading="lazy" className="w-full h-auto object-cover" />
-              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-foreground/90 to-transparent p-5">
-                <div className="font-mono text-[10px] uppercase tracking-widest text-accent-orange mb-1">/ серия c7h · max · t7h</div>
-                <div className="font-display text-xl text-background">Полная линейка тягачей и самосвалов</div>
-              </div>
-            </div>
-            <div className="absolute -bottom-3 -right-3 bg-accent-orange text-accent-orange-foreground px-4 py-2 font-mono text-xs uppercase tracking-widest font-bold">
-              IN STOCK
             </div>
           </div>
         </div>
