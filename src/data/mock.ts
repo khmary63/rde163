@@ -200,7 +200,7 @@ export const currentManager: Manager = {
 export const adminContact = {
   name: "Администратор магазина",
   phone: "8 937-219-49-26",
-  email: "shop@gross-parts.ru",
+  email: "hrs@gross.ru",
   telegram: "@gross_shop",
 };
 
