@@ -80,11 +80,15 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { title: "Русский Дом Экспорта — запчасти для китайской спецтехники и грузовиков" },
       { name: "description", content: "Каталог 40 000+ позиций, 8 складов по РФ, персональные цены для юрлиц. Заявка менеджеру за 30 секунд." },
       { name: "author", content: "ООО «Русский Дом Экспорта»" },
-      { property: "og:title", content: "Русский Дом Экспорта — B2B каталог запчастей" },
-      { property: "og:description", content: "Запчасти для SDLG, XCMG, Shantui, Shacman, HOWO. Наличие, сроки, персональные скидки." },
+      { property: "og:title", content: "Русский Дом Экспорта — запчасти для китайской спецтехники и грузовиков" },
+      { property: "og:description", content: "Каталог 40 000+ позиций, 8 складов по РФ, персональные цены для юрлиц. Заявка менеджеру за 30 секунд." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:title", content: "Русский Дом Экспорта — запчасти для китайской спецтехники и грузовиков" },
+      { name: "twitter:description", content: "Каталог 40 000+ позиций, 8 складов по РФ, персональные цены для юрлиц. Заявка менеджеру за 30 секунд." },
+      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/8efdb99b-f960-4c58-9df8-187a8883e341" },
+      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/8efdb99b-f960-4c58-9df8-187a8883e341" },
     ],
     links: [
       {
