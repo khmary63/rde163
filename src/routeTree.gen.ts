@@ -26,6 +26,7 @@ import { Route as AdminRefsRouteImport } from './routes/admin.refs'
 import { Route as AdminOrdersRouteImport } from './routes/admin.orders'
 import { Route as AdminCustomersRouteImport } from './routes/admin.customers'
 import { Route as AdminCrossesRouteImport } from './routes/admin.crosses'
+import { Route as AdminContentRouteImport } from './routes/admin.content'
 import { Route as AdminCatalogRouteImport } from './routes/admin.catalog'
 import { Route as AdminOrdersIdRouteImport } from './routes/admin.orders.$id'
 
@@ -114,6 +115,11 @@ const AdminCrossesRoute = AdminCrossesRouteImport.update({
   path: '/crosses',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminContentRoute = AdminContentRouteImport.update({
+  id: '/content',
+  path: '/content',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminCatalogRoute = AdminCatalogRouteImport.update({
   id: '/catalog',
   path: '/catalog',
@@ -136,6 +142,7 @@ export interface FileRoutesByFullPath {
   '/register': typeof RegisterRoute
   '/reviews': typeof ReviewsRoute
   '/admin/catalog': typeof AdminCatalogRoute
+  '/admin/content': typeof AdminContentRoute
   '/admin/crosses': typeof AdminCrossesRoute
   '/admin/customers': typeof AdminCustomersRoute
   '/admin/orders': typeof AdminOrdersRouteWithChildren
@@ -156,6 +163,7 @@ export interface FileRoutesByTo {
   '/register': typeof RegisterRoute
   '/reviews': typeof ReviewsRoute
   '/admin/catalog': typeof AdminCatalogRoute
+  '/admin/content': typeof AdminContentRoute
   '/admin/crosses': typeof AdminCrossesRoute
   '/admin/customers': typeof AdminCustomersRoute
   '/admin/orders': typeof AdminOrdersRouteWithChildren
@@ -178,6 +186,7 @@ export interface FileRoutesById {
   '/register': typeof RegisterRoute
   '/reviews': typeof ReviewsRoute
   '/admin/catalog': typeof AdminCatalogRoute
+  '/admin/content': typeof AdminContentRoute
   '/admin/crosses': typeof AdminCrossesRoute
   '/admin/customers': typeof AdminCustomersRoute
   '/admin/orders': typeof AdminOrdersRouteWithChildren
@@ -201,6 +210,7 @@ export interface FileRouteTypes {
     | '/register'
     | '/reviews'
     | '/admin/catalog'
+    | '/admin/content'
     | '/admin/crosses'
     | '/admin/customers'
     | '/admin/orders'
@@ -221,6 +231,7 @@ export interface FileRouteTypes {
     | '/register'
     | '/reviews'
     | '/admin/catalog'
+    | '/admin/content'
     | '/admin/crosses'
     | '/admin/customers'
     | '/admin/orders'
@@ -242,6 +253,7 @@ export interface FileRouteTypes {
     | '/register'
     | '/reviews'
     | '/admin/catalog'
+    | '/admin/content'
     | '/admin/crosses'
     | '/admin/customers'
     | '/admin/orders'
@@ -388,6 +400,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminCrossesRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/content': {
+      id: '/admin/content'
+      path: '/content'
+      fullPath: '/admin/content'
+      preLoaderRoute: typeof AdminContentRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/catalog': {
       id: '/admin/catalog'
       path: '/catalog'
@@ -419,6 +438,7 @@ const AdminOrdersRouteWithChildren = AdminOrdersRoute._addFileChildren(
 
 interface AdminRouteChildren {
   AdminCatalogRoute: typeof AdminCatalogRoute
+  AdminContentRoute: typeof AdminContentRoute
   AdminCrossesRoute: typeof AdminCrossesRoute
   AdminCustomersRoute: typeof AdminCustomersRoute
   AdminOrdersRoute: typeof AdminOrdersRouteWithChildren
@@ -429,6 +449,7 @@ interface AdminRouteChildren {
 
 const AdminRouteChildren: AdminRouteChildren = {
   AdminCatalogRoute: AdminCatalogRoute,
+  AdminContentRoute: AdminContentRoute,
   AdminCrossesRoute: AdminCrossesRoute,
   AdminCustomersRoute: AdminCustomersRoute,
   AdminOrdersRoute: AdminOrdersRouteWithChildren,
