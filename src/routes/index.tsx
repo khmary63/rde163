@@ -95,7 +95,7 @@ function HomePage() {
           </h1>
 
           {/* Подзаголовок + поиск */}
-          <div className="mt-12 grid lg:grid-cols-[1.4fr_auto] gap-10 items-end max-w-[1100px]">
+          <div className="mt-12 max-w-2xl">
             <div>
               <p className="text-base lg:text-lg text-foreground/80 max-w-2xl leading-relaxed">
                 <span className="font-mono text-accent-orange font-bold">→</span> Официальный спрос на SITRAK · оригинал и аналоги. Введите артикул — получите наличие, склад и цену с вашей договорной скидкой.
@@ -127,16 +127,16 @@ function HomePage() {
                 <span><span className="text-brand font-bold">●</span> 40 132 SKU индексировано</span>
               </div>
             </div>
+          </div>
 
-            {/* Боковая статистика — стек */}
-            <div className="hidden lg:flex flex-col gap-1 font-mono text-right bg-background/85 backdrop-blur-md border border-border px-6 py-5 shadow-[0_20px_60px_-20px_oklch(0.20_0.013_250/0.35)]">
-              <div className="text-[10px] uppercase tracking-[0.3em] text-foreground/70">в реальном времени</div>
-              <div className="font-display text-6xl font-bold tabular-nums text-accent-orange leading-none">40K+</div>
-              <div className="text-xs text-foreground/75">позиций в наличии</div>
-              <div className="mt-3 h-px w-full bg-border" />
-              <div className="font-display text-3xl font-bold tabular-nums leading-none mt-3 text-accent-teal">~ 30 сек</div>
-              <div className="text-xs text-foreground/75">от запроса до КП</div>
-            </div>
+          {/* Боковая статистика — позиционирована над задним колесом грузовика */}
+          <div className="hidden lg:flex absolute right-[6%] bottom-[14%] flex-col gap-1 font-mono text-right bg-background/85 backdrop-blur-md border border-border px-6 py-5 shadow-[0_20px_60px_-20px_oklch(0.20_0.013_250/0.35)]">
+            <div className="text-[10px] uppercase tracking-[0.3em] text-foreground/70">в реальном времени</div>
+            <div className="font-display text-6xl font-bold tabular-nums text-accent-orange leading-none">40K+</div>
+            <div className="text-xs text-foreground/75">позиций в наличии</div>
+            <div className="mt-3 h-px w-full bg-border" />
+            <div className="font-display text-3xl font-bold tabular-nums leading-none mt-3 text-accent-teal">~ 30 сек</div>
+            <div className="text-xs text-foreground/75">от запроса до КП</div>
           </div>
         </div>
 
