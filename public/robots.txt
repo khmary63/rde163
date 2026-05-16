@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /account
+Disallow: /cart
+Disallow: /lovable/
+Disallow: /api/
+
+Sitemap: https://rde163.ru/sitemap.xml

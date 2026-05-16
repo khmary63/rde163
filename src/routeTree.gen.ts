@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as UnsubscribeRouteImport } from './routes/unsubscribe'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as ReviewsRouteImport } from './routes/reviews'
 import { Route as RegisterRouteImport } from './routes/register'
 import { Route as LoginRouteImport } from './routes/login'
@@ -23,7 +24,6 @@ import { Route as BlogIndexRouteImport } from './routes/blog.index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
 import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
-import { Route as ApiSitemapDotxmlRouteImport } from './routes/api.sitemap[.]xml'
 import { Route as AdminReviewsRouteImport } from './routes/admin.reviews'
 import { Route as AdminRefsRouteImport } from './routes/admin.refs'
 import { Route as AdminOrdersRouteImport } from './routes/admin.orders'
@@ -43,6 +43,11 @@ import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/em
 const UnsubscribeRoute = UnsubscribeRouteImport.update({
   id: '/unsubscribe',
   path: '/unsubscribe',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ReviewsRoute = ReviewsRouteImport.update({
@@ -108,11 +113,6 @@ const EmailUnsubscribeRoute = EmailUnsubscribeRouteImport.update({
 const BlogSlugRoute = BlogSlugRouteImport.update({
   id: '/blog/$slug',
   path: '/blog/$slug',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiSitemapDotxmlRoute = ApiSitemapDotxmlRouteImport.update({
-  id: '/api/sitemap.xml',
-  path: '/api/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminReviewsRoute = AdminReviewsRouteImport.update({
@@ -204,6 +204,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
   '/reviews': typeof ReviewsRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/admin/catalog': typeof AdminCatalogRoute
   '/admin/content': typeof AdminContentRoute
@@ -213,7 +214,6 @@ export interface FileRoutesByFullPath {
   '/admin/orders': typeof AdminOrdersRouteWithChildren
   '/admin/refs': typeof AdminRefsRoute
   '/admin/reviews': typeof AdminReviewsRoute
-  '/api/sitemap.xml': typeof ApiSitemapDotxmlRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/admin/': typeof AdminIndexRoute
@@ -235,6 +235,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
   '/reviews': typeof ReviewsRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/admin/catalog': typeof AdminCatalogRoute
   '/admin/content': typeof AdminContentRoute
@@ -244,7 +245,6 @@ export interface FileRoutesByTo {
   '/admin/orders': typeof AdminOrdersRouteWithChildren
   '/admin/refs': typeof AdminRefsRoute
   '/admin/reviews': typeof AdminReviewsRoute
-  '/api/sitemap.xml': typeof ApiSitemapDotxmlRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/admin': typeof AdminIndexRoute
@@ -268,6 +268,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
   '/reviews': typeof ReviewsRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/admin/catalog': typeof AdminCatalogRoute
   '/admin/content': typeof AdminContentRoute
@@ -277,7 +278,6 @@ export interface FileRoutesById {
   '/admin/orders': typeof AdminOrdersRouteWithChildren
   '/admin/refs': typeof AdminRefsRoute
   '/admin/reviews': typeof AdminReviewsRoute
-  '/api/sitemap.xml': typeof ApiSitemapDotxmlRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/admin/': typeof AdminIndexRoute
@@ -302,6 +302,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/register'
     | '/reviews'
+    | '/sitemap.xml'
     | '/unsubscribe'
     | '/admin/catalog'
     | '/admin/content'
@@ -311,7 +312,6 @@ export interface FileRouteTypes {
     | '/admin/orders'
     | '/admin/refs'
     | '/admin/reviews'
-    | '/api/sitemap.xml'
     | '/blog/$slug'
     | '/email/unsubscribe'
     | '/admin/'
@@ -333,6 +333,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/register'
     | '/reviews'
+    | '/sitemap.xml'
     | '/unsubscribe'
     | '/admin/catalog'
     | '/admin/content'
@@ -342,7 +343,6 @@ export interface FileRouteTypes {
     | '/admin/orders'
     | '/admin/refs'
     | '/admin/reviews'
-    | '/api/sitemap.xml'
     | '/blog/$slug'
     | '/email/unsubscribe'
     | '/admin'
@@ -365,6 +365,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/register'
     | '/reviews'
+    | '/sitemap.xml'
     | '/unsubscribe'
     | '/admin/catalog'
     | '/admin/content'
@@ -374,7 +375,6 @@ export interface FileRouteTypes {
     | '/admin/orders'
     | '/admin/refs'
     | '/admin/reviews'
-    | '/api/sitemap.xml'
     | '/blog/$slug'
     | '/email/unsubscribe'
     | '/admin/'
@@ -398,8 +398,8 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   RegisterRoute: typeof RegisterRoute
   ReviewsRoute: typeof ReviewsRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   UnsubscribeRoute: typeof UnsubscribeRoute
-  ApiSitemapDotxmlRoute: typeof ApiSitemapDotxmlRoute
   BlogSlugRoute: typeof BlogSlugRoute
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
   BlogIndexRoute: typeof BlogIndexRoute
@@ -418,6 +418,13 @@ declare module '@tanstack/react-router' {
       path: '/unsubscribe'
       fullPath: '/unsubscribe'
       preLoaderRoute: typeof UnsubscribeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/reviews': {
@@ -509,13 +516,6 @@ declare module '@tanstack/react-router' {
       path: '/blog/$slug'
       fullPath: '/blog/$slug'
       preLoaderRoute: typeof BlogSlugRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/sitemap.xml': {
-      id: '/api/sitemap.xml'
-      path: '/api/sitemap.xml'
-      fullPath: '/api/sitemap.xml'
-      preLoaderRoute: typeof ApiSitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/reviews': {
@@ -674,8 +674,8 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   RegisterRoute: RegisterRoute,
   ReviewsRoute: ReviewsRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
   UnsubscribeRoute: UnsubscribeRoute,
-  ApiSitemapDotxmlRoute: ApiSitemapDotxmlRoute,
   BlogSlugRoute: BlogSlugRoute,
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
   BlogIndexRoute: BlogIndexRoute,

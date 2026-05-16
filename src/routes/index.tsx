@@ -14,7 +14,7 @@ const organizationJsonLd = {
   "@type": "Organization",
   name: "Русский Дом Экспорта",
   alternateName: "РДЭ Запчасти",
-  url: "https://rde163.lovable.app",
+  url: "https://rde163.ru",
   description: "B2B каталог запчастей для китайской спецтехники и грузовиков. 40 000+ позиций, 8 складов по РФ.",
   areaServed: "RU",
   sameAs: [],
@@ -25,7 +25,11 @@ export const Route = createFileRoute("/")({
     meta: [
       { title: "Русский Дом Экспорта — B2B каталог запчастей для китайской спецтехники" },
       { name: "description", content: "40 000+ позиций в наличии на 8 складах по РФ. Персональные цены для юрлиц, заявка менеджеру за 30 секунд." },
+      { property: "og:title", content: "РДЭ — B2B каталог запчастей для китайской спецтехники" },
+      { property: "og:description", content: "40 000+ позиций, 8 складов по РФ, персональные цены для юрлиц." },
+      { property: "og:url", content: "https://rde163.ru/" },
     ],
+    links: [{ rel: "canonical", href: "https://rde163.ru/" }],
     scripts: [
       { type: "application/ld+json", children: JSON.stringify(organizationJsonLd) },
     ],

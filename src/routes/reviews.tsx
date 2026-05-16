@@ -3,7 +3,16 @@ import { reviews } from "@/data/mock";
 import { formatDate } from "@/lib/format";
 
 export const Route = createFileRoute("/reviews")({
-  head: () => ({ meta: [{ title: "Отзывы — ГРОСС Запчасти" }] }),
+  head: () => ({
+    meta: [
+      { title: "Отзывы клиентов — РДЭ Запчасти" },
+      { name: "description", content: "Реальные отзывы B2B-клиентов РДЭ о поставках запчастей для китайской спецтехники и грузовиков." },
+      { property: "og:title", content: "Отзывы клиентов РДЭ" },
+      { property: "og:description", content: "Что говорят B2B-клиенты о работе с РДЭ." },
+      { property: "og:url", content: "https://rde163.ru/reviews" },
+    ],
+    links: [{ rel: "canonical", href: "https://rde163.ru/reviews" }],
+  }),
   component: () => (
     <div className="mx-auto max-w-[1400px] px-4 py-16">
       <h1 className="font-display text-4xl mb-8">Отзывы клиентов</h1>
