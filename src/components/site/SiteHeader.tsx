@@ -3,6 +3,7 @@ import { Phone, MessageCircle, Send, User, ShoppingCart, Search, Menu, X } from 
 import { useState } from "react";
 import { adminContact } from "@/data/mock";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/hooks/use-auth";
 import logoRde from "@/assets/logo-rde.png";
 
 const nav = [
