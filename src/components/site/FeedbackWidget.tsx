@@ -1,10 +1,34 @@
 import { useState } from "react";
-import { MessageSquare, X, Send } from "lucide-react";
+import { MessageSquare, X, Send, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 export function FeedbackWidget() {
   const [open, setOpen] = useState(false);
   const [sent, setSent] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [form, setForm] = useState({ name: "", phone: "", message: "" });
+
+  async function onSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setLoading(true);
+    const { data: { user } } = await supabase.auth.getUser();
+    const { error } = await supabase.from("feedback_messages").insert({
+      name: form.name,
+      phone: form.phone,
+      message: form.message,
+      user_id: user?.id ?? null,
+      email: user?.email ?? null,
+    });
+    setLoading(false);
+    if (error) {
+      toast.error("Не удалось отправить сообщение");
+      return;
+    }
+    setSent(true);
+    setForm({ name: "", phone: "", message: "" });
+  }
 
   return (
     <>
@@ -25,7 +49,7 @@ export function FeedbackWidget() {
                 <div className="font-display text-lg">Связь с менеджером</div>
                 <div className="text-xs text-muted-foreground">Ответим в течение рабочего дня</div>
               </div>
-              <button onClick={() => setOpen(false)} aria-label="Закрыть" className="text-muted-foreground hover:text-foreground">
+              <button onClick={() => { setOpen(false); setSent(false); }} aria-label="Закрыть" className="text-muted-foreground hover:text-foreground">
                 <X className="h-5 w-5" />
               </button>
             </div>
@@ -40,33 +64,37 @@ export function FeedbackWidget() {
                 <Button variant="outline" onClick={() => { setSent(false); setOpen(false); }}>Закрыть</Button>
               </div>
             ) : (
-              <form
-                onSubmit={(e) => { e.preventDefault(); setSent(true); }}
-                className="flex flex-col gap-3 p-4"
-              >
+              <form onSubmit={onSubmit} className="flex flex-col gap-3 p-4">
                 <input
                   required
                   type="text"
+                  value={form.name}
+                  onChange={(e) => setForm({ ...form, name: e.target.value })}
                   placeholder="Ваше имя"
                   className="w-full rounded-md bg-background border border-input px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand/50"
                 />
                 <input
                   required
                   type="tel"
+                  value={form.phone}
+                  onChange={(e) => setForm({ ...form, phone: e.target.value })}
                   placeholder="Телефон"
                   className="w-full rounded-md bg-background border border-input px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand/50"
                 />
                 <textarea
                   required
                   rows={4}
+                  value={form.message}
+                  onChange={(e) => setForm({ ...form, message: e.target.value })}
                   placeholder="Опишите задачу: артикул, бренд техники, что нужно подобрать"
                   className="w-full rounded-md bg-background border border-input px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand/50"
                 />
                 <p className="text-xs text-muted-foreground">
                   Нажимая «Отправить», вы соглашаетесь на обработку персональных данных.
                 </p>
-                <Button type="submit" className="bg-brand text-brand-foreground hover:bg-brand/90">
-                  <Send className="h-4 w-4 mr-2" /> Отправить
+                <Button type="submit" disabled={loading} className="bg-brand text-brand-foreground hover:bg-brand/90">
+                  {loading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Send className="h-4 w-4 mr-2" />}
+                  Отправить
                 </Button>
               </form>
             )}

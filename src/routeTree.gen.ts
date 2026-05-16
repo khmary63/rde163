@@ -21,6 +21,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as BlogIndexRouteImport } from './routes/blog.index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
+import { Route as ApiSitemapDotxmlRouteImport } from './routes/api.sitemap[.]xml'
 import { Route as AdminReviewsRouteImport } from './routes/admin.reviews'
 import { Route as AdminRefsRouteImport } from './routes/admin.refs'
 import { Route as AdminOrdersRouteImport } from './routes/admin.orders'
@@ -91,6 +92,11 @@ const BlogSlugRoute = BlogSlugRouteImport.update({
   path: '/blog/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiSitemapDotxmlRoute = ApiSitemapDotxmlRouteImport.update({
+  id: '/api/sitemap.xml',
+  path: '/api/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminReviewsRoute = AdminReviewsRouteImport.update({
   id: '/reviews',
   path: '/reviews',
@@ -155,6 +161,7 @@ export interface FileRoutesByFullPath {
   '/admin/orders': typeof AdminOrdersRouteWithChildren
   '/admin/refs': typeof AdminRefsRoute
   '/admin/reviews': typeof AdminReviewsRoute
+  '/api/sitemap.xml': typeof ApiSitemapDotxmlRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/admin/': typeof AdminIndexRoute
   '/blog/': typeof BlogIndexRoute
@@ -177,6 +184,7 @@ export interface FileRoutesByTo {
   '/admin/orders': typeof AdminOrdersRouteWithChildren
   '/admin/refs': typeof AdminRefsRoute
   '/admin/reviews': typeof AdminReviewsRoute
+  '/api/sitemap.xml': typeof ApiSitemapDotxmlRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/admin': typeof AdminIndexRoute
   '/blog': typeof BlogIndexRoute
@@ -201,6 +209,7 @@ export interface FileRoutesById {
   '/admin/orders': typeof AdminOrdersRouteWithChildren
   '/admin/refs': typeof AdminRefsRoute
   '/admin/reviews': typeof AdminReviewsRoute
+  '/api/sitemap.xml': typeof ApiSitemapDotxmlRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/admin/': typeof AdminIndexRoute
   '/blog/': typeof BlogIndexRoute
@@ -226,6 +235,7 @@ export interface FileRouteTypes {
     | '/admin/orders'
     | '/admin/refs'
     | '/admin/reviews'
+    | '/api/sitemap.xml'
     | '/blog/$slug'
     | '/admin/'
     | '/blog/'
@@ -248,6 +258,7 @@ export interface FileRouteTypes {
     | '/admin/orders'
     | '/admin/refs'
     | '/admin/reviews'
+    | '/api/sitemap.xml'
     | '/blog/$slug'
     | '/admin'
     | '/blog'
@@ -271,6 +282,7 @@ export interface FileRouteTypes {
     | '/admin/orders'
     | '/admin/refs'
     | '/admin/reviews'
+    | '/api/sitemap.xml'
     | '/blog/$slug'
     | '/admin/'
     | '/blog/'
@@ -287,6 +299,7 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   RegisterRoute: typeof RegisterRoute
   ReviewsRoute: typeof ReviewsRoute
+  ApiSitemapDotxmlRoute: typeof ApiSitemapDotxmlRoute
   BlogSlugRoute: typeof BlogSlugRoute
   BlogIndexRoute: typeof BlogIndexRoute
 }
@@ -375,6 +388,13 @@ declare module '@tanstack/react-router' {
       path: '/blog/$slug'
       fullPath: '/blog/$slug'
       preLoaderRoute: typeof BlogSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/sitemap.xml': {
+      id: '/api/sitemap.xml'
+      path: '/api/sitemap.xml'
+      fullPath: '/api/sitemap.xml'
+      preLoaderRoute: typeof ApiSitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/reviews': {
@@ -491,9 +511,20 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   RegisterRoute: RegisterRoute,
   ReviewsRoute: ReviewsRoute,
+  ApiSitemapDotxmlRoute: ApiSitemapDotxmlRoute,
   BlogSlugRoute: BlogSlugRoute,
   BlogIndexRoute: BlogIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
