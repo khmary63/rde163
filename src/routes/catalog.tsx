@@ -23,6 +23,30 @@ export const Route = createFileRoute("/catalog")({
       { property: "og:url", content: "https://rde163.ru/catalog" },
     ],
     links: [{ rel: "canonical", href: "https://rde163.ru/catalog" }],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "CollectionPage",
+          name: "Каталог запчастей РДЭ",
+          description: "Каталог оригинальных запчастей для китайской спецтехники и грузовиков.",
+          url: "https://rde163.ru/catalog",
+          isPartOf: { "@type": "WebSite", name: "Русский Дом Экспорта", url: "https://rde163.ru" },
+        }),
+      },
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          itemListElement: [
+            { "@type": "ListItem", position: 1, name: "Главная", item: "https://rde163.ru" },
+            { "@type": "ListItem", position: 2, name: "Каталог", item: "https://rde163.ru/catalog" },
+          ],
+        }),
+      },
+    ],
   }),
   component: CatalogPage,
 });
