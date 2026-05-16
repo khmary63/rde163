@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState, useRef } from "react";
 import { ArrowLeft, Upload, FileText, Trash2, Loader2, Download } from "lucide-react";
+import type { Database } from "@/integrations/supabase/types";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
@@ -9,15 +10,16 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { StatusBadge } from "./admin.index";
 import { toast } from "sonner";
 
+type OrderStatus = Database["public"]["Enums"]["order_status"];
+
 export const Route = createFileRoute("/admin/orders/$id")({
   component: AdminOrderDetail,
 });
 
-const STATUS_OPTIONS = [
+const STATUS_OPTIONS: { value: OrderStatus; label: string }[] = [
   { value: "submitted", label: "Новая" },
-  { value: "in_progress", label: "В работе" },
-  { value: "invoiced", label: "Счёт выставлен" },
-  { value: "paid", label: "Оплачена" },
+  { value: "confirmed", label: "Подтверждена" },
+  { value: "processing", label: "В работе" },
   { value: "shipped", label: "Отгружена" },
   { value: "completed", label: "Завершена" },
   { value: "cancelled", label: "Отменена" },
@@ -42,24 +44,39 @@ function AdminOrderDetail() {
   const orderQ = useQuery({
     queryKey: ["admin", "order", id],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data: order, error } = await supabase
         .from("orders")
-        .select(`
-          id, number, status, total_amount, created_at, submitted_at, notes, invoice_grouping,
-          profile:profiles(full_name, company_name, inn, kpp, legal_address, phone, email, discount_percent),
-          items:order_items(id, qty, unit_price, line_total, product:products(name, sku), warehouse:warehouses(name, city)),
-          documents:order_documents(id, doc_type, file_path, file_name, created_at)
-        `)
+        .select("id, number, status, total_amount, created_at, submitted_at, notes, invoice_grouping, user_id")
         .eq("id", id)
         .single();
       if (error) throw error;
-      return data;
+
+      const [items, docs, profile] = await Promise.all([
+        supabase.from("order_items")
+          .select("id, qty, unit_price, line_total, product:products(name, sku), warehouse:warehouses(name, city)")
+          .eq("order_id", id),
+        supabase.from("order_documents")
+          .select("id, doc_type, file_path, file_name, created_at")
+          .eq("order_id", id)
+          .order("created_at", { ascending: false }),
+        supabase.from("profiles")
+          .select("full_name, company_name, inn, kpp, legal_address, phone, email, discount_percent")
+          .eq("id", order.user_id)
+          .maybeSingle(),
+      ]);
+
+      return {
+        ...order,
+        items: items.data ?? [],
+        documents: docs.data ?? [],
+        profile: profile.data ?? null,
+      };
     },
   });
 
   const statusMutation = useMutation({
-    mutationFn: async (newStatus: string) => {
-      const patch: Record<string, unknown> = { status: newStatus };
+    mutationFn: async (newStatus: OrderStatus) => {
+      const patch: Database["public"]["Tables"]["orders"]["Update"] = { status: newStatus };
       if (newStatus === "completed") patch.completed_at = new Date().toISOString();
       const { error } = await supabase.from("orders").update(patch).eq("id", id);
       if (error) throw error;
@@ -121,10 +138,7 @@ function AdminOrderDetail() {
     return <div className="mx-auto max-w-[1600px] px-6 py-10 text-center">Заявка не найдена</div>;
   }
   const o = orderQ.data;
-  const p = o.profile as {
-    full_name: string | null; company_name: string | null; inn: string | null; kpp: string | null;
-    legal_address: string | null; phone: string | null; email: string | null; discount_percent: number;
-  } | null;
+  const p = o.profile;
 
   return (
     <div className="mx-auto max-w-[1600px] px-6 py-8">
@@ -145,7 +159,7 @@ function AdminOrderDetail() {
         </div>
         <div className="flex items-center gap-2">
           <span className="text-xs uppercase tracking-wide text-muted-foreground">Статус:</span>
-          <Select value={o.status} onValueChange={(v) => statusMutation.mutate(v)}>
+          <Select value={o.status} onValueChange={(v) => statusMutation.mutate(v as OrderStatus)}>
             <SelectTrigger className="w-52"><SelectValue /></SelectTrigger>
             <SelectContent>
               {STATUS_OPTIONS.map((s) => <SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>)}
@@ -158,7 +172,7 @@ function AdminOrderDetail() {
         <div className="space-y-6">
           {/* Items */}
           <section className="border border-border rounded-md bg-surface overflow-hidden">
-            <h2 className="font-display text-lg px-5 py-3 border-b border-border">Позиции ({o.items?.length ?? 0})</h2>
+            <h2 className="font-display text-lg px-5 py-3 border-b border-border">Позиции ({o.items.length})</h2>
             <table className="w-full text-sm">
               <thead className="text-xs uppercase tracking-wider text-muted-foreground bg-background">
                 <tr className="text-left">
@@ -170,22 +184,18 @@ function AdminOrderDetail() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
-                {o.items?.map((it) => {
-                  const prod = it.product as { name: string; sku: string } | null;
-                  const wh = it.warehouse as { name: string; city: string | null } | null;
-                  return (
-                    <tr key={it.id}>
-                      <td className="px-4 py-2.5">
-                        <div className="font-medium">{prod?.name}</div>
-                        <div className="font-mono text-[11px] text-muted-foreground">{prod?.sku}</div>
-                      </td>
-                      <td className="px-4 py-2.5 text-xs text-muted-foreground">{wh?.city ?? wh?.name ?? "—"}</td>
-                      <td className="px-4 py-2.5 text-right">{it.qty}</td>
-                      <td className="px-4 py-2.5 text-right">{Number(it.unit_price).toLocaleString("ru-RU", { maximumFractionDigits: 0 })} ₽</td>
-                      <td className="px-4 py-2.5 text-right font-semibold">{Number(it.line_total).toLocaleString("ru-RU", { maximumFractionDigits: 0 })} ₽</td>
-                    </tr>
-                  );
-                })}
+                {o.items.map((it) => (
+                  <tr key={it.id}>
+                    <td className="px-4 py-2.5">
+                      <div className="font-medium">{it.product?.name}</div>
+                      <div className="font-mono text-[11px] text-muted-foreground">{it.product?.sku}</div>
+                    </td>
+                    <td className="px-4 py-2.5 text-xs text-muted-foreground">{it.warehouse?.city ?? it.warehouse?.name ?? "—"}</td>
+                    <td className="px-4 py-2.5 text-right">{it.qty}</td>
+                    <td className="px-4 py-2.5 text-right">{Number(it.unit_price).toLocaleString("ru-RU", { maximumFractionDigits: 0 })} ₽</td>
+                    <td className="px-4 py-2.5 text-right font-semibold">{Number(it.line_total).toLocaleString("ru-RU", { maximumFractionDigits: 0 })} ₽</td>
+                  </tr>
+                ))}
               </tbody>
               <tfoot>
                 <tr className="border-t border-border bg-background">
@@ -202,10 +212,10 @@ function AdminOrderDetail() {
           <section className="border border-border rounded-md bg-surface">
             <h2 className="font-display text-lg px-5 py-3 border-b border-border">Документы</h2>
             <div className="p-5 space-y-3">
-              {(o.documents ?? []).length === 0 && (
+              {o.documents.length === 0 && (
                 <p className="text-sm text-muted-foreground">Документов пока нет.</p>
               )}
-              {o.documents?.map((d) => (
+              {o.documents.map((d) => (
                 <div key={d.id} className="flex items-center gap-3 rounded-md border border-border bg-background px-3 py-2">
                   <FileText className="h-4 w-4 text-brand shrink-0" />
                   <div className="flex-1 min-w-0">
