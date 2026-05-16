@@ -1,12 +1,384 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
+import { useMemo, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { Search, Loader2, ShoppingCart, ChevronLeft, ChevronRight, X } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Badge } from "@/components/ui/badge";
+import { Label } from "@/components/ui/label";
+import { Card } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/catalog")({
-  head: () => ({ meta: [{ title: "Каталог запчастей — ГРОСС Запчасти" }] }),
-  component: () => (
-    <div className="mx-auto max-w-[1400px] px-4 py-20 text-center space-y-4">
-      <h1 className="font-display text-4xl">Каталог</h1>
-      <p className="text-muted-foreground">Страница в разработке. Будет реализована в следующей итерации (фильтры, таблица позиций, бейджи статусов).</p>
-      <Link to="/" className="text-brand hover:underline">← На главную</Link>
-    </div>
-  ),
+  head: () => ({
+    meta: [
+      { title: "Каталог запчастей для китайской спецтехники — ГРОСС Запчасти" },
+      { name: "description", content: "Каталог из 5000+ оригинальных запчастей CNHTC, HOWO, XGMA, Shacman, Sitrak. 8 складов по России, наличие в реальном времени, персональные цены." },
+    ],
+  }),
+  component: CatalogPage,
 });
+
+const PAGE_SIZE = 50;
+
+type Brand = { id: string; slug: string; name: string };
+type Warehouse = { id: string; code: string; name: string; city: string | null; sort_order: number };
+type StockRow = { warehouse_id: string; qty: number };
+type Product = {
+  id: string;
+  sku: string;
+  name: string;
+  base_price: number;
+  is_original: boolean;
+  brand: Brand | null;
+  stock: StockRow[];
+};
+
+function useBrands() {
+  return useQuery({
+    queryKey: ["brands"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("brands")
+        .select("id, slug, name")
+        .order("sort_order");
+      if (error) throw error;
+      return data as Brand[];
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+}
+
+function useWarehouses() {
+  return useQuery({
+    queryKey: ["warehouses"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("warehouses")
+        .select("id, code, name, city, sort_order")
+        .eq("is_active", true)
+        .order("sort_order");
+      if (error) throw error;
+      return data as Warehouse[];
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+}
+
+type Filters = {
+  search: string;
+  brandIds: string[];
+  warehouseIds: string[];
+  originality: "all" | "original" | "analog";
+  inStockOnly: boolean;
+  page: number;
+};
+
+function useProducts(filters: Filters) {
+  return useQuery({
+    queryKey: ["products", filters],
+    queryFn: async () => {
+      const from = filters.page * PAGE_SIZE;
+      const to = from + PAGE_SIZE - 1;
+
+      const stockJoin = filters.warehouseIds.length > 0 || filters.inStockOnly ? "stock!inner" : "stock";
+      let q = supabase
+        .from("products")
+        .select(
+          `id, sku, name, base_price, is_original, brand:brands(id, slug, name), stock:${stockJoin}(warehouse_id, qty)`,
+          { count: "exact" }
+        );
+
+      if (filters.search.trim()) {
+        const s = filters.search.trim().replace(/[%_]/g, " ");
+        q = q.or(`name.ilike.%${s}%,sku.ilike.%${s}%`);
+      }
+      if (filters.brandIds.length > 0) {
+        q = q.in("brand_id", filters.brandIds);
+      }
+      if (filters.originality === "original") q = q.eq("is_original", true);
+      else if (filters.originality === "analog") q = q.eq("is_original", false);
+
+      if (filters.warehouseIds.length > 0) {
+        q = q.in("stock.warehouse_id", filters.warehouseIds);
+      }
+      if (filters.inStockOnly) {
+        q = q.gt("stock.qty", 0);
+      }
+
+      q = q.order("name").range(from, to);
+      const { data, error, count } = await q;
+      if (error) throw error;
+      return { rows: (data ?? []) as Product[], total: count ?? 0 };
+    },
+    placeholderData: (prev) => prev,
+  });
+}
+
+function CatalogPage() {
+  const [search, setSearch] = useState("");
+  const [brandIds, setBrandIds] = useState<string[]>([]);
+  const [warehouseIds, setWarehouseIds] = useState<string[]>([]);
+  const [originality, setOriginality] = useState<Filters["originality"]>("original");
+  const [inStockOnly, setInStockOnly] = useState(true);
+  const [page, setPage] = useState(0);
+
+  const filters: Filters = { search, brandIds, warehouseIds, originality, inStockOnly, page };
+
+  const brandsQ = useBrands();
+  const whQ = useWarehouses();
+  const productsQ = useProducts(filters);
+
+  const totalPages = Math.max(1, Math.ceil((productsQ.data?.total ?? 0) / PAGE_SIZE));
+  const wareById = useMemo(() => new Map((whQ.data ?? []).map((w) => [w.id, w])), [whQ.data]);
+
+  const toggleId = (arr: string[], id: string, setter: (v: string[]) => void) => {
+    setter(arr.includes(id) ? arr.filter((x) => x !== id) : [...arr, id]);
+    setPage(0);
+  };
+
+  const resetFilters = () => {
+    setSearch("");
+    setBrandIds([]);
+    setWarehouseIds([]);
+    setOriginality("original");
+    setInStockOnly(true);
+    setPage(0);
+  };
+
+  const activeCount = (search ? 1 : 0) + brandIds.length + warehouseIds.length + (originality !== "original" ? 1 : 0) + (!inStockOnly ? 1 : 0);
+
+  return (
+    <div className="mx-auto max-w-[1400px] px-4 py-8">
+      <header className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <h1 className="font-display text-3xl uppercase tracking-tight sm:text-4xl">Каталог запчастей</h1>
+          <p className="mt-1 text-sm text-muted-foreground">
+            {productsQ.isLoading ? "Загрузка…" : `${(productsQ.data?.total ?? 0).toLocaleString("ru-RU")} позиций · 8 складов по России`}
+          </p>
+        </div>
+        <div className="relative w-full max-w-sm">
+          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            value={search}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              setPage(0);
+            }}
+            placeholder="Поиск по артикулу или названию"
+            className="pl-9"
+          />
+        </div>
+      </header>
+
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[280px_1fr]">
+        {/* Filters */}
+        <aside className="space-y-5">
+          <div className="flex items-center justify-between">
+            <h2 className="font-display text-sm uppercase tracking-wider text-muted-foreground">Фильтры</h2>
+            {activeCount > 0 && (
+              <button onClick={resetFilters} className="flex items-center gap-1 text-xs text-brand hover:underline">
+                <X className="h-3 w-3" /> сбросить ({activeCount})
+              </button>
+            )}
+          </div>
+
+          <FilterSection title="Тип">
+            {(["original", "analog", "all"] as const).map((v) => (
+              <label key={v} className="flex cursor-pointer items-center gap-2 text-sm">
+                <input
+                  type="radio"
+                  name="orig"
+                  className="h-3.5 w-3.5 accent-brand"
+                  checked={originality === v}
+                  onChange={() => {
+                    setOriginality(v);
+                    setPage(0);
+                  }}
+                />
+                {v === "original" ? "Оригинал" : v === "analog" ? "Аналог" : "Все"}
+              </label>
+            ))}
+          </FilterSection>
+
+          <FilterSection title="Наличие">
+            <label className="flex cursor-pointer items-center gap-2 text-sm">
+              <Checkbox
+                checked={inStockOnly}
+                onCheckedChange={(c) => {
+                  setInStockOnly(!!c);
+                  setPage(0);
+                }}
+              />
+              Только в наличии
+            </label>
+          </FilterSection>
+
+          <FilterSection title="Склады">
+            {whQ.data?.map((w) => (
+              <label key={w.id} className="flex cursor-pointer items-start gap-2 text-sm">
+                <Checkbox
+                  className="mt-0.5"
+                  checked={warehouseIds.includes(w.id)}
+                  onCheckedChange={() => toggleId(warehouseIds, w.id, setWarehouseIds)}
+                />
+                <span>
+                  <span className="block">{w.city ?? w.name}</span>
+                  <span className="block text-xs text-muted-foreground">{w.name}</span>
+                </span>
+              </label>
+            ))}
+          </FilterSection>
+
+          <FilterSection title={`Бренд${brandIds.length ? ` · ${brandIds.length}` : ""}`}>
+            <div className="max-h-72 space-y-1.5 overflow-y-auto pr-2">
+              {brandsQ.data?.map((b) => (
+                <label key={b.id} className="flex cursor-pointer items-center gap-2 text-sm">
+                  <Checkbox
+                    checked={brandIds.includes(b.id)}
+                    onCheckedChange={() => toggleId(brandIds, b.id, setBrandIds)}
+                  />
+                  {b.name}
+                </label>
+              ))}
+            </div>
+          </FilterSection>
+        </aside>
+
+        {/* Table */}
+        <div className="min-w-0 space-y-4">
+          {productsQ.isLoading ? (
+            <div className="flex h-64 items-center justify-center text-muted-foreground">
+              <Loader2 className="mr-2 h-5 w-5 animate-spin" /> Загрузка каталога…
+            </div>
+          ) : productsQ.data?.rows.length === 0 ? (
+            <Card className="p-10 text-center">
+              <p className="text-lg font-medium">Ничего не найдено</p>
+              <p className="mt-1 text-sm text-muted-foreground">Попробуйте сбросить фильтры или изменить запрос.</p>
+              {activeCount > 0 && (
+                <Button variant="outline" className="mt-4" onClick={resetFilters}>
+                  Сбросить фильтры
+                </Button>
+              )}
+            </Card>
+          ) : (
+            <>
+              <div className="overflow-hidden rounded-lg border border-border bg-card">
+                <table className="w-full text-sm">
+                  <thead className="bg-surface text-xs uppercase tracking-wider text-muted-foreground">
+                    <tr>
+                      <th className="px-4 py-3 text-left">Наименование / артикул</th>
+                      <th className="px-4 py-3 text-left">Бренд</th>
+                      <th className="px-4 py-3 text-left">Наличие · склады</th>
+                      <th className="px-4 py-3 text-right">Цена</th>
+                      <th className="px-4 py-3"></th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-border">
+                    {productsQ.data?.rows.map((p) => {
+                      const totalQty = p.stock.reduce((s, r) => s + (r.qty || 0), 0);
+                      const status: "in" | "low" | "out" = totalQty === 0 ? "out" : totalQty < 5 ? "low" : "in";
+                      return (
+                        <tr key={p.id} className="hover:bg-surface/50">
+                          <td className="px-4 py-3 align-top">
+                            <div className="font-medium leading-tight">{p.name}</div>
+                            <div className="mt-1 font-mono text-xs text-muted-foreground">{p.sku}</div>
+                          </td>
+                          <td className="px-4 py-3 align-top">
+                            <Badge variant="secondary" className="font-normal">
+                              {p.brand?.name ?? "—"}
+                            </Badge>
+                            {!p.is_original && (
+                              <Badge variant="outline" className="ml-1 font-normal">аналог</Badge>
+                            )}
+                          </td>
+                          <td className="px-4 py-3 align-top">
+                            <div className="flex items-center gap-2">
+                              <span
+                                className={cn(
+                                  "inline-flex h-2 w-2 rounded-full",
+                                  status === "in" && "bg-[oklch(0.70_0.18_145)]",
+                                  status === "low" && "bg-[oklch(0.78_0.16_75)]",
+                                  status === "out" && "bg-[oklch(0.62_0.20_25)]",
+                                )}
+                              />
+                              <span className="font-medium">
+                                {status === "in" && `${totalQty} шт.`}
+                                {status === "low" && `${totalQty} шт. · мало`}
+                                {status === "out" && "Под заказ"}
+                              </span>
+                            </div>
+                            <div className="mt-1 flex flex-wrap gap-1">
+                              {p.stock
+                                .filter((s) => s.qty > 0)
+                                .slice(0, 4)
+                                .map((s) => {
+                                  const w = wareById.get(s.warehouse_id);
+                                  return (
+                                    <span key={s.warehouse_id} className="rounded bg-surface px-1.5 py-0.5 text-[11px] text-muted-foreground">
+                                      {w?.city ?? w?.name ?? "—"}: {s.qty}
+                                    </span>
+                                  );
+                                })}
+                              {p.stock.filter((s) => s.qty > 0).length > 4 && (
+                                <span className="text-[11px] text-muted-foreground">
+                                  +{p.stock.filter((s) => s.qty > 0).length - 4}
+                                </span>
+                              )}
+                            </div>
+                          </td>
+                          <td className="px-4 py-3 text-right align-top">
+                            <div className="font-display text-base font-semibold">
+                              {Number(p.base_price).toLocaleString("ru-RU", { maximumFractionDigits: 0 })} ₽
+                            </div>
+                            <div className="text-[11px] text-muted-foreground">с учётом скидки</div>
+                          </td>
+                          <td className="px-4 py-3 text-right align-top">
+                            <Button size="sm" variant="outline" className="gap-1.5" disabled={status === "out"}>
+                              <ShoppingCart className="h-3.5 w-3.5" /> В корзину
+                            </Button>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Pagination */}
+              <div className="flex items-center justify-between text-sm text-muted-foreground">
+                <div>
+                  Страница {page + 1} из {totalPages}
+                </div>
+                <div className="flex items-center gap-2">
+                  <Button variant="outline" size="sm" disabled={page === 0} onClick={() => setPage((p) => Math.max(0, p - 1))}>
+                    <ChevronLeft className="h-4 w-4" /> Назад
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={page >= totalPages - 1}
+                    onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
+                  >
+                    Вперёд <ChevronRight className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function FilterSection({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <div className="space-y-2.5 rounded-lg border border-border bg-card p-4">
+      <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{title}</Label>
+      <div className="space-y-2">{children}</div>
+    </div>
+  );
+}
