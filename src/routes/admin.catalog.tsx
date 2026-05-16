@@ -284,15 +284,19 @@ function CatalogUploadPage() {
     }
   };
 
-  const downloadTemplate = () => {
-    const whCols = warehouseCodes.map((c) => `qty_${c}`).join(",");
-    const header = `sku,name,brand,is_original,price,oem,category,description,${whCols}`;
-    const sample = [
-      `VG1540080110,Фильтр топливный WD615,CNHTC,original,1850,VG1540080110,Фильтры,Оригинал. фильтр для двигателя WD615,${warehouseCodes.map((c) => (c === "msk" ? "12" : c === "samara_addr" ? "8" : "0")).join(",")}`,
-      `WG9112550110,Фильтр воздушный HOWO,HOWO,original,2400,WG9112550110,Фильтры,,${warehouseCodes.map(() => "5").join(",")}`,
-      `MANN-WK9165,Фильтр аналог Mann WK9165,Mann,analog,1200,,Фильтры,Аналог,${warehouseCodes.map((c, i) => (i < 2 ? "3" : "0")).join(",")}`,
-    ].join("\n");
-    const csv = `${header}\n${sample}\n`;
+  const buildTemplateRows = () => {
+    const header = ["sku", "name", "brand", "is_original", "price", "oem", "category", "description", ...warehouseCodes.map((c) => `qty_${c}`)];
+    const samples = [
+      ["VG1540080110", "Фильтр топливный WD615", "CNHTC", "original", "1850", "VG1540080110", "Фильтры", "Оригинал. фильтр для двигателя WD615", ...warehouseCodes.map((c) => (c === "msk" ? "12" : c === "samara_addr" ? "8" : "0"))],
+      ["WG9112550110", "Фильтр воздушный HOWO", "HOWO", "original", "2400", "WG9112550110", "Фильтры", "", ...warehouseCodes.map(() => "5")],
+      ["MANN-WK9165", "Фильтр аналог Mann WK9165", "Mann", "analog", "1200", "", "Фильтры", "Аналог", ...warehouseCodes.map((_c, i) => (i < 2 ? "3" : "0"))],
+    ];
+    return { header, samples };
+  };
+
+  const downloadTemplateCsv = () => {
+    const { header, samples } = buildTemplateRows();
+    const csv = [header.join(","), ...samples.map((r) => r.join(","))].join("\n") + "\n";
     const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -300,6 +304,15 @@ function CatalogUploadPage() {
     a.download = "price-template.csv";
     a.click();
     URL.revokeObjectURL(url);
+  };
+
+  const downloadTemplateXlsx = () => {
+    const { header, samples } = buildTemplateRows();
+    const aoa = [header, ...samples];
+    const ws = XLSX.utils.aoa_to_sheet(aoa);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Прайс");
+    XLSX.writeFile(wb, "price-template.xlsx");
   };
 
   return (
@@ -314,15 +327,20 @@ function CatalogUploadPage() {
             )}
           </p>
         </div>
-        <Button variant="outline" size="sm" onClick={downloadTemplate} className="gap-1.5" disabled={!warehousesQ.data}>
-          <Download className="h-3.5 w-3.5" /> Скачать шаблон
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" size="sm" onClick={downloadTemplateXlsx} className="gap-1.5" disabled={!warehousesQ.data}>
+            <Download className="h-3.5 w-3.5" /> Шаблон .xlsx
+          </Button>
+          <Button variant="outline" size="sm" onClick={downloadTemplateCsv} className="gap-1.5" disabled={!warehousesQ.data}>
+            <Download className="h-3.5 w-3.5" /> Шаблон .csv
+          </Button>
+        </div>
       </div>
 
       {/* Spec */}
       <Card className="p-5">
         <h2 className="font-display text-sm uppercase tracking-wider text-muted-foreground">Формат файла</h2>
-        <p className="mt-2 text-sm">CSV (UTF-8, разделитель — запятая или точка с запятой). Первая строка — заголовки.</p>
+        <p className="mt-2 text-sm">Принимаются файлы <strong>Excel (.xlsx, .xls)</strong> и <strong>CSV</strong> (UTF-8, разделитель — запятая или точка с запятой). Первая строка — заголовки.</p>
 
         <div className="mt-3 overflow-hidden rounded border border-border">
           <table className="w-full text-sm">
