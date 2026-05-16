@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { sendMaxMessage } from "./max.server";
+import { sendInternalTransactionalEmail } from "./email/send.server";
 
 const OrderItemInput = z.object({
   product_id: z.string().uuid(),
@@ -73,7 +74,21 @@ export const submitOrder = createServerFn({ method: "POST" })
       `Сумма: ${total.toLocaleString("ru-RU")} ₽`,
       data.notes ? `\nКомментарий: ${data.notes}` : null,
     ].filter(Boolean) as string[];
-    await sendMaxMessage(lines.join("\n"));
+    await Promise.allSettled([
+      sendMaxMessage(lines.join("\n")),
+      sendInternalTransactionalEmail({
+        templateName: "new-order",
+        idempotencyKey: `new-order-${order.number}`,
+        templateData: {
+          number: order.number,
+          customer,
+          phone: profile?.phone ?? undefined,
+          itemsCount: data.items.length,
+          total,
+          notes: data.notes ?? undefined,
+        },
+      }),
+    ]);
 
     return { id: order.id, number: order.number };
   });

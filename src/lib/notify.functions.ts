@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { sendMaxMessage } from "./max.server";
+import { sendInternalTransactionalEmail } from "./email/send.server";
 
 const FeedbackInput = z.object({
   name: z.string().max(200).optional().nullable(),
@@ -20,7 +21,19 @@ export const notifyNewFeedback = createServerFn({ method: "POST" })
       "",
       data.message,
     ].filter(Boolean) as string[];
-    await sendMaxMessage(lines.join("\n"));
+
+    await Promise.allSettled([
+      sendMaxMessage(lines.join("\n")),
+      sendInternalTransactionalEmail({
+        templateName: "new-feedback",
+        templateData: {
+          name: data.name ?? undefined,
+          phone: data.phone ?? undefined,
+          email: data.email ?? undefined,
+          message: data.message,
+        },
+      }),
+    ]);
     return { ok: true };
   });
 
@@ -43,6 +56,20 @@ export const notifyNewOrder = createServerFn({ method: "POST" })
       `Сумма: ${data.total.toLocaleString("ru-RU")} ₽`,
       data.notes ? `\nКомментарий: ${data.notes}` : null,
     ].filter(Boolean) as string[];
-    await sendMaxMessage(lines.join("\n"));
+
+    await Promise.allSettled([
+      sendMaxMessage(lines.join("\n")),
+      sendInternalTransactionalEmail({
+        templateName: "new-order",
+        idempotencyKey: `new-order-${data.number}`,
+        templateData: {
+          number: data.number,
+          customer: data.customer ?? "—",
+          itemsCount: data.itemsCount,
+          total: data.total,
+          notes: data.notes ?? undefined,
+        },
+      }),
+    ]);
     return { ok: true };
   });
