@@ -17,10 +17,10 @@ export const Route = createFileRoute("/sitemap.xml")({
   server: {
     handlers: {
       GET: async () => {
-        const { data: posts } = await supabaseAdmin
-          .from("blog_posts")
-          .select("slug, updated_at")
-          .eq("is_published", true);
+        const [{ data: posts }, { data: brands }] = await Promise.all([
+          supabaseAdmin.from("blog_posts").select("slug, updated_at").eq("is_published", true),
+          supabaseAdmin.from("brands").select("slug"),
+        ]);
 
         const urls: string[] = [];
         for (const s of STATIC) {
@@ -32,6 +32,17 @@ export const Route = createFileRoute("/sitemap.xml")({
               s.priority ? `    <priority>${s.priority}</priority>` : null,
               `  </url>`,
             ].filter(Boolean).join("\n"),
+          );
+        }
+        for (const b of brands ?? []) {
+          urls.push(
+            [
+              `  <url>`,
+              `    <loc>${BASE}/catalog/brand/${b.slug}</loc>`,
+              `    <changefreq>weekly</changefreq>`,
+              `    <priority>0.8</priority>`,
+              `  </url>`,
+            ].join("\n"),
           );
         }
         for (const p of posts ?? []) {

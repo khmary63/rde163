@@ -34,6 +34,7 @@ import { Route as AdminCrossesRouteImport } from './routes/admin.crosses'
 import { Route as AdminContentRouteImport } from './routes/admin.content'
 import { Route as AdminCatalogRouteImport } from './routes/admin.catalog'
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
+import { Route as CatalogBrandSlugRouteImport } from './routes/catalog.brand.$slug'
 import { Route as AdminOrdersIdRouteImport } from './routes/admin.orders.$id'
 import { Route as LovableEmailTransactionalSendRouteImport } from './routes/lovable/email/transactional/send'
 import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
@@ -166,6 +167,11 @@ const LovableEmailSuppressionRoute = LovableEmailSuppressionRouteImport.update({
   path: '/lovable/email/suppression',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CatalogBrandSlugRoute = CatalogBrandSlugRouteImport.update({
+  id: '/brand/$slug',
+  path: '/brand/$slug',
+  getParentRoute: () => CatalogRoute,
+} as any)
 const AdminOrdersIdRoute = AdminOrdersIdRouteImport.update({
   id: '/$id',
   path: '/$id',
@@ -205,7 +211,7 @@ export interface FileRoutesByFullPath {
   '/account': typeof AccountRoute
   '/admin': typeof AdminRouteWithChildren
   '/cart': typeof CartRoute
-  '/catalog': typeof CatalogRoute
+  '/catalog': typeof CatalogRouteWithChildren
   '/contacts': typeof ContactsRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
@@ -226,6 +232,7 @@ export interface FileRoutesByFullPath {
   '/admin/': typeof AdminIndexRoute
   '/blog/': typeof BlogIndexRoute
   '/admin/orders/$id': typeof AdminOrdersIdRoute
+  '/catalog/brand/$slug': typeof CatalogBrandSlugRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
@@ -237,7 +244,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/account': typeof AccountRoute
   '/cart': typeof CartRoute
-  '/catalog': typeof CatalogRoute
+  '/catalog': typeof CatalogRouteWithChildren
   '/contacts': typeof ContactsRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
@@ -258,6 +265,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AdminIndexRoute
   '/blog': typeof BlogIndexRoute
   '/admin/orders/$id': typeof AdminOrdersIdRoute
+  '/catalog/brand/$slug': typeof CatalogBrandSlugRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
@@ -271,7 +279,7 @@ export interface FileRoutesById {
   '/account': typeof AccountRoute
   '/admin': typeof AdminRouteWithChildren
   '/cart': typeof CartRoute
-  '/catalog': typeof CatalogRoute
+  '/catalog': typeof CatalogRouteWithChildren
   '/contacts': typeof ContactsRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
@@ -292,6 +300,7 @@ export interface FileRoutesById {
   '/admin/': typeof AdminIndexRoute
   '/blog/': typeof BlogIndexRoute
   '/admin/orders/$id': typeof AdminOrdersIdRoute
+  '/catalog/brand/$slug': typeof CatalogBrandSlugRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
@@ -327,6 +336,7 @@ export interface FileRouteTypes {
     | '/admin/'
     | '/blog/'
     | '/admin/orders/$id'
+    | '/catalog/brand/$slug'
     | '/lovable/email/suppression'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
@@ -359,6 +369,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/blog'
     | '/admin/orders/$id'
+    | '/catalog/brand/$slug'
     | '/lovable/email/suppression'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
@@ -392,6 +403,7 @@ export interface FileRouteTypes {
     | '/admin/'
     | '/blog/'
     | '/admin/orders/$id'
+    | '/catalog/brand/$slug'
     | '/lovable/email/suppression'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
@@ -405,7 +417,7 @@ export interface RootRouteChildren {
   AccountRoute: typeof AccountRoute
   AdminRoute: typeof AdminRouteWithChildren
   CartRoute: typeof CartRoute
-  CatalogRoute: typeof CatalogRoute
+  CatalogRoute: typeof CatalogRouteWithChildren
   ContactsRoute: typeof ContactsRoute
   LoginRoute: typeof LoginRoute
   RegisterRoute: typeof RegisterRoute
@@ -600,6 +612,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LovableEmailSuppressionRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/catalog/brand/$slug': {
+      id: '/catalog/brand/$slug'
+      path: '/brand/$slug'
+      fullPath: '/catalog/brand/$slug'
+      preLoaderRoute: typeof CatalogBrandSlugRouteImport
+      parentRoute: typeof CatalogRoute
+    }
     '/admin/orders/$id': {
       id: '/admin/orders/$id'
       path: '/$id'
@@ -685,12 +704,23 @@ const AdminRouteChildren: AdminRouteChildren = {
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
+interface CatalogRouteChildren {
+  CatalogBrandSlugRoute: typeof CatalogBrandSlugRoute
+}
+
+const CatalogRouteChildren: CatalogRouteChildren = {
+  CatalogBrandSlugRoute: CatalogBrandSlugRoute,
+}
+
+const CatalogRouteWithChildren =
+  CatalogRoute._addFileChildren(CatalogRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AccountRoute: AccountRoute,
   AdminRoute: AdminRouteWithChildren,
   CartRoute: CartRoute,
-  CatalogRoute: CatalogRoute,
+  CatalogRoute: CatalogRouteWithChildren,
   ContactsRoute: ContactsRoute,
   LoginRoute: LoginRoute,
   RegisterRoute: RegisterRoute,

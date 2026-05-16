@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Search, Loader2, ShoppingCart, ChevronLeft, ChevronRight, X } from "lucide-react";
@@ -281,13 +281,23 @@ function CatalogPage() {
           <FilterSection title={`Бренд${brandIds.length ? ` · ${brandIds.length}` : ""}`}>
             <div className="max-h-72 space-y-1.5 overflow-y-auto pr-2">
               {brandsQ.data?.map((b) => (
-                <label key={b.id} className="flex cursor-pointer items-center gap-2 text-sm">
-                  <Checkbox
-                    checked={brandIds.includes(b.id)}
-                    onCheckedChange={() => toggleId(brandIds, b.id, setBrandIds)}
-                  />
-                  {b.name}
-                </label>
+                <div key={b.id} className="flex items-center justify-between gap-2 text-sm">
+                  <label className="flex flex-1 cursor-pointer items-center gap-2">
+                    <Checkbox
+                      checked={brandIds.includes(b.id)}
+                      onCheckedChange={() => toggleId(brandIds, b.id, setBrandIds)}
+                    />
+                    {b.name}
+                  </label>
+                  <Link
+                    to="/catalog/brand/$slug"
+                    params={{ slug: b.slug }}
+                    className="text-[11px] text-muted-foreground hover:text-brand hover:underline"
+                    title={`SEO-страница бренда ${b.name}`}
+                  >
+                    →
+                  </Link>
+                </div>
               ))}
             </div>
           </FilterSection>
