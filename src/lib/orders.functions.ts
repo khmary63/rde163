@@ -9,7 +9,6 @@ const OrderItemInput = z.object({
   product_id: z.string().uuid(),
   warehouse_id: z.string().uuid(),
   qty: z.number().int().min(1).max(10000),
-  unit_price: z.number().min(0),
 });
 
 const SubmitInput = z.object({
@@ -24,7 +23,59 @@ export const submitOrder = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
 
-    const total = data.items.reduce((s, it) => s + it.qty * it.unit_price, 0);
+    // SECURITY: prices must be computed server-side, never trusted from the client.
+    // Fetch authoritative base prices and product info for all requested products.
+    const productIds = Array.from(new Set(data.items.map((it) => it.product_id)));
+    const warehouseIds = Array.from(new Set(data.items.map((it) => it.warehouse_id)));
+
+    const [{ data: products, error: productsErr }, { data: warehouses }, { data: profile }] =
+      await Promise.all([
+        supabase.from("products").select("id, name, sku, base_price").in("id", productIds),
+        supabase.from("warehouses").select("id, name").in("id", warehouseIds),
+        supabase
+          .from("profiles")
+          .select("full_name, company_name, phone, email, discount_percent")
+          .eq("id", userId)
+          .maybeSingle(),
+      ]);
+
+    if (productsErr) throw new Error(productsErr.message);
+    if (!products || products.length !== productIds.length) {
+      throw new Error("Некоторые товары недоступны");
+    }
+
+    const productMap = new Map(products.map((p) => [p.id, p]));
+    const warehouseMap = new Map((warehouses ?? []).map((w) => [w.id, w]));
+
+    // Per-user discount: take the higher of profile.discount_percent or a row in discounts
+    const { data: discountRow } = await supabase
+      .from("discounts")
+      .select("percent")
+      .eq("user_id", userId)
+      .maybeSingle();
+    const profileDiscount = Number(profile?.discount_percent ?? 0);
+    const rowDiscount = Number(discountRow?.percent ?? 0);
+    const discountPercent = Math.max(0, Math.min(100, Math.max(profileDiscount, rowDiscount)));
+
+    // Build priced rows server-side
+    const priced = data.items.map((it) => {
+      const p = productMap.get(it.product_id)!;
+      const basePrice = Number(p.base_price);
+      const unitPrice = +(basePrice * (1 - discountPercent / 100)).toFixed(2);
+      const lineTotal = +(unitPrice * it.qty).toFixed(2);
+      return {
+        product_id: it.product_id,
+        warehouse_id: it.warehouse_id,
+        qty: it.qty,
+        unit_price: unitPrice,
+        discount_percent: discountPercent,
+        line_total: lineTotal,
+        product_name: p.name,
+        product_sku: p.sku as string | null,
+      };
+    });
+
+    const total = +priced.reduce((s, r) => s + r.line_total, 0).toFixed(2);
 
     const { data: order, error: orderErr } = await supabase
       .from("orders")
@@ -43,14 +94,14 @@ export const submitOrder = createServerFn({ method: "POST" })
       throw new Error(orderErr?.message ?? "Не удалось создать заявку");
     }
 
-    const rows = data.items.map((it) => ({
+    const rows = priced.map((r) => ({
       order_id: order.id,
-      product_id: it.product_id,
-      warehouse_id: it.warehouse_id,
-      qty: it.qty,
-      unit_price: it.unit_price,
-      discount_percent: 0,
-      line_total: it.qty * it.unit_price,
+      product_id: r.product_id,
+      warehouse_id: r.warehouse_id,
+      qty: r.qty,
+      unit_price: r.unit_price,
+      discount_percent: r.discount_percent,
+      line_total: r.line_total,
       action: "buy" as const,
     }));
 
@@ -59,35 +110,16 @@ export const submitOrder = createServerFn({ method: "POST" })
       throw new Error(itemsErr.message);
     }
 
-    // Уведомление менеджеру в MAX (не блокирует ответ)
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("full_name, company_name, phone, email")
-      .eq("id", userId)
-      .maybeSingle();
     const customer = profile?.company_name || profile?.full_name || profile?.email || "—";
 
-    // Соберём названия товаров/складов для Excel-выгрузки
-    const productIds = Array.from(new Set(data.items.map((it) => it.product_id)));
-    const warehouseIds = Array.from(new Set(data.items.map((it) => it.warehouse_id)));
-    const [{ data: products }, { data: warehouses }] = await Promise.all([
-      supabase.from("products").select("id, name, sku").in("id", productIds),
-      supabase.from("warehouses").select("id, name").in("id", warehouseIds),
-    ]);
-    const productMap = new Map((products ?? []).map((p) => [p.id, p]));
-    const warehouseMap = new Map((warehouses ?? []).map((w) => [w.id, w]));
-    const exportItems: OrderExportItem[] = data.items.map((it) => {
-      const p = productMap.get(it.product_id);
-      const w = warehouseMap.get(it.warehouse_id);
-      return {
-        product_name: p?.name ?? it.product_id,
-        product_sku: p?.sku ?? null,
-        warehouse_name: w?.name ?? it.warehouse_id,
-        qty: it.qty,
-        unit_price: it.unit_price,
-        line_total: it.qty * it.unit_price,
-      };
-    });
+    const exportItems: OrderExportItem[] = priced.map((r) => ({
+      product_name: r.product_name,
+      product_sku: r.product_sku,
+      warehouse_name: warehouseMap.get(r.warehouse_id)?.name ?? r.warehouse_id,
+      qty: r.qty,
+      unit_price: r.unit_price,
+      line_total: r.line_total,
+    }));
 
     const xlsx = await buildAndUploadOrderXlsx({
       number: String(order.number),

@@ -59,6 +59,20 @@ export const Route = createFileRoute("/lovable/email/transactional/send")({
           return Response.json({ error: 'Unauthorized' }, { status: 401 })
         }
 
+        // Authorization: only staff (admin/manager) may trigger internal email sends.
+        const { data: roleRows, error: roleErr } = await supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', user.id)
+        if (roleErr) {
+          console.error('Role lookup failed', { error: roleErr })
+          return Response.json({ error: 'Forbidden' }, { status: 403 })
+        }
+        const isStaff = (roleRows ?? []).some((r) => r.role === 'admin' || r.role === 'manager')
+        if (!isStaff) {
+          return Response.json({ error: 'Forbidden' }, { status: 403 })
+        }
+
         // Parse request body
         let templateName: string
         let recipientEmail: string
