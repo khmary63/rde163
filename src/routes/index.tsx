@@ -327,14 +327,14 @@ function HomePage() {
             backgroundSize: '24px 24px',
           }}
         />
-        <div className="absolute -top-20 -right-20 h-[500px] w-[500px] rounded-full bg-accent-blue/30 blur-3xl" />
+        <div className="absolute -top-20 -right-20 h-[500px] w-[500px] rounded-full bg-accent-teal/30 blur-3xl" />
 
         <div className="relative mx-auto max-w-[1480px] px-6 py-24 grid lg:grid-cols-[1.2fr_1fr] gap-14 items-center">
           <div className="space-y-6">
-            <div className="font-mono text-[11px] text-accent-blue uppercase tracking-[0.3em]">/ 05 · custom request</div>
+            <div className="font-mono text-[11px] text-accent-teal uppercase tracking-[0.3em]">/ 05 · custom request</div>
             <h2 className="font-display text-4xl lg:text-6xl font-bold leading-[0.95]">
               Не нашли деталь?<br />
-              <span className="text-accent-blue">Найдём за вас.</span>
+              <span className="text-accent-teal">Найдём за вас.</span>
             </h2>
             <p className="text-lg text-background/70 max-w-xl leading-relaxed">
               Загрузите артикул, список или фото — менеджер подберёт оригинал или аналог в течение рабочего дня.
@@ -342,23 +342,23 @@ function HomePage() {
             <ul className="space-y-3 text-sm text-background/85">
               {["Подбор по фото и серийному номеру", "Сравнение оригинал ↔ аналог", "Расчёт логистики до вашего города"].map((x) => (
                 <li key={x} className="flex items-center gap-3">
-                  <span className="h-px w-6 bg-accent-blue" />{x}
+                  <span className="h-px w-6 bg-accent-teal" />{x}
                 </li>
               ))}
             </ul>
           </div>
 
-          <form className="relative space-y-3 bg-background text-foreground p-8 border border-accent-blue/40 shadow-[0_30px_80px_-20px_oklch(0.42 0.18 258 / 0.5)]" onSubmit={(e) => e.preventDefault()}>
+          <form className="relative space-y-3 bg-background text-foreground p-8 border border-accent-teal/40 shadow-[0_30px_80px_-20px_oklch(0.72_0.13_195/0.5)]" onSubmit={(e) => e.preventDefault()}>
             <div className="flex items-center justify-between mb-4">
               <span className="font-mono text-xs uppercase tracking-widest text-muted-foreground">// заявка</span>
               <span className="font-mono text-xs text-brand">REQ-{Math.floor(Math.random() * 9000 + 1000)}</span>
             </div>
-            <input type="text" placeholder="Артикул или название детали" className="w-full h-12 border border-border bg-background px-4 text-sm focus:outline-none focus:border-accent-blue rounded-none" />
-            <input type="tel" placeholder="Ваш телефон" className="w-full h-12 border border-border bg-background px-4 text-sm focus:outline-none focus:border-accent-blue rounded-none" />
-            <button type="button" className="w-full h-12 border border-dashed border-border bg-background text-sm text-muted-foreground hover:border-accent-blue hover:text-accent-blue transition-colors flex items-center justify-center gap-2 rounded-none">
+            <input type="text" placeholder="Артикул или название детали" className="w-full h-12 border border-border bg-background px-4 text-sm focus:outline-none focus:border-accent-teal rounded-none" />
+            <input type="tel" placeholder="Ваш телефон" className="w-full h-12 border border-border bg-background px-4 text-sm focus:outline-none focus:border-accent-teal rounded-none" />
+            <button type="button" className="w-full h-12 border border-dashed border-border bg-background text-sm text-muted-foreground hover:border-accent-teal hover:text-accent-teal transition-colors flex items-center justify-center gap-2 rounded-none">
               <Upload className="h-4 w-4" />Прикрепить файл или фото
             </button>
-            <Button type="submit" size="lg" className="w-full rounded-none bg-foreground text-background hover:bg-accent-blue hover:text-accent-blue-foreground font-display tracking-wide h-12">
+            <Button type="submit" size="lg" className="w-full rounded-none bg-foreground text-background hover:bg-accent-teal hover:text-accent-teal-foreground font-display tracking-wide h-12">
               ОТПРАВИТЬ → МЕНЕДЖЕР
             </Button>
           </form>
