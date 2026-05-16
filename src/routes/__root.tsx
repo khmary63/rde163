@@ -121,6 +121,15 @@ function RootShell({ children }: { children: React.ReactNode }) {
         <HeadContent />
       </head>
       <body>
+        <noscript>
+          <div>
+            <img
+              src="https://mc.yandex.ru/watch/109252143"
+              style={{ position: "absolute", left: "-9999px" }}
+              alt=""
+            />
+          </div>
+        </noscript>
         {children}
         <Scripts />
       </body>
