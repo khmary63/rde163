@@ -98,8 +98,8 @@
   --accent-blue: oklch(0.42 0.18 258);           /* deep dark blue #1E3FB0 */
   --accent-blue-foreground: oklch(1 0 0);
 
-  --accent-teal: oklch(0.72 0.13 195);           /* teal/бирюзовый */
-  --accent-teal-foreground: oklch(0.18 0.02 220);
+  --accent-teal: oklch(0.70 0.14 220);           /* фирменный бирюзовый #00BCE4 */
+  --accent-teal-foreground: oklch(1 0 0);
 
   --primary: oklch(0.70 0.14 220);
   --primary-foreground: oklch(1 0 0);
