@@ -105,10 +105,7 @@ function HomePage() {
           <h1 className="mt-10 font-display font-bold leading-[0.85] tracking-tight">
             <span className="block text-[clamp(3.5rem,9vw,9.5rem)]">ЗАПЧАСТИ</span>
             <span className="block text-[clamp(2.2rem,5.5vw,5.5rem)] text-muted-foreground/70 mt-2">
-              для <span className="text-accent-orange font-extrabold">SITRAK</span>, SDLG,<br className="hidden lg:block"/> XCMG, HOWO и других
-            </span>
-            <span className="block text-[clamp(2rem,4.5vw,4.5rem)] mt-4">
-              в один экран. <span className="font-mono text-brand text-[0.7em] align-middle">/</span> в одну минуту.
+              один экран <span className="text-accent-orange font-extrabold">—</span> одна минута
             </span>
           </h1>
 
