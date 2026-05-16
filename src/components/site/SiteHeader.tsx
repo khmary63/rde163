@@ -76,12 +76,12 @@ export function SiteHeader() {
           <span className="absolute -top-0.5 -right-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-brand px-1 text-[10px] font-bold text-brand-foreground">3</span>
         </Link>
 
-        <Link to="/account" className="inline-flex h-9 w-9 items-center justify-center rounded-md hover:bg-surface transition-colors">
+        <Link to={user ? "/account" : "/login"} className="inline-flex h-9 w-9 items-center justify-center rounded-md hover:bg-surface transition-colors" aria-label="Личный кабинет">
           <User className="h-5 w-5" />
         </Link>
 
         <Button asChild size="sm" className="hidden md:inline-flex bg-brand text-brand-foreground hover:bg-brand/90 font-semibold">
-          <Link to="/login">Войти</Link>
+          <Link to={user ? "/account" : "/login"}>{user ? "Кабинет" : "Войти"}</Link>
         </Button>
 
         <button
