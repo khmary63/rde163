@@ -129,13 +129,13 @@ function HomePage() {
             </div>
 
             {/* Боковая статистика — стек */}
-            <div className="hidden lg:flex flex-col gap-1 font-mono text-right">
-              <div className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground">в реальном времени</div>
+            <div className="hidden lg:flex flex-col gap-1 font-mono text-right bg-background/85 backdrop-blur-md border border-border px-6 py-5 shadow-[0_20px_60px_-20px_oklch(0.20_0.013_250/0.35)]">
+              <div className="text-[10px] uppercase tracking-[0.3em] text-foreground/70">в реальном времени</div>
               <div className="font-display text-6xl font-bold tabular-nums text-accent-orange leading-none">40K+</div>
-              <div className="text-xs text-muted-foreground">позиций в наличии</div>
+              <div className="text-xs text-foreground/75">позиций в наличии</div>
               <div className="mt-3 h-px w-full bg-border" />
               <div className="font-display text-3xl font-bold tabular-nums leading-none mt-3 text-accent-teal">~ 30 сек</div>
-              <div className="text-xs text-muted-foreground">от запроса до КП</div>
+              <div className="text-xs text-foreground/75">от запроса до КП</div>
             </div>
           </div>
         </div>
