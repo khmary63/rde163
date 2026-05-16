@@ -21,6 +21,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as BlogIndexRouteImport } from './routes/blog.index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
+import { Route as AdminRefsRouteImport } from './routes/admin.refs'
 import { Route as AdminOrdersRouteImport } from './routes/admin.orders'
 import { Route as AdminCustomersRouteImport } from './routes/admin.customers'
 import { Route as AdminCrossesRouteImport } from './routes/admin.crosses'
@@ -87,6 +88,11 @@ const BlogSlugRoute = BlogSlugRouteImport.update({
   path: '/blog/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminRefsRoute = AdminRefsRouteImport.update({
+  id: '/refs',
+  path: '/refs',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminOrdersRoute = AdminOrdersRouteImport.update({
   id: '/orders',
   path: '/orders',
@@ -127,6 +133,7 @@ export interface FileRoutesByFullPath {
   '/admin/crosses': typeof AdminCrossesRoute
   '/admin/customers': typeof AdminCustomersRoute
   '/admin/orders': typeof AdminOrdersRouteWithChildren
+  '/admin/refs': typeof AdminRefsRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/admin/': typeof AdminIndexRoute
   '/blog/': typeof BlogIndexRoute
@@ -145,6 +152,7 @@ export interface FileRoutesByTo {
   '/admin/crosses': typeof AdminCrossesRoute
   '/admin/customers': typeof AdminCustomersRoute
   '/admin/orders': typeof AdminOrdersRouteWithChildren
+  '/admin/refs': typeof AdminRefsRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/admin': typeof AdminIndexRoute
   '/blog': typeof BlogIndexRoute
@@ -165,6 +173,7 @@ export interface FileRoutesById {
   '/admin/crosses': typeof AdminCrossesRoute
   '/admin/customers': typeof AdminCustomersRoute
   '/admin/orders': typeof AdminOrdersRouteWithChildren
+  '/admin/refs': typeof AdminRefsRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/admin/': typeof AdminIndexRoute
   '/blog/': typeof BlogIndexRoute
@@ -186,6 +195,7 @@ export interface FileRouteTypes {
     | '/admin/crosses'
     | '/admin/customers'
     | '/admin/orders'
+    | '/admin/refs'
     | '/blog/$slug'
     | '/admin/'
     | '/blog/'
@@ -204,6 +214,7 @@ export interface FileRouteTypes {
     | '/admin/crosses'
     | '/admin/customers'
     | '/admin/orders'
+    | '/admin/refs'
     | '/blog/$slug'
     | '/admin'
     | '/blog'
@@ -223,6 +234,7 @@ export interface FileRouteTypes {
     | '/admin/crosses'
     | '/admin/customers'
     | '/admin/orders'
+    | '/admin/refs'
     | '/blog/$slug'
     | '/admin/'
     | '/blog/'
@@ -329,6 +341,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BlogSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/refs': {
+      id: '/admin/refs'
+      path: '/refs'
+      fullPath: '/admin/refs'
+      preLoaderRoute: typeof AdminRefsRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/orders': {
       id: '/admin/orders'
       path: '/orders'
@@ -384,6 +403,7 @@ interface AdminRouteChildren {
   AdminCrossesRoute: typeof AdminCrossesRoute
   AdminCustomersRoute: typeof AdminCustomersRoute
   AdminOrdersRoute: typeof AdminOrdersRouteWithChildren
+  AdminRefsRoute: typeof AdminRefsRoute
   AdminIndexRoute: typeof AdminIndexRoute
 }
 
@@ -392,6 +412,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminCrossesRoute: AdminCrossesRoute,
   AdminCustomersRoute: AdminCustomersRoute,
   AdminOrdersRoute: AdminOrdersRouteWithChildren,
+  AdminRefsRoute: AdminRefsRoute,
   AdminIndexRoute: AdminIndexRoute,
 }
 
