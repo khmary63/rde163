@@ -1,0 +1,1 @@
+GRANT INSERT, UPDATE ON public.stock TO sandbox_exec;

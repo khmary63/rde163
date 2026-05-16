@@ -1,0 +1,1 @@
+REVOKE INSERT, UPDATE ON public.stock FROM sandbox_exec;
