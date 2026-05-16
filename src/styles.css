@@ -183,6 +183,14 @@
   .bg-accent-blue { background-color: var(--accent-blue); }
   .border-accent-blue { border-color: var(--accent-blue); }
   .text-accent-blue-foreground { color: var(--accent-blue-foreground); }
+  .text-accent-teal { color: var(--accent-teal); }
+  .bg-accent-teal { background-color: var(--accent-teal); }
+  .border-accent-teal { border-color: var(--accent-teal); }
+  .text-accent-teal-foreground { color: var(--accent-teal-foreground); }
+  .hover\:bg-accent-teal:hover { background-color: var(--accent-teal); }
+  .hover\:text-accent-teal:hover { color: var(--accent-teal); }
+  .hover\:text-accent-teal-foreground:hover { color: var(--accent-teal-foreground); }
+  .hover\:border-accent-teal:hover { border-color: var(--accent-teal); }
 }
 
 @keyframes ticker {
