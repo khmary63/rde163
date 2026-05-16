@@ -2,16 +2,18 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Search, Package } from "lucide-react";
+import type { Database } from "@/integrations/supabase/types";
 import { supabase } from "@/integrations/supabase/client";
 import { Input } from "@/components/ui/input";
 import { StatusBadge } from "./admin.index";
 
-const STATUSES = [
+type OrderStatus = Database["public"]["Enums"]["order_status"];
+
+const STATUSES: { value: "all" | OrderStatus; label: string }[] = [
   { value: "all", label: "Все" },
   { value: "submitted", label: "Новые" },
-  { value: "in_progress", label: "В работе" },
-  { value: "invoiced", label: "Счёт" },
-  { value: "paid", label: "Оплачены" },
+  { value: "confirmed", label: "Подтверждены" },
+  { value: "processing", label: "В работе" },
   { value: "shipped", label: "Отгружены" },
   { value: "completed", label: "Завершены" },
   { value: "cancelled", label: "Отменены" },
@@ -22,7 +24,7 @@ export const Route = createFileRoute("/admin/orders")({
 });
 
 function AdminOrdersPage() {
-  const [status, setStatus] = useState("all");
+  const [status, setStatus] = useState<"all" | OrderStatus>("all");
   const [q, setQ] = useState("");
 
   const { data, isLoading } = useQuery({
@@ -30,7 +32,7 @@ function AdminOrdersPage() {
     queryFn: async () => {
       let query = supabase
         .from("orders")
-        .select("id, number, status, total_amount, created_at, submitted_at, notes, profile:profiles(full_name, company_name, phone, email)")
+        .select("id, number, status, total_amount, created_at, submitted_at, notes, user_id")
         .neq("status", "draft")
         .order("created_at", { ascending: false })
         .limit(200);
@@ -38,7 +40,17 @@ function AdminOrdersPage() {
       if (q.trim()) query = query.ilike("number", `%${q.trim()}%`);
       const { data, error } = await query;
       if (error) throw error;
-      return data;
+
+      const userIds = Array.from(new Set((data ?? []).map((r) => r.user_id)));
+      let profiles: Record<string, { full_name: string | null; company_name: string | null; phone: string | null; email: string | null }> = {};
+      if (userIds.length) {
+        const { data: pr } = await supabase
+          .from("profiles")
+          .select("id, full_name, company_name, phone, email")
+          .in("id", userIds);
+        profiles = Object.fromEntries((pr ?? []).map((p) => [p.id, p]));
+      }
+      return (data ?? []).map((r) => ({ ...r, profile: profiles[r.user_id] ?? null }));
     },
   });
 
@@ -88,33 +100,30 @@ function AdminOrdersPage() {
                 <Package className="mx-auto h-8 w-8 opacity-40" /><div className="mt-2">Заявок не найдено</div>
               </td></tr>
             )}
-            {data?.map((o) => {
-              const p = o.profile as { full_name: string | null; company_name: string | null; phone: string | null; email: string | null } | null;
-              return (
-                <tr key={o.id} className="hover:bg-background/50">
-                  <td className="px-4 py-2.5">
-                    <Link to="/admin/orders/$id" params={{ id: o.id }} className="font-mono text-xs font-semibold text-brand hover:underline">
-                      {o.number}
-                    </Link>
-                  </td>
-                  <td className="px-4 py-2.5">
-                    <div className="font-medium">{p?.company_name || p?.full_name || "—"}</div>
-                    {p?.company_name && p.full_name && <div className="text-xs text-muted-foreground">{p.full_name}</div>}
-                  </td>
-                  <td className="px-4 py-2.5 text-xs text-muted-foreground">
-                    {p?.phone && <div>{p.phone}</div>}
-                    {p?.email && <div>{p.email}</div>}
-                  </td>
-                  <td className="px-4 py-2.5"><StatusBadge status={o.status} /></td>
-                  <td className="px-4 py-2.5 text-right font-display font-semibold">
-                    {Number(o.total_amount).toLocaleString("ru-RU", { maximumFractionDigits: 0 })} ₽
-                  </td>
-                  <td className="px-4 py-2.5 text-xs text-muted-foreground">
-                    {new Date(o.created_at).toLocaleString("ru-RU", { day: "2-digit", month: "short", year: "2-digit", hour: "2-digit", minute: "2-digit" })}
-                  </td>
-                </tr>
-              );
-            })}
+            {data?.map((o) => (
+              <tr key={o.id} className="hover:bg-background/50">
+                <td className="px-4 py-2.5">
+                  <Link to="/admin/orders/$id" params={{ id: o.id }} className="font-mono text-xs font-semibold text-brand hover:underline">
+                    {o.number}
+                  </Link>
+                </td>
+                <td className="px-4 py-2.5">
+                  <div className="font-medium">{o.profile?.company_name || o.profile?.full_name || "—"}</div>
+                  {o.profile?.company_name && o.profile.full_name && <div className="text-xs text-muted-foreground">{o.profile.full_name}</div>}
+                </td>
+                <td className="px-4 py-2.5 text-xs text-muted-foreground">
+                  {o.profile?.phone && <div>{o.profile.phone}</div>}
+                  {o.profile?.email && <div>{o.profile.email}</div>}
+                </td>
+                <td className="px-4 py-2.5"><StatusBadge status={o.status} /></td>
+                <td className="px-4 py-2.5 text-right font-display font-semibold">
+                  {Number(o.total_amount).toLocaleString("ru-RU", { maximumFractionDigits: 0 })} ₽
+                </td>
+                <td className="px-4 py-2.5 text-xs text-muted-foreground">
+                  {new Date(o.created_at).toLocaleString("ru-RU", { day: "2-digit", month: "short", year: "2-digit", hour: "2-digit", minute: "2-digit" })}
+                </td>
+              </tr>
+            ))}
           </tbody>
         </table>
       </div>

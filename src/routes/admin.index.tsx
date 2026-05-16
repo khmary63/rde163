@@ -14,19 +14,31 @@ function AdminDashboard() {
       const [all, sub, prog, done, recent] = await Promise.all([
         supabase.from("orders").select("id", { count: "exact", head: true }),
         supabase.from("orders").select("id", { count: "exact", head: true }).eq("status", "submitted"),
-        supabase.from("orders").select("id", { count: "exact", head: true }).in("status", ["in_progress", "invoiced", "paid"]),
+        supabase.from("orders").select("id", { count: "exact", head: true }).in("status", ["confirmed", "processing"]),
         supabase.from("orders").select("id", { count: "exact", head: true }).eq("status", "completed"),
         supabase.from("orders")
-          .select("id, number, status, total_amount, created_at, profile:profiles(full_name, company_name)")
+          .select("id, number, status, total_amount, created_at, user_id")
           .order("created_at", { ascending: false })
           .limit(8),
       ]);
+
+      const recentRows = recent.data ?? [];
+      const userIds = Array.from(new Set(recentRows.map((r) => r.user_id)));
+      let profiles: Record<string, { full_name: string | null; company_name: string | null }> = {};
+      if (userIds.length) {
+        const { data: pr } = await supabase
+          .from("profiles")
+          .select("id, full_name, company_name")
+          .in("id", userIds);
+        profiles = Object.fromEntries((pr ?? []).map((p) => [p.id, { full_name: p.full_name, company_name: p.company_name }]));
+      }
+
       return {
         total: all.count ?? 0,
         new: sub.count ?? 0,
         inWork: prog.count ?? 0,
         done: done.count ?? 0,
-        recent: recent.data ?? [],
+        recent: recentRows.map((r) => ({ ...r, profile: profiles[r.user_id] ?? null })),
       };
     },
   });
@@ -66,20 +78,17 @@ function AdminDashboard() {
             {stats?.recent.length === 0 && (
               <tr><td colSpan={5} className="px-5 py-8 text-center text-muted-foreground"><Package className="mx-auto h-8 w-8 opacity-40" /><div className="mt-2">Заявок пока нет</div></td></tr>
             )}
-            {stats?.recent.map((o) => {
-              const p = o.profile as { full_name: string | null; company_name: string | null } | null;
-              return (
-                <tr key={o.id} className="hover:bg-background/50">
-                  <td className="px-5 py-2.5">
-                    <Link to="/admin/orders/$id" params={{ id: o.id }} className="font-mono text-xs font-semibold text-brand hover:underline">{o.number}</Link>
-                  </td>
-                  <td className="px-5 py-2.5">{p?.company_name || p?.full_name || "—"}</td>
-                  <td className="px-5 py-2.5"><StatusBadge status={o.status} /></td>
-                  <td className="px-5 py-2.5 text-right font-display font-semibold">{Number(o.total_amount).toLocaleString("ru-RU", { maximumFractionDigits: 0 })} ₽</td>
-                  <td className="px-5 py-2.5 text-xs text-muted-foreground">{new Date(o.created_at).toLocaleString("ru-RU", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" })}</td>
-                </tr>
-              );
-            })}
+            {stats?.recent.map((o) => (
+              <tr key={o.id} className="hover:bg-background/50">
+                <td className="px-5 py-2.5">
+                  <Link to="/admin/orders/$id" params={{ id: o.id }} className="font-mono text-xs font-semibold text-brand hover:underline">{o.number}</Link>
+                </td>
+                <td className="px-5 py-2.5">{o.profile?.company_name || o.profile?.full_name || "—"}</td>
+                <td className="px-5 py-2.5"><StatusBadge status={o.status} /></td>
+                <td className="px-5 py-2.5 text-right font-display font-semibold">{Number(o.total_amount).toLocaleString("ru-RU", { maximumFractionDigits: 0 })} ₽</td>
+                <td className="px-5 py-2.5 text-xs text-muted-foreground">{new Date(o.created_at).toLocaleString("ru-RU", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" })}</td>
+              </tr>
+            ))}
           </tbody>
         </table>
       </div>
@@ -111,9 +120,8 @@ export function StatusBadge({ status }: { status: string }) {
   const map: Record<string, { label: string; cls: string }> = {
     draft: { label: "Черновик", cls: "bg-muted text-muted-foreground" },
     submitted: { label: "Новая", cls: "bg-brand/15 text-brand" },
-    in_progress: { label: "В работе", cls: "bg-accent-orange/15 text-accent-orange" },
-    invoiced: { label: "Счёт выставлен", cls: "bg-accent-orange/15 text-accent-orange" },
-    paid: { label: "Оплачена", cls: "bg-[oklch(0.70_0.18_145)]/15 text-[oklch(0.55_0.18_145)]" },
+    confirmed: { label: "Подтверждена", cls: "bg-brand/15 text-brand" },
+    processing: { label: "В работе", cls: "bg-accent-orange/15 text-accent-orange" },
     shipped: { label: "Отгружена", cls: "bg-[oklch(0.70_0.18_145)]/15 text-[oklch(0.55_0.18_145)]" },
     completed: { label: "Завершена", cls: "bg-[oklch(0.70_0.18_145)]/15 text-[oklch(0.55_0.18_145)]" },
     cancelled: { label: "Отменена", cls: "bg-destructive/15 text-destructive" },
