@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as UnsubscribeRouteImport } from './routes/unsubscribe'
 import { Route as ReviewsRouteImport } from './routes/reviews'
 import { Route as RegisterRouteImport } from './routes/register'
 import { Route as LoginRouteImport } from './routes/login'
@@ -37,6 +38,11 @@ import { Route as LovableEmailTransactionalSendRouteImport } from './routes/lova
 import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
 
+const UnsubscribeRoute = UnsubscribeRouteImport.update({
+  id: '/unsubscribe',
+  path: '/unsubscribe',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ReviewsRoute = ReviewsRouteImport.update({
   id: '/reviews',
   path: '/reviews',
@@ -186,6 +192,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
   '/reviews': typeof ReviewsRoute
+  '/unsubscribe': typeof UnsubscribeRoute
   '/admin/catalog': typeof AdminCatalogRoute
   '/admin/content': typeof AdminContentRoute
   '/admin/crosses': typeof AdminCrossesRoute
@@ -214,6 +221,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
   '/reviews': typeof ReviewsRoute
+  '/unsubscribe': typeof UnsubscribeRoute
   '/admin/catalog': typeof AdminCatalogRoute
   '/admin/content': typeof AdminContentRoute
   '/admin/crosses': typeof AdminCrossesRoute
@@ -244,6 +252,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
   '/reviews': typeof ReviewsRoute
+  '/unsubscribe': typeof UnsubscribeRoute
   '/admin/catalog': typeof AdminCatalogRoute
   '/admin/content': typeof AdminContentRoute
   '/admin/crosses': typeof AdminCrossesRoute
@@ -275,6 +284,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/register'
     | '/reviews'
+    | '/unsubscribe'
     | '/admin/catalog'
     | '/admin/content'
     | '/admin/crosses'
@@ -303,6 +313,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/register'
     | '/reviews'
+    | '/unsubscribe'
     | '/admin/catalog'
     | '/admin/content'
     | '/admin/crosses'
@@ -332,6 +343,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/register'
     | '/reviews'
+    | '/unsubscribe'
     | '/admin/catalog'
     | '/admin/content'
     | '/admin/crosses'
@@ -362,6 +374,7 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   RegisterRoute: typeof RegisterRoute
   ReviewsRoute: typeof ReviewsRoute
+  UnsubscribeRoute: typeof UnsubscribeRoute
   ApiSitemapDotxmlRoute: typeof ApiSitemapDotxmlRoute
   BlogSlugRoute: typeof BlogSlugRoute
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
@@ -374,6 +387,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/unsubscribe': {
+      id: '/unsubscribe'
+      path: '/unsubscribe'
+      fullPath: '/unsubscribe'
+      preLoaderRoute: typeof UnsubscribeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/reviews': {
       id: '/reviews'
       path: '/reviews'
@@ -614,6 +634,7 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   RegisterRoute: RegisterRoute,
   ReviewsRoute: ReviewsRoute,
+  UnsubscribeRoute: UnsubscribeRoute,
   ApiSitemapDotxmlRoute: ApiSitemapDotxmlRoute,
   BlogSlugRoute: BlogSlugRoute,
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
