@@ -1,6 +1,6 @@
 import { createFileRoute, Link, Outlet, useRouter } from "@tanstack/react-router";
 import { useEffect } from "react";
-import { ShieldAlert, LogOut, LayoutDashboard, Package, Users as UsersIcon, GitFork, FileSpreadsheet, Library } from "lucide-react";
+import { ShieldAlert, LogOut, LayoutDashboard, Package, Users as UsersIcon, GitFork, FileSpreadsheet, Library, MessageSquare, FileText, Percent } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { useStaffRole } from "@/hooks/use-role";
 import { Button } from "@/components/ui/button";
