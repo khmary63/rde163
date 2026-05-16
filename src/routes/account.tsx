@@ -237,14 +237,22 @@ function OrdersSection({ userId }: { userId: string }) {
   );
 }
 
-function OrderDetails({ orderId, notes }: { orderId: string; notes: string | null }) {
+type OrderRow = {
+  id: string;
+  number: string;
+  notes: string | null;
+  created_at: string;
+  invoice_grouping: "single" | "per_warehouse";
+};
+
+function OrderDetails({ order }: { order: OrderRow }) {
   const { data, isLoading } = useQuery({
-    queryKey: ["order-items", orderId],
+    queryKey: ["order-items", order.id],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("order_items")
-        .select("id, qty, unit_price, line_total, product:products(name, sku), warehouse:warehouses(name, city)")
-        .eq("order_id", orderId);
+        .select("id, qty, unit_price, line_total, product:products(name, sku, brand:brands(name)), warehouse:warehouses(name, city)")
+        .eq("order_id", order.id);
       if (error) throw error;
       return data;
     },
@@ -256,6 +264,34 @@ function OrderDetails({ orderId, notes }: { orderId: string; notes: string | nul
         <div className="py-4 text-center text-xs text-muted-foreground">Загрузка позиций…</div>
       ) : (
         <>
+          <div className="flex items-center justify-end mb-2">
+            <Button
+              variant="outline"
+              size="sm"
+              className="gap-1.5 h-7 text-xs"
+              disabled={!data || data.length === 0}
+              onClick={() => {
+                if (!data) return;
+                exportOrderToExcel({
+                  number: order.number,
+                  created_at: order.created_at,
+                  notes: order.notes,
+                  invoice_grouping: order.invoice_grouping,
+                  items: data.map((it) => ({
+                    sku: it.product?.sku ?? "",
+                    name: it.product?.name ?? "",
+                    brand: it.product?.brand?.name ?? null,
+                    warehouseName: it.warehouse?.city ?? it.warehouse?.name ?? "—",
+                    qty: it.qty,
+                    unit_price: Number(it.unit_price),
+                    line_total: Number(it.line_total),
+                  })),
+                });
+              }}
+            >
+              <FileSpreadsheet className="h-3.5 w-3.5" /> Скачать Excel
+            </Button>
+          </div>
           <div className="overflow-x-auto">
             <table className="w-full text-xs">
               <thead className="text-muted-foreground">
@@ -283,9 +319,9 @@ function OrderDetails({ orderId, notes }: { orderId: string; notes: string | nul
               </tbody>
             </table>
           </div>
-          {notes && (
+          {order.notes && (
             <div className="mt-3 rounded border border-border/60 bg-background p-2 text-xs">
-              <span className="text-muted-foreground">Комментарий:</span> {notes}
+              <span className="text-muted-foreground">Комментарий:</span> {order.notes}
             </div>
           )}
         </>
