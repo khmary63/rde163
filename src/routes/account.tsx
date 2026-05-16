@@ -1,12 +1,15 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { LogOut, User as UserIcon, Building2, Phone, Mail, Percent, ShoppingBag, FileText, Repeat, BarChart3, Headset, ChevronDown, ChevronUp, Package, FileSpreadsheet } from "lucide-react";
+import { LogOut, User as UserIcon, Building2, Phone, Mail, Percent, ShoppingBag, FileText, Repeat, BarChart3, Headset, ChevronDown, ChevronUp, Package, FileSpreadsheet, Bookmark, Trash2, Plus } from "lucide-react";
 import { exportOrderToExcel } from "@/lib/order-excel";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
+import { useCart, type CartItem } from "@/hooks/use-cart";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/account")({
   head: () => ({ meta: [{ title: "Личный кабинет — РДЭ Запчасти" }] }),
