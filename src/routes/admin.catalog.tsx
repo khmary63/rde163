@@ -402,13 +402,13 @@ function CatalogUploadPage() {
         <label className="mt-3 flex cursor-pointer items-center justify-center gap-3 rounded-lg border-2 border-dashed border-border bg-surface/50 px-6 py-10 hover:border-brand">
           <Upload className="h-5 w-5 text-muted-foreground" />
           <div className="text-sm">
-            <div className="font-medium">Выберите CSV-файл прайса</div>
+            <div className="font-medium">Выберите файл прайса (.xlsx, .xls или .csv)</div>
             <div className="text-xs text-muted-foreground">Рекомендуется до 50 000 строк за раз.</div>
           </div>
           <input
             ref={fileRef}
             type="file"
-            accept=".csv,text/csv"
+            accept=".csv,text/csv,.xlsx,.xls,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel"
             className="hidden"
             onChange={(e) => {
               const f = e.target.files?.[0];
