@@ -9,11 +9,25 @@ import sitrakTruck2 from "@/assets/sitrak-truck-2.jpg";
 import sitrakFleet from "@/assets/sitrak-fleet.png";
 
 
+const organizationJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  name: "Русский Дом Экспорта",
+  alternateName: "РДЭ Запчасти",
+  url: "https://rde163.lovable.app",
+  description: "B2B каталог запчастей для китайской спецтехники и грузовиков. 40 000+ позиций, 8 складов по РФ.",
+  areaServed: "RU",
+  sameAs: [],
+};
+
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "Русский Дом Экспорта — B2B каталог запчастей для китайской спецтехники" },
       { name: "description", content: "40 000+ позиций в наличии на 8 складах по РФ. Персональные цены для юрлиц, заявка менеджеру за 30 секунд." },
+    ],
+    scripts: [
+      { type: "application/ld+json", children: JSON.stringify(organizationJsonLd) },
     ],
   }),
   component: HomePage,
