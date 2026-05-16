@@ -51,6 +51,7 @@ function AdminLayout() {
             <AdminLink to="/admin" icon={LayoutDashboard} label="Обзор" />
             <AdminLink to="/admin/orders" icon={Package} label="Заявки" />
             <AdminLink to="/admin/customers" icon={UsersIcon} label="Клиенты" />
+            <AdminLink to="/admin/crosses" icon={GitFork} label="Кросс-номера" />
           </nav>
           <div className="ml-auto flex items-center gap-3 text-xs">
             <Link to="/" className="text-background/70 hover:text-background">← Магазин</Link>
