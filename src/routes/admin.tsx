@@ -1,6 +1,6 @@
 import { createFileRoute, Link, Outlet, useRouter } from "@tanstack/react-router";
 import { useEffect } from "react";
-import { ShieldAlert, LogOut, LayoutDashboard, Package, Users as UsersIcon, GitFork, FileSpreadsheet } from "lucide-react";
+import { ShieldAlert, LogOut, LayoutDashboard, Package, Users as UsersIcon, GitFork, FileSpreadsheet, Library } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { useStaffRole } from "@/hooks/use-role";
 import { Button } from "@/components/ui/button";
@@ -53,6 +53,7 @@ function AdminLayout() {
             <AdminLink to="/admin/catalog" icon={FileSpreadsheet} label="Прайс" />
             <AdminLink to="/admin/customers" icon={UsersIcon} label="Клиенты" />
             <AdminLink to="/admin/crosses" icon={GitFork} label="Кросс-номера" />
+            <AdminLink to="/admin/refs" icon={Library} label="Справочники" />
           </nav>
           <div className="ml-auto flex items-center gap-3 text-xs">
             <Link to="/" className="text-background/70 hover:text-background">← Магазин</Link>
