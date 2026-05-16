@@ -86,6 +86,9 @@ function AccountPage() {
             </div>
           </div>
 
+          {/* Дашборд */}
+          <DashboardSection userId={user.id} />
+
           {/* Мои заявки */}
           <OrdersSection userId={user.id} />
 
@@ -94,7 +97,7 @@ function AccountPage() {
             <NavTile to="/catalog" icon={ShoppingBag} title="Каталог" desc="40 000+ позиций" />
             <NavTile to="/cart" icon={Repeat} title="Корзина" desc="Активная заявка" />
             <NavTile to="/account" icon={FileText} title="Документы" desc="Скоро" />
-            <NavTile to="/account" icon={BarChart3} title="Дашборд" desc="Скоро" />
+            <NavTile to="/account" icon={BarChart3} title="Аналитика" desc="Ниже на странице" />
           </div>
         </div>
 
@@ -326,6 +329,214 @@ function OrderDetails({ order }: { order: OrderRow }) {
           )}
         </>
       )}
+    </div>
+  );
+}
+
+function DashboardSection({ userId }: { userId: string }) {
+  const { data, isLoading } = useQuery({
+    queryKey: ["dashboard", userId],
+    queryFn: async () => {
+      const { data: orders, error } = await supabase
+        .from("orders")
+        .select("id, status, total_amount, created_at, submitted_at")
+        .eq("user_id", userId);
+      if (error) throw error;
+
+      const { data: items, error: e2 } = await supabase
+        .from("order_items")
+        .select("qty, line_total, order:orders!inner(user_id, status, created_at), product:products(name, sku, brand:brands(name))")
+        .eq("order.user_id", userId);
+      if (e2) throw e2;
+
+      return { orders: orders ?? [], items: items ?? [] };
+    },
+  });
+
+  if (isLoading) {
+    return (
+      <div className="border border-border bg-surface p-6 rounded-md">
+        <div className="text-sm text-muted-foreground">Загрузка статистики…</div>
+      </div>
+    );
+  }
+
+  const orders = data?.orders ?? [];
+  const items = data?.items ?? [];
+
+  const activeStatuses = new Set(["submitted", "confirmed", "processing", "shipped"]);
+  const doneStatuses = new Set(["completed", "shipped"]);
+
+  const total = orders.length;
+  const active = orders.filter((o) => activeStatuses.has(o.status)).length;
+  const drafts = orders.filter((o) => o.status === "draft").length;
+  const totalSpent = orders
+    .filter((o) => doneStatuses.has(o.status) || o.status === "confirmed" || o.status === "processing" || o.status === "submitted")
+    .reduce((s, o) => s + Number(o.total_amount || 0), 0);
+  const submittedCount = orders.filter((o) => o.status !== "draft").length;
+  const avgCheck = submittedCount ? totalSpent / submittedCount : 0;
+
+  const now = Date.now();
+  const day = 24 * 60 * 60 * 1000;
+  const last30 = orders.filter((o) => now - new Date(o.created_at).getTime() <= 30 * day);
+  const last30Amount = last30.reduce((s, o) => s + Number(o.total_amount || 0), 0);
+
+  // 6 месяцев — гистограмма по сумме
+  const months: { label: string; amount: number; count: number }[] = [];
+  for (let i = 5; i >= 0; i--) {
+    const d = new Date();
+    d.setMonth(d.getMonth() - i);
+    const key = `${d.getFullYear()}-${d.getMonth()}`;
+    const label = d.toLocaleDateString("ru-RU", { month: "short" });
+    const mOrders = orders.filter((o) => {
+      const od = new Date(o.created_at);
+      return `${od.getFullYear()}-${od.getMonth()}` === key && o.status !== "draft";
+    });
+    months.push({
+      label,
+      amount: mOrders.reduce((s, o) => s + Number(o.total_amount || 0), 0),
+      count: mOrders.length,
+    });
+  }
+  const maxAmount = Math.max(1, ...months.map((m) => m.amount));
+
+  // Топ брендов
+  const brandMap = new Map<string, { qty: number; amount: number }>();
+  const productMap = new Map<string, { name: string; sku: string; qty: number; amount: number }>();
+  for (const it of items) {
+    const brand = it.product?.brand?.name ?? "Без бренда";
+    const b = brandMap.get(brand) ?? { qty: 0, amount: 0 };
+    b.qty += it.qty;
+    b.amount += Number(it.line_total || 0);
+    brandMap.set(brand, b);
+
+    const sku = it.product?.sku ?? "—";
+    const p = productMap.get(sku) ?? { name: it.product?.name ?? "—", sku, qty: 0, amount: 0 };
+    p.qty += it.qty;
+    p.amount += Number(it.line_total || 0);
+    productMap.set(sku, p);
+  }
+  const topBrands = [...brandMap.entries()].sort((a, b) => b[1].amount - a[1].amount).slice(0, 5);
+  const topProducts = [...productMap.values()].sort((a, b) => b.amount - a.amount).slice(0, 5);
+
+  const fmt = (n: number) => Number(n).toLocaleString("ru-RU", { maximumFractionDigits: 0 });
+
+  return (
+    <div className="border border-border bg-surface p-6 rounded-md">
+      <div className="flex items-center gap-3 mb-5">
+        <BarChart3 className="h-5 w-5 text-brand" />
+        <h2 className="font-display text-xl">Аналитика</h2>
+      </div>
+
+      {total === 0 ? (
+        <div className="py-6 text-center text-sm text-muted-foreground">
+          Здесь появится статистика после первой заявки.
+        </div>
+      ) : (
+        <>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+            <Kpi label="Всего заявок" value={String(total)} sub={`${drafts} черновиков`} />
+            <Kpi label="В работе" value={String(active)} sub="подтверждённые и в обработке" />
+            <Kpi label="Сумма закупок" value={`${fmt(totalSpent)} ₽`} sub={`за всё время`} />
+            <Kpi label="Средний чек" value={`${fmt(avgCheck)} ₽`} sub={`за ${submittedCount || 0} заявок`} accent />
+          </div>
+
+          <div className="grid lg:grid-cols-[1.2fr_1fr] gap-6">
+            {/* Гистограмма по месяцам */}
+            <div>
+              <div className="text-xs uppercase tracking-wide text-muted-foreground mb-3">
+                Заявки за 6 месяцев — {fmt(last30Amount)} ₽ за 30 дней
+              </div>
+              <div className="flex items-end gap-2 h-40 border-b border-border">
+                {months.map((m, i) => {
+                  const h = Math.round((m.amount / maxAmount) * 100);
+                  return (
+                    <div key={i} className="flex-1 flex flex-col items-center gap-1 group">
+                      <div className="flex-1 w-full flex items-end">
+                        <div
+                          className="w-full bg-brand/70 hover:bg-brand transition-colors rounded-t"
+                          style={{ height: `${Math.max(h, 2)}%` }}
+                          title={`${fmt(m.amount)} ₽ · ${m.count} заявок`}
+                        />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+              <div className="flex gap-2 mt-1">
+                {months.map((m, i) => (
+                  <div key={i} className="flex-1 text-center text-[10px] text-muted-foreground uppercase">{m.label}</div>
+                ))}
+              </div>
+            </div>
+
+            {/* Топ брендов */}
+            <div>
+              <div className="text-xs uppercase tracking-wide text-muted-foreground mb-3">Топ брендов</div>
+              {topBrands.length === 0 ? (
+                <div className="text-xs text-muted-foreground">Нет данных</div>
+              ) : (
+                <div className="space-y-2">
+                  {topBrands.map(([name, b]) => {
+                    const max = topBrands[0][1].amount || 1;
+                    const w = Math.round((b.amount / max) * 100);
+                    return (
+                      <div key={name}>
+                        <div className="flex items-baseline justify-between text-xs mb-1">
+                          <span className="font-medium">{name}</span>
+                          <span className="text-muted-foreground">{fmt(b.amount)} ₽ · {b.qty} шт</span>
+                        </div>
+                        <div className="h-1.5 bg-border rounded">
+                          <div className="h-full bg-accent-orange rounded" style={{ width: `${w}%` }} />
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Топ позиций */}
+          {topProducts.length > 0 && (
+            <div className="mt-6">
+              <div className="text-xs uppercase tracking-wide text-muted-foreground mb-3">Топ позиций</div>
+              <div className="overflow-x-auto rounded border border-border">
+                <table className="w-full text-xs">
+                  <thead className="bg-background text-muted-foreground">
+                    <tr className="text-left">
+                      <th className="px-3 py-2 font-normal">Артикул</th>
+                      <th className="px-3 py-2 font-normal">Наименование</th>
+                      <th className="px-3 py-2 text-right font-normal">Кол-во</th>
+                      <th className="px-3 py-2 text-right font-normal">Сумма</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-border">
+                    {topProducts.map((p) => (
+                      <tr key={p.sku}>
+                        <td className="px-3 py-2 font-mono">{p.sku}</td>
+                        <td className="px-3 py-2">{p.name}</td>
+                        <td className="px-3 py-2 text-right">{p.qty}</td>
+                        <td className="px-3 py-2 text-right font-semibold">{fmt(p.amount)} ₽</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+        </>
+      )}
+    </div>
+  );
+}
+
+function Kpi({ label, value, sub, accent }: { label: string; value: string; sub?: string; accent?: boolean }) {
+  return (
+    <div className="border border-border bg-background rounded-md p-4">
+      <div className="text-[10px] uppercase tracking-wide text-muted-foreground">{label}</div>
+      <div className={`font-display text-xl lg:text-2xl font-bold mt-1 ${accent ? "text-accent-orange" : ""}`}>{value}</div>
+      {sub && <div className="text-[11px] text-muted-foreground mt-1">{sub}</div>}
     </div>
   );
 }
