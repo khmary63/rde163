@@ -1,13 +1,14 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState, useRef } from "react";
-import { ArrowLeft, Upload, FileText, Trash2, Loader2, Download } from "lucide-react";
+import { ArrowLeft, Upload, FileText, Trash2, Loader2, Download, FileSpreadsheet } from "lucide-react";
 import type { Database } from "@/integrations/supabase/types";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { StatusBadge } from "./admin.index";
+import { exportOrderToExcel } from "@/lib/order-excel";
 import { toast } from "sonner";
 
 type OrderStatus = Database["public"]["Enums"]["order_status"];
