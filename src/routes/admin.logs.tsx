@@ -119,7 +119,7 @@ type Feedback = {
   phone: string | null;
   email: string | null;
   message: string;
-  is_processed: boolean;
+  status: string;
   created_at: string;
 };
 
@@ -138,19 +138,18 @@ function FeedbackTab() {
     },
   });
 
-  const toggle = async (m: Feedback) => {
-    const { error } = await supabase
-      .from("feedback_messages")
-      .update({ is_processed: !m.is_processed })
-      .eq("id", m.id);
+  const setStatus = async (m: Feedback, next: string) => {
+    const { error } = await supabase.from("feedback_messages").update({ status: next }).eq("id", m.id);
     if (!error) qc.invalidateQueries({ queryKey: ["admin-feedback"] });
   };
+
+  const isOpen = (m: Feedback) => m.status === "new" || m.status === "open";
 
   return (
     <Card className="p-6">
       <div className="mb-4 flex items-center justify-between">
         <div className="text-sm text-muted-foreground">
-          Всего: {q.data?.length ?? 0} · необработанных: {(q.data ?? []).filter((m) => !m.is_processed).length}
+          Всего: {q.data?.length ?? 0} · новых: {(q.data ?? []).filter(isOpen).length}
         </div>
         <Button variant="outline" size="sm" onClick={() => qc.invalidateQueries({ queryKey: ["admin-feedback"] })}>
           <RefreshCw className="mr-1.5 h-3.5 w-3.5" /> Обновить
@@ -162,38 +161,44 @@ function FeedbackTab() {
         <div className="py-12 text-center text-sm text-muted-foreground">Сообщений пока нет</div>
       ) : (
         <div className="space-y-3">
-          {q.data?.map((m) => (
-            <div
-              key={m.id}
-              className={`rounded border p-4 ${m.is_processed ? "border-border bg-surface/40" : "border-brand/40 bg-brand/5"}`}
-            >
-              <div className="flex items-start justify-between gap-3 flex-wrap">
-                <div className="space-y-0.5">
-                  <div className="font-medium">{m.name || "Без имени"}</div>
-                  <div className="text-xs text-muted-foreground space-x-3">
-                    {m.phone && <span>{m.phone}</span>}
-                    {m.email && <span>{m.email}</span>}
+          {q.data?.map((m) => {
+            const open = isOpen(m);
+            return (
+              <div
+                key={m.id}
+                className={`rounded border p-4 ${open ? "border-brand/40 bg-brand/5" : "border-border bg-surface/40"}`}
+              >
+                <div className="flex items-start justify-between gap-3 flex-wrap">
+                  <div className="space-y-0.5">
+                    <div className="font-medium flex items-center gap-2">
+                      {m.name || "Без имени"}
+                      <Badge variant="outline" className="text-[10px]">{m.status}</Badge>
+                    </div>
+                    <div className="text-xs text-muted-foreground space-x-3">
+                      {m.phone && <span>{m.phone}</span>}
+                      {m.email && <span>{m.email}</span>}
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="text-xs text-muted-foreground whitespace-nowrap">
+                      {new Date(m.created_at).toLocaleString("ru-RU")}
+                    </div>
+                    <button
+                      onClick={() => setStatus(m, open ? "done" : "new")}
+                      className={`text-xs rounded border px-2 py-1 transition-colors ${
+                        open
+                          ? "border-brand text-brand hover:bg-brand hover:text-brand-foreground"
+                          : "border-border text-muted-foreground hover:text-foreground"
+                      }`}
+                    >
+                      {open ? "Отметить обработанным" : "Вернуть в работу"}
+                    </button>
                   </div>
                 </div>
-                <div className="flex items-center gap-3">
-                  <div className="text-xs text-muted-foreground whitespace-nowrap">
-                    {new Date(m.created_at).toLocaleString("ru-RU")}
-                  </div>
-                  <button
-                    onClick={() => toggle(m)}
-                    className={`text-xs rounded border px-2 py-1 transition-colors ${
-                      m.is_processed
-                        ? "border-border text-muted-foreground hover:text-foreground"
-                        : "border-brand text-brand hover:bg-brand hover:text-brand-foreground"
-                    }`}
-                  >
-                    {m.is_processed ? "Вернуть в работу" : "Отметить обработанным"}
-                  </button>
-                </div>
+                <div className="mt-3 text-sm whitespace-pre-wrap break-words">{m.message}</div>
               </div>
-              <div className="mt-3 text-sm whitespace-pre-wrap break-words">{m.message}</div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </Card>
