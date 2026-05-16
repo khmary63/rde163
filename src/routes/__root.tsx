@@ -14,6 +14,7 @@ import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { FeedbackWidget } from "@/components/site/FeedbackWidget";
 import { Toaster } from "@/components/ui/sonner";
+import { AuthProvider } from "@/hooks/use-auth";
 
 function NotFoundComponent() {
   return (
