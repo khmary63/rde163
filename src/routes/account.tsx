@@ -86,6 +86,9 @@ function AccountPage() {
             </div>
           </div>
 
+          {/* Дашборд */}
+          <DashboardSection userId={user.id} />
+
           {/* Мои заявки */}
           <OrdersSection userId={user.id} />
 
@@ -94,7 +97,7 @@ function AccountPage() {
             <NavTile to="/catalog" icon={ShoppingBag} title="Каталог" desc="40 000+ позиций" />
             <NavTile to="/cart" icon={Repeat} title="Корзина" desc="Активная заявка" />
             <NavTile to="/account" icon={FileText} title="Документы" desc="Скоро" />
-            <NavTile to="/account" icon={BarChart3} title="Дашборд" desc="Скоро" />
+            <NavTile to="/account" icon={BarChart3} title="Аналитика" desc="Ниже на странице" />
           </div>
         </div>
 
