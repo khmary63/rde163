@@ -98,12 +98,13 @@ function AccountPage() {
           {/* Шаблоны заявок */}
           <TemplatesSection userId={user.id} />
 
+          {/* Документы заказов */}
+          <DocumentsSection userId={user.id} />
+
           {/* Разделы */}
           <div className="grid sm:grid-cols-2 gap-3">
             <NavTile to="/catalog" icon={ShoppingBag} title="Каталог" desc="40 000+ позиций" />
             <NavTile to="/cart" icon={Repeat} title="Корзина" desc="Активная заявка" />
-            <NavTile to="/account" icon={FileText} title="Документы" desc="Скоро" />
-            <NavTile to="/account" icon={BarChart3} title="Аналитика" desc="Ниже на странице" />
           </div>
         </div>
 
