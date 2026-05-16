@@ -1,13 +1,14 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState, useRef } from "react";
-import { ArrowLeft, Upload, FileText, Trash2, Loader2, Download } from "lucide-react";
+import { ArrowLeft, Upload, FileText, Trash2, Loader2, Download, FileSpreadsheet } from "lucide-react";
 import type { Database } from "@/integrations/supabase/types";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { StatusBadge } from "./admin.index";
+import { exportOrderToExcel } from "@/lib/order-excel";
 import { toast } from "sonner";
 
 type OrderStatus = Database["public"]["Enums"]["order_status"];
@@ -53,7 +54,7 @@ function AdminOrderDetail() {
 
       const [items, docs, profile] = await Promise.all([
         supabase.from("order_items")
-          .select("id, qty, unit_price, line_total, product:products(name, sku), warehouse:warehouses(name, city)")
+          .select("id, qty, unit_price, line_total, product:products(name, sku, brand:brands(name)), warehouse:warehouses(name, city)")
           .eq("order_id", id),
         supabase.from("order_documents")
           .select("id, doc_type, file_path, file_name, created_at")
@@ -157,7 +158,34 @@ function AdminOrderDetail() {
             </span>
           </div>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
+          <Button
+            variant="outline"
+            size="sm"
+            className="gap-1.5"
+            onClick={() => {
+              exportOrderToExcel({
+                number: o.number,
+                created_at: o.created_at,
+                status: o.status,
+                customer: p?.company_name ?? p?.full_name ?? null,
+                inn: p?.inn ?? null,
+                notes: o.notes,
+                invoice_grouping: o.invoice_grouping,
+                items: o.items.map((it) => ({
+                  sku: it.product?.sku ?? "",
+                  name: it.product?.name ?? "",
+                  brand: it.product?.brand?.name ?? null,
+                  warehouseName: it.warehouse?.city ?? it.warehouse?.name ?? "—",
+                  qty: it.qty,
+                  unit_price: Number(it.unit_price),
+                  line_total: Number(it.line_total),
+                })),
+              });
+            }}
+          >
+            <FileSpreadsheet className="h-3.5 w-3.5" /> Excel
+          </Button>
           <span className="text-xs uppercase tracking-wide text-muted-foreground">Статус:</span>
           <Select value={o.status} onValueChange={(v) => statusMutation.mutate(v as OrderStatus)}>
             <SelectTrigger className="w-52"><SelectValue /></SelectTrigger>
