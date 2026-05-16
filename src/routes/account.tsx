@@ -546,3 +546,109 @@ function Kpi({ label, value, sub, accent }: { label: string; value: string; sub?
     </div>
   );
 }
+
+function TemplatesSection({ userId }: { userId: string }) {
+  const { items, clear, add } = useCart();
+  const [name, setName] = useState("");
+  const [saving, setSaving] = useState(false);
+
+  const { data: templates, isLoading, refetch } = useQuery({
+    queryKey: ["order-templates", userId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("order_templates")
+        .select("*")
+        .eq("user_id", userId)
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return data as { id: string; name: string; items: CartItem[]; created_at: string }[];
+    },
+  });
+
+  const saveCurrent = async () => {
+    if (!name.trim()) return toast.error("Введите название шаблона");
+    if (items.length === 0) return toast.error("Корзина пуста");
+    setSaving(true);
+    const { error } = await supabase.from("order_templates").insert({
+      user_id: userId,
+      name: name.trim(),
+      items: items as unknown as object,
+    });
+    setSaving(false);
+    if (error) return toast.error(error.message);
+    toast.success("Шаблон сохранён");
+    setName("");
+    refetch();
+  };
+
+  const applyTemplate = (tpl: { name: string; items: CartItem[] }) => {
+    if (!Array.isArray(tpl.items) || tpl.items.length === 0) return toast.error("Шаблон пуст");
+    tpl.items.forEach((it) => add({ ...it, qty: it.qty }));
+    toast.success(`Добавлено ${tpl.items.length} поз. из «${tpl.name}»`);
+  };
+
+  const removeTpl = async (id: string) => {
+    if (!confirm("Удалить шаблон?")) return;
+    const { error } = await supabase.from("order_templates").delete().eq("id", id);
+    if (error) return toast.error(error.message);
+    refetch();
+  };
+
+  return (
+    <div className="border border-border bg-surface p-6 rounded-md">
+      <div className="flex items-center gap-3 mb-5">
+        <Bookmark className="h-5 w-5 text-brand" />
+        <h2 className="font-display text-xl">Шаблоны заявок</h2>
+        <span className="ml-auto text-xs text-muted-foreground">{templates?.length ?? 0} сохранено</span>
+      </div>
+
+      <div className="flex gap-2 mb-5">
+        <Input
+          placeholder={items.length > 0 ? `Назвать шаблон из ${items.length} поз.` : "Сначала добавьте товары в корзину"}
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          disabled={items.length === 0}
+        />
+        <Button onClick={saveCurrent} disabled={saving || items.length === 0}>
+          <Plus className="mr-1.5 h-4 w-4" />Сохранить
+        </Button>
+      </div>
+
+      {isLoading ? (
+        <div className="py-6 text-center text-sm text-muted-foreground">Загрузка…</div>
+      ) : templates?.length === 0 ? (
+        <p className="text-sm text-muted-foreground">
+          Сохраняйте корзину как шаблон — например, регулярный пополняющий заказ — и применяйте его в один клик.
+        </p>
+      ) : (
+        <div className="space-y-2">
+          {templates?.map((t) => {
+            const total = (t.items ?? []).reduce((s, it) => s + (it.price || 0) * (it.qty || 0), 0);
+            return (
+              <div key={t.id} className="flex items-center gap-3 border border-border rounded-md p-3 bg-background">
+                <div className="min-w-0 flex-1">
+                  <div className="font-medium truncate">{t.name}</div>
+                  <div className="text-xs text-muted-foreground">
+                    {(t.items ?? []).length} поз. · {total.toLocaleString("ru-RU")} ₽ · {new Date(t.created_at).toLocaleDateString("ru-RU")}
+                  </div>
+                </div>
+                <Button size="sm" variant="outline" onClick={() => applyTemplate(t)}>
+                  <Repeat className="mr-1 h-3.5 w-3.5" />Применить
+                </Button>
+                <Button size="icon" variant="ghost" onClick={() => removeTpl(t.id)}>
+                  <Trash2 className="h-4 w-4 text-destructive" />
+                </Button>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {items.length > 0 && (
+        <button onClick={() => { if (confirm("Очистить корзину?")) clear(); }} className="mt-4 text-xs text-muted-foreground hover:text-destructive">
+          Очистить текущую корзину
+        </button>
+      )}
+    </div>
+  );
+}
