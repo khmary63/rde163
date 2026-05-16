@@ -227,7 +227,7 @@ function OrdersSection({ userId }: { userId: string }) {
                     {isOpen ? <ChevronUp className="h-4 w-4 text-muted-foreground" /> : <ChevronDown className="h-4 w-4 text-muted-foreground" />}
                   </div>
                 </button>
-                {isOpen && <OrderDetails orderId={o.id} notes={o.notes} />}
+                {isOpen && <OrderDetails order={o} />}
               </div>
             );
           })}
