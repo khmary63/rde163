@@ -105,7 +105,7 @@ function HomePage() {
           <h1 className="mt-10 font-display font-bold leading-[0.85] tracking-tight">
             <span className="block text-[clamp(3.5rem,9vw,9.5rem)]">ЗАПЧАСТИ</span>
             <span className="block text-[clamp(2.2rem,5.5vw,5.5rem)] text-muted-foreground/70 mt-2">
-              один экран <span className="text-accent-orange font-extrabold">—</span> одна минута
+              SITRAK <span className="text-accent-orange font-extrabold">/</span> HOWO
             </span>
           </h1>
 
