@@ -50,6 +50,7 @@ function AdminLayout() {
           <nav className="flex items-center gap-1 text-sm">
             <AdminLink to="/admin" icon={LayoutDashboard} label="Обзор" />
             <AdminLink to="/admin/orders" icon={Package} label="Заявки" />
+            <AdminLink to="/admin/catalog" icon={FileSpreadsheet} label="Прайс" />
             <AdminLink to="/admin/customers" icon={UsersIcon} label="Клиенты" />
             <AdminLink to="/admin/crosses" icon={GitFork} label="Кросс-номера" />
           </nav>
