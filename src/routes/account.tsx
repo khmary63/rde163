@@ -561,7 +561,7 @@ function TemplatesSection({ userId }: { userId: string }) {
         .eq("user_id", userId)
         .order("created_at", { ascending: false });
       if (error) throw error;
-      return data as { id: string; name: string; items: CartItem[]; created_at: string }[];
+      return data as unknown as { id: string; name: string; items: CartItem[]; created_at: string }[];
     },
   });
 
@@ -572,7 +572,7 @@ function TemplatesSection({ userId }: { userId: string }) {
     const { error } = await supabase.from("order_templates").insert({
       user_id: userId,
       name: name.trim(),
-      items: items as unknown as object,
+      items: items as unknown as never,
     });
     setSaving(false);
     if (error) return toast.error(error.message);
