@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { Phone, Mail, MapPin, Send, MessageCircle } from "lucide-react";
 import { adminContact } from "@/data/mock";
+import logoRde from "@/assets/logo-rde.png";
 
 export function SiteFooter() {
   return (
@@ -8,7 +9,7 @@ export function SiteFooter() {
       <div className="mx-auto max-w-[1400px] px-4 py-14 grid gap-10 md:grid-cols-4">
         <div className="space-y-4">
           <div className="flex items-center gap-2.5">
-            <div className="flex h-10 w-10 items-center justify-center bg-brand text-brand-foreground font-display font-bold text-base rounded-sm">РДЭ</div>
+            <img src={logoRde} alt="Логотип Русский Дом Экспорта" className="h-10 w-10 object-contain" />
             <div className="flex flex-col leading-tight">
               <span className="font-display font-bold text-base tracking-wide uppercase">Русский Дом Экспорта</span>
               <span className="text-[10px] text-muted-foreground tracking-[0.18em] uppercase">Запчасти для спецтехники</span>
