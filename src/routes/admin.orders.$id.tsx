@@ -54,7 +54,7 @@ function AdminOrderDetail() {
 
       const [items, docs, profile] = await Promise.all([
         supabase.from("order_items")
-          .select("id, qty, unit_price, line_total, product:products(name, sku), warehouse:warehouses(name, city)")
+          .select("id, qty, unit_price, line_total, product:products(name, sku, brand:brands(name)), warehouse:warehouses(name, city)")
           .eq("order_id", id),
         supabase.from("order_documents")
           .select("id, doc_type, file_path, file_name, created_at")
