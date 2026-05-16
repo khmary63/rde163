@@ -50,6 +50,8 @@
   --color-accent-orange-foreground: var(--accent-orange-foreground);
   --color-accent-blue: var(--accent-blue);
   --color-accent-blue-foreground: var(--accent-blue-foreground);
+  --color-accent-teal: var(--accent-teal);
+  --color-accent-teal-foreground: var(--accent-teal-foreground);
   --color-status-in-stock: var(--status-in-stock);
   --color-status-expected: var(--status-expected);
   --color-status-out: var(--status-out);
