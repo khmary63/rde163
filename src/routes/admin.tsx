@@ -54,6 +54,9 @@ function AdminLayout() {
             <AdminLink to="/admin/customers" icon={UsersIcon} label="Клиенты" />
             <AdminLink to="/admin/crosses" icon={GitFork} label="Кросс-номера" />
             <AdminLink to="/admin/refs" icon={Library} label="Справочники" />
+            <AdminLink to="/admin/reviews" icon={MessageSquare} label="Отзывы" />
+            <AdminLink to="/admin/content" icon={FileText} label="Контент" />
+            <AdminLink to="/admin/discounts" icon={Percent} label="Скидки" />
           </nav>
           <div className="ml-auto flex items-center gap-3 text-xs">
             <Link to="/" className="text-background/70 hover:text-background">← Магазин</Link>
