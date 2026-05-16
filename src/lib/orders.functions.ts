@@ -3,6 +3,7 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { sendMaxMessage } from "./max.server";
 import { sendInternalTransactionalEmail } from "./email/send.server";
+import { buildAndUploadOrderXlsx, type OrderExportItem } from "./orders-export.server";
 
 const OrderItemInput = z.object({
   product_id: z.string().uuid(),
