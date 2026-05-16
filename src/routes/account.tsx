@@ -159,9 +159,8 @@ function ManagerCard({ manager }: { manager?: { full_name: string; phone?: strin
 const STATUS_LABEL: Record<string, { label: string; cls: string }> = {
   draft: { label: "Черновик", cls: "bg-muted text-muted-foreground" },
   submitted: { label: "Отправлена", cls: "bg-brand/15 text-brand" },
-  in_progress: { label: "В работе", cls: "bg-accent-orange/15 text-accent-orange" },
-  invoiced: { label: "Счёт выставлен", cls: "bg-accent-orange/15 text-accent-orange" },
-  paid: { label: "Оплачена", cls: "bg-[oklch(0.70_0.18_145)]/15 text-[oklch(0.55_0.18_145)]" },
+  confirmed: { label: "Подтверждена", cls: "bg-brand/15 text-brand" },
+  processing: { label: "В работе", cls: "bg-accent-orange/15 text-accent-orange" },
   shipped: { label: "Отгружена", cls: "bg-[oklch(0.70_0.18_145)]/15 text-[oklch(0.55_0.18_145)]" },
   completed: { label: "Завершена", cls: "bg-[oklch(0.70_0.18_145)]/15 text-[oklch(0.55_0.18_145)]" },
   cancelled: { label: "Отменена", cls: "bg-destructive/15 text-destructive" },
