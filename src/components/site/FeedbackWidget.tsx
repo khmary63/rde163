@@ -2,6 +2,8 @@ import { useState } from "react";
 import { MessageSquare, X, Send, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
+import { useServerFn } from "@tanstack/react-start";
+import { notifyNewFeedback } from "@/lib/notify.functions";
 import { toast } from "sonner";
 
 export function FeedbackWidget() {
@@ -9,23 +11,28 @@ export function FeedbackWidget() {
   const [sent, setSent] = useState(false);
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({ name: "", phone: "", message: "" });
+  const notify = useServerFn(notifyNewFeedback);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
     const { data: { user } } = await supabase.auth.getUser();
-    const { error } = await supabase.from("feedback_messages").insert({
+    const payload = {
       name: form.name,
       phone: form.phone,
       message: form.message,
       user_id: user?.id ?? null,
       email: user?.email ?? null,
-    });
-    setLoading(false);
+    };
+    const { error } = await supabase.from("feedback_messages").insert(payload);
     if (error) {
+      setLoading(false);
       toast.error("Не удалось отправить сообщение");
       return;
     }
+    // Параллельно уведомим менеджера в MAX (ошибка не блокирует UX)
+    notify({ data: { name: form.name, phone: form.phone, email: user?.email ?? null, message: form.message } }).catch(() => {});
+    setLoading(false);
     setSent(true);
     setForm({ name: "", phone: "", message: "" });
   }

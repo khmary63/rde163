@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { sendMaxMessage } from "./max.server";
 
 const OrderItemInput = z.object({
   product_id: z.string().uuid(),
@@ -55,6 +56,24 @@ export const submitOrder = createServerFn({ method: "POST" })
     if (itemsErr) {
       throw new Error(itemsErr.message);
     }
+
+    // Уведомление менеджеру в MAX (не блокирует ответ)
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("full_name, company_name, phone, email")
+      .eq("id", userId)
+      .maybeSingle();
+    const customer = profile?.company_name || profile?.full_name || profile?.email || "—";
+    const lines = [
+      "📦 Новая заявка РДЭ",
+      `№ ${order.number}`,
+      `Клиент: ${customer}`,
+      profile?.phone ? `Телефон: ${profile.phone}` : null,
+      `Позиций: ${data.items.length}`,
+      `Сумма: ${total.toLocaleString("ru-RU")} ₽`,
+      data.notes ? `\nКомментарий: ${data.notes}` : null,
+    ].filter(Boolean) as string[];
+    await sendMaxMessage(lines.join("\n"));
 
     return { id: order.id, number: order.number };
   });
