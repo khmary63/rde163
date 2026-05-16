@@ -1,6 +1,6 @@
 import * as React from 'react'
 import {
-  Body, Container, Head, Heading, Hr, Html, Preview, Section, Text,
+  Body, Button, Container, Head, Heading, Hr, Html, Preview, Section, Text,
 } from '@react-email/components'
 import type { TemplateEntry } from './registry'
 
@@ -13,6 +13,7 @@ interface NewOrderProps {
   itemsCount?: number
   total?: number
   notes?: string
+  xlsxUrl?: string
 }
 
 const NewOrderEmail = ({
@@ -22,6 +23,7 @@ const NewOrderEmail = ({
   itemsCount = 0,
   total = 0,
   notes,
+  xlsxUrl,
 }: NewOrderProps) => (
   <Html lang="ru" dir="ltr">
     <Head />
@@ -35,6 +37,14 @@ const NewOrderEmail = ({
           <Text style={row}><strong>Позиций:</strong> {itemsCount}</Text>
           <Text style={row}><strong>Сумма:</strong> {total.toLocaleString('ru-RU')} ₽</Text>
         </Section>
+        {xlsxUrl ? (
+          <Section style={{ textAlign: 'center', margin: '0 0 20px' }}>
+            <Button href={xlsxUrl} style={button}>
+              Скачать заявку (Excel)
+            </Button>
+            <Text style={hint}>Ссылка действительна 30 дней</Text>
+          </Section>
+        ) : null}
         {notes ? (
           <>
             <Hr style={hr} />
@@ -61,6 +71,7 @@ export const template = {
     itemsCount: 3,
     total: 125000,
     notes: 'Срочно, нужна доставка до пятницы',
+    xlsxUrl: 'https://example.com/order.xlsx',
   },
 } satisfies TemplateEntry
 
@@ -73,3 +84,15 @@ const label = { fontSize: '12px', color: '#888888', textTransform: 'uppercase' a
 const text = { fontSize: '14px', color: '#222222', lineHeight: '1.5', margin: '0 0 16px' }
 const hr = { borderColor: '#e6e6e6', margin: '20px 0' }
 const footer = { fontSize: '12px', color: '#999999', margin: '0' }
+const button = {
+  backgroundColor: '#111111',
+  color: '#ffffff',
+  padding: '12px 24px',
+  borderRadius: '6px',
+  fontSize: '14px',
+  fontWeight: 'bold' as const,
+  textDecoration: 'none',
+  display: 'inline-block',
+}
+const hint = { fontSize: '12px', color: '#888888', margin: '8px 0 0' }
+
