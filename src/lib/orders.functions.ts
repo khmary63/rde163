@@ -3,6 +3,7 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { sendMaxMessage } from "./max.server";
 import { sendInternalTransactionalEmail } from "./email/send.server";
+import { buildAndUploadOrderXlsx, type OrderExportItem } from "./orders-export.server";
 
 const OrderItemInput = z.object({
   product_id: z.string().uuid(),
@@ -65,6 +66,40 @@ export const submitOrder = createServerFn({ method: "POST" })
       .eq("id", userId)
       .maybeSingle();
     const customer = profile?.company_name || profile?.full_name || profile?.email || "—";
+
+    // Соберём названия товаров/складов для Excel-выгрузки
+    const productIds = Array.from(new Set(data.items.map((it) => it.product_id)));
+    const warehouseIds = Array.from(new Set(data.items.map((it) => it.warehouse_id)));
+    const [{ data: products }, { data: warehouses }] = await Promise.all([
+      supabase.from("products").select("id, name, sku").in("id", productIds),
+      supabase.from("warehouses").select("id, name").in("id", warehouseIds),
+    ]);
+    const productMap = new Map((products ?? []).map((p) => [p.id, p]));
+    const warehouseMap = new Map((warehouses ?? []).map((w) => [w.id, w]));
+    const exportItems: OrderExportItem[] = data.items.map((it) => {
+      const p = productMap.get(it.product_id);
+      const w = warehouseMap.get(it.warehouse_id);
+      return {
+        product_name: p?.name ?? it.product_id,
+        product_sku: p?.sku ?? null,
+        warehouse_name: w?.name ?? it.warehouse_id,
+        qty: it.qty,
+        unit_price: it.unit_price,
+        line_total: it.qty * it.unit_price,
+      };
+    });
+
+    const xlsx = await buildAndUploadOrderXlsx({
+      number: String(order.number),
+      customer,
+      phone: profile?.phone ?? null,
+      email: profile?.email ?? null,
+      notes: data.notes ?? null,
+      total,
+      invoice_grouping: data.invoice_grouping,
+      items: exportItems,
+    });
+
     const lines = [
       "📦 Новая заявка РДЭ",
       `№ ${order.number}`,
@@ -72,6 +107,7 @@ export const submitOrder = createServerFn({ method: "POST" })
       profile?.phone ? `Телефон: ${profile.phone}` : null,
       `Позиций: ${data.items.length}`,
       `Сумма: ${total.toLocaleString("ru-RU")} ₽`,
+      xlsx ? `\nExcel: ${xlsx.url}` : null,
       data.notes ? `\nКомментарий: ${data.notes}` : null,
     ].filter(Boolean) as string[];
     await Promise.allSettled([
@@ -86,6 +122,7 @@ export const submitOrder = createServerFn({ method: "POST" })
           itemsCount: data.items.length,
           total,
           notes: data.notes ?? undefined,
+          xlsxUrl: xlsx?.url,
         },
       }),
     ]);
