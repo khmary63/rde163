@@ -2,7 +2,48 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { blogPosts } from "@/data/mock";
 import { formatDate } from "@/lib/format";
 
+const BASE = "https://rde163.lovable.app";
+
 export const Route = createFileRoute("/blog/$slug")({
+  head: ({ params }) => {
+    const post = blogPosts.find((p) => p.slug === params.slug);
+    if (!post) return { meta: [{ title: "Статья не найдена" }] };
+    const jsonLd = {
+      "@context": "https://schema.org",
+      "@type": "BlogPosting",
+      headline: post.title,
+      description: post.excerpt,
+      image: post.cover,
+      datePublished: post.date,
+      author: { "@type": "Organization", name: "Русский Дом Экспорта" },
+      publisher: { "@type": "Organization", name: "Русский Дом Экспорта" },
+      mainEntityOfPage: `${BASE}/blog/${post.slug}`,
+    };
+    const breadcrumbs = {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "Главная", item: BASE },
+        { "@type": "ListItem", position: 2, name: "Блог", item: `${BASE}/blog` },
+        { "@type": "ListItem", position: 3, name: post.title, item: `${BASE}/blog/${post.slug}` },
+      ],
+    };
+    return {
+      meta: [
+        { title: `${post.title} — Блог РДЭ` },
+        { name: "description", content: post.excerpt },
+        { property: "og:title", content: post.title },
+        { property: "og:description", content: post.excerpt },
+        { property: "og:type", content: "article" },
+        { property: "og:image", content: post.cover },
+        { name: "twitter:image", content: post.cover },
+      ],
+      scripts: [
+        { type: "application/ld+json", children: JSON.stringify(jsonLd) },
+        { type: "application/ld+json", children: JSON.stringify(breadcrumbs) },
+      ],
+    };
+  },
   component: BlogPost,
 });
 

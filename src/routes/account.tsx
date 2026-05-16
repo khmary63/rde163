@@ -98,12 +98,13 @@ function AccountPage() {
           {/* Шаблоны заявок */}
           <TemplatesSection userId={user.id} />
 
+          {/* Документы заказов */}
+          <DocumentsSection userId={user.id} />
+
           {/* Разделы */}
           <div className="grid sm:grid-cols-2 gap-3">
             <NavTile to="/catalog" icon={ShoppingBag} title="Каталог" desc="40 000+ позиций" />
             <NavTile to="/cart" icon={Repeat} title="Корзина" desc="Активная заявка" />
-            <NavTile to="/account" icon={FileText} title="Документы" desc="Скоро" />
-            <NavTile to="/account" icon={BarChart3} title="Аналитика" desc="Ниже на странице" />
           </div>
         </div>
 
@@ -648,6 +649,79 @@ function TemplatesSection({ userId }: { userId: string }) {
         <button onClick={() => { if (confirm("Очистить корзину?")) clear(); }} className="mt-4 text-xs text-muted-foreground hover:text-destructive">
           Очистить текущую корзину
         </button>
+      )}
+    </div>
+  );
+}
+
+function DocumentsSection({ userId }: { userId: string }) {
+  const { data, isLoading } = useQuery({
+    queryKey: ["my-documents", userId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("order_documents")
+        .select("id, doc_type, file_name, file_path, created_at, order:orders!inner(id, number, user_id)")
+        .eq("order.user_id", userId)
+        .order("created_at", { ascending: false })
+        .limit(50);
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+
+  async function download(path: string, fileName: string) {
+    const { data, error } = await supabase.storage.from("order-docs").createSignedUrl(path, 60);
+    if (error || !data) {
+      toast.error("Не удалось получить ссылку на файл");
+      return;
+    }
+    const a = document.createElement("a");
+    a.href = data.signedUrl;
+    a.download = fileName;
+    a.target = "_blank";
+    a.rel = "noopener";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  }
+
+  const docTypeLabel: Record<string, string> = {
+    invoice: "Счёт",
+    invoice_pdf: "Счёт PDF",
+    invoice_xml: "Счёт-фактура",
+    receipt: "Квитанция",
+    other: "Документ",
+  };
+
+  return (
+    <div className="border border-border bg-surface p-6 rounded-md">
+      <div className="flex items-center gap-2 mb-4">
+        <FileText className="h-5 w-5 text-brand" />
+        <h2 className="font-display text-xl">Документы заказов</h2>
+      </div>
+      {isLoading && <div className="text-sm text-muted-foreground">Загрузка…</div>}
+      {!isLoading && (!data || data.length === 0) && (
+        <div className="text-sm text-muted-foreground">Менеджер ещё не прикреплял документы к вашим заказам.</div>
+      )}
+      {!isLoading && data && data.length > 0 && (
+        <div className="divide-y divide-border -mx-2">
+          {data.map((d) => (
+            <button
+              key={d.id}
+              onClick={() => download(d.file_path, d.file_name)}
+              className="w-full flex items-center gap-3 px-2 py-3 hover:bg-background/50 text-left transition-colors"
+            >
+              <FileSpreadsheet className="h-4 w-4 text-brand shrink-0" />
+              <div className="min-w-0 flex-1">
+                <div className="text-sm font-medium truncate">{d.file_name}</div>
+                <div className="text-xs text-muted-foreground">
+                  {docTypeLabel[d.doc_type] ?? d.doc_type} · заказ {(d.order as { number: string } | null)?.number ?? "—"} · {new Date(d.created_at).toLocaleDateString("ru-RU")}
+                </div>
+              </div>
+              <span className="text-xs text-brand">Скачать ↓</span>
+            </button>
+          ))}
+        </div>
       )}
     </div>
   );
