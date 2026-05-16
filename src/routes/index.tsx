@@ -7,7 +7,7 @@ import heroImage from "@/assets/hero-hitech.jpg";
 import sitrakTruck1 from "@/assets/sitrak-truck-1.jpg";
 import sitrakTruck2 from "@/assets/sitrak-truck-2.jpg";
 import sitrakFleet from "@/assets/sitrak-fleet.jpg";
-import sitrakRoadVideo from "@/assets/sitrak-road.mp4.asset.json";
+
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -44,15 +44,12 @@ function HomePage() {
     <div className="overflow-hidden">
       {/* ============== HI-TECH HERO ============== */}
       <section className="relative">
-        {/* Динамическая видео-подложка — SITRAK на горной дороге */}
+        {/* Статичная подложка — SITRAK */}
         <div className="absolute inset-0 overflow-hidden bg-accent-blue">
-          <video
-            src={sitrakRoadVideo.url}
-            autoPlay
-            muted
-            loop
-            playsInline
-            poster={sitrakTruck1}
+          <img
+            src={sitrakTruck1}
+            alt=""
+            aria-hidden
             className="h-full w-full object-cover"
           />
           {/* Светлый градиент-вуаль слева, чтобы текст читался */}
