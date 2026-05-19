@@ -2,17 +2,51 @@ import { createFileRoute } from "@tanstack/react-router";
 import { warehouses, adminContact } from "@/data/mock";
 import { Phone, Mail, MapPin, Send } from "lucide-react";
 
+const BASE = "https://rde163.ru";
+
 export const Route = createFileRoute("/contacts")({
-  head: () => ({
-    meta: [
-      { title: "Контакты — РДЭ Запчасти" },
-      { name: "description", content: "Свяжитесь с РДЭ: телефон, email, Telegram и адреса 8 складов по России." },
-      { property: "og:title", content: "Контакты РДЭ" },
-      { property: "og:description", content: "Телефон, email и адреса 8 складов по России." },
-      { property: "og:url", content: "https://rde163.ru/contacts" },
-    ],
-    links: [{ rel: "canonical", href: "https://rde163.ru/contacts" }],
-  }),
+  head: () => {
+    const localBusiness = {
+      "@context": "https://schema.org",
+      "@type": "AutoPartsStore",
+      name: "Русский Дом Экспорта",
+      alternateName: "РДЭ Запчасти",
+      url: `${BASE}/contacts`,
+      telephone: adminContact.phone,
+      email: adminContact.email,
+      address: {
+        "@type": "PostalAddress",
+        streetAddress: "ул. Демократическая, 63А",
+        addressLocality: "Самара",
+        addressCountry: "RU",
+      },
+      areaServed: "RU",
+      department: warehouses.map((w) => ({
+        "@type": "AutoPartsStore",
+        name: `РДЭ — склад ${w.city}`,
+        address: {
+          "@type": "PostalAddress",
+          streetAddress: w.address,
+          addressLocality: w.city,
+          addressCountry: "RU",
+        },
+        telephone: adminContact.phone,
+      })),
+    };
+    return {
+      meta: [
+        { title: "Контакты — РДЭ Запчасти" },
+        { name: "description", content: "Свяжитесь с РДЭ: телефон, email, Telegram и адреса 8 складов по России." },
+        { property: "og:title", content: "Контакты РДЭ" },
+        { property: "og:description", content: "Телефон, email и адреса 8 складов по России." },
+        { property: "og:url", content: `${BASE}/contacts` },
+      ],
+      links: [{ rel: "canonical", href: `${BASE}/contacts` }],
+      scripts: [
+        { type: "application/ld+json", children: JSON.stringify(localBusiness) },
+      ],
+    };
+  },
   component: () => (
     <div className="mx-auto max-w-[1400px] px-4 py-16 space-y-10">
       <div>
