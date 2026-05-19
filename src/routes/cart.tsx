@@ -15,8 +15,9 @@ import { toast } from "sonner";
 export const Route = createFileRoute("/cart")({
   head: () => ({
     meta: [
-      { title: "Корзина — ГРОСС Запчасти" },
+      { title: "Корзина — РДЭ Запчасти" },
       { name: "description", content: "Оформление заявки менеджеру: товары сгруппированы по складам, расчёт за 30 секунд." },
+      { name: "robots", content: "noindex,nofollow" },
     ],
   }),
   component: CartPage,
