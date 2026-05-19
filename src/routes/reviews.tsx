@@ -2,17 +2,51 @@ import { createFileRoute } from "@tanstack/react-router";
 import { reviews } from "@/data/mock";
 import { formatDate } from "@/lib/format";
 
+const BASE = "https://rde163.ru";
+
 export const Route = createFileRoute("/reviews")({
-  head: () => ({
-    meta: [
-      { title: "Отзывы клиентов — РДЭ Запчасти" },
-      { name: "description", content: "Реальные отзывы B2B-клиентов РДЭ о поставках запчастей для китайской спецтехники и грузовиков." },
-      { property: "og:title", content: "Отзывы клиентов РДЭ" },
-      { property: "og:description", content: "Что говорят B2B-клиенты о работе с РДЭ." },
-      { property: "og:url", content: "https://rde163.ru/reviews" },
-    ],
-    links: [{ rel: "canonical", href: "https://rde163.ru/reviews" }],
-  }),
+  head: () => {
+    const count = reviews.length;
+    const avg = count ? reviews.reduce((s, r) => s + r.rating, 0) / count : 0;
+    const aggregate = {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      name: "Русский Дом Экспорта",
+      url: BASE,
+      aggregateRating: {
+        "@type": "AggregateRating",
+        ratingValue: avg.toFixed(2),
+        reviewCount: count,
+        bestRating: "5",
+        worstRating: "1",
+      },
+      review: reviews.map((r) => ({
+        "@type": "Review",
+        author: { "@type": "Person", name: r.author },
+        datePublished: r.date,
+        reviewBody: r.text,
+        reviewRating: {
+          "@type": "Rating",
+          ratingValue: String(r.rating),
+          bestRating: "5",
+          worstRating: "1",
+        },
+      })),
+    };
+    return {
+      meta: [
+        { title: "Отзывы клиентов — РДЭ Запчасти" },
+        { name: "description", content: "Реальные отзывы B2B-клиентов РДЭ о поставках запчастей для китайской спецтехники и грузовиков." },
+        { property: "og:title", content: "Отзывы клиентов РДЭ" },
+        { property: "og:description", content: "Что говорят B2B-клиенты о работе с РДЭ." },
+        { property: "og:url", content: `${BASE}/reviews` },
+      ],
+      links: [{ rel: "canonical", href: `${BASE}/reviews` }],
+      scripts: [
+        { type: "application/ld+json", children: JSON.stringify(aggregate) },
+      ],
+    };
+  },
   component: () => (
     <div className="mx-auto max-w-[1400px] px-4 py-16">
       <h1 className="font-display text-4xl mb-8">Отзывы клиентов</h1>
