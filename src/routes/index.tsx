@@ -82,12 +82,6 @@ function HomePage() {
         <Corner className="top-4 left-4" pos="tl" color="orange" />
         <Corner className="top-4 right-4" pos="tr" color="brand" />
 
-        {/* Координаты-метки */}
-        <div className="absolute top-6 right-1/2 translate-x-1/2 hidden lg:flex items-center gap-3 font-mono text-[10px] tracking-[0.3em] text-muted-foreground uppercase">
-          <span className="h-px w-8 bg-accent-orange" />
-          <span>SYS · РДЭ · v2026.05</span>
-          <span className="h-px w-8 bg-brand" />
-        </div>
 
         <div className="relative mx-auto max-w-[1480px] px-6 pt-20 pb-32 lg:pt-28 lg:pb-40">
           {/* Метка-чип */}
