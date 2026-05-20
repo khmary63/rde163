@@ -134,7 +134,7 @@ function HomePage() {
               <div className="mt-5 flex flex-wrap gap-x-6 gap-y-2 text-xs font-mono text-muted-foreground uppercase tracking-wider">
                 <span><span className="text-accent-orange font-bold">⌘K</span> быстрый поиск</span>
                 <span><span className="text-accent-orange font-bold">↵</span> отправить</span>
-                <span><span className="text-brand font-bold">●</span> 40 132 SKU индексировано</span>
+                <span><span className="text-brand font-bold">●</span> 5700 SKU ИНДЕКСИРОВАНО</span>
               </div>
             </div>
           </div>
