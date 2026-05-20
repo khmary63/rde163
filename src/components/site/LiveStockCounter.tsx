@@ -4,13 +4,24 @@ import { supabase } from "@/integrations/supabase/client";
 
 async function fetchInStockCount(): Promise<number> {
   // Считаем уникальные товары со статусом "в наличии" и положительным остатком.
-  const { data, error } = await supabase
-    .from("stock")
-    .select("product_id")
-    .eq("status", "in_stock")
-    .gt("qty", 0);
-  if (error) throw error;
-  const unique = new Set((data ?? []).map((r) => r.product_id));
+  // Постраничная выборка, т.к. Supabase отдаёт максимум 1000 строк за запрос.
+  const unique = new Set<string>();
+  const pageSize = 1000;
+  let from = 0;
+  // защитный потолок, чтобы не уйти в бесконечный цикл
+  for (let i = 0; i < 50; i++) {
+    const { data, error } = await supabase
+      .from("stock")
+      .select("product_id")
+      .eq("status", "in_stock")
+      .gt("qty", 0)
+      .range(from, from + pageSize - 1);
+    if (error) throw error;
+    const rows = data ?? [];
+    rows.forEach((r) => r.product_id && unique.add(r.product_id));
+    if (rows.length < pageSize) break;
+    from += pageSize;
+  }
   return unique.size;
 }
 
