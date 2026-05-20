@@ -24,7 +24,7 @@ export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "РДЭ — B2B каталог запчастей для китайской техники" },
-      { name: "description", content: "40 000+ позиций в наличии на 8 складах по РФ. Персональные цены для юрлиц, заявка менеджеру за 30 секунд." },
+      { name: "description", content: "40 000+ наименований в наличии на 8 складах по РФ. Персональные цены для юрлиц, заявка менеджеру за 30 секунд." },
       { property: "og:title", content: "РДЭ — B2B каталог запчастей для китайской техники" },
       { property: "og:description", content: "40 000+ позиций, 8 складов по РФ, персональные цены для юрлиц." },
       { property: "og:url", content: "https://rde163.ru/" },
@@ -142,7 +142,7 @@ function HomePage() {
           <div className="hidden lg:flex absolute right-[6%] bottom-[14%] flex-col gap-1 font-mono text-right bg-background/85 backdrop-blur-md border border-border px-6 py-5 shadow-[0_20px_60px_-20px_oklch(0.20_0.013_250/0.35)]">
             <div className="text-[10px] uppercase tracking-[0.3em] text-foreground/70">в реальном времени</div>
             <div className="font-display text-6xl font-bold tabular-nums text-accent-orange leading-none">5700</div>
-            <div className="text-xs text-foreground/75">позиций в наличии</div>
+            <div className="text-xs text-foreground/75">наименований в наличии</div>
             <div className="mt-3 h-px w-full bg-border" />
             <div className="font-display text-3xl font-bold tabular-nums leading-none mt-3 text-accent-teal">~ 30 сек</div>
             <div className="text-xs text-foreground/75">от запроса до КП</div>
