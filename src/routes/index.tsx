@@ -153,46 +153,94 @@ function HomePage() {
 
       {/* ============== BENTO: «Нашёл за 30 секунд» + сценарии ============== */}
       <section className="relative mx-auto max-w-[1480px] px-6 py-24 lg:py-32">
-        <div className="grid lg:grid-cols-12 gap-4">
-          {/* Заголовок секции — большой */}
-          <div className="lg:col-span-12 mb-6 flex items-end justify-between gap-6 flex-wrap">
+        <div className="grid lg:grid-cols-12 gap-8">
+          {/* Заголовок секции */}
+          <div className="lg:col-span-12 mb-2 flex items-end justify-between gap-6 flex-wrap">
             <div>
-              <div className="font-mono text-[11px] text-accent-blue uppercase tracking-[0.3em] mb-3">/ 02 · workflow</div>
+              <div className="font-mono text-[11px] text-accent-blue uppercase tracking-[0.3em] mb-3">/ 02 · о компании</div>
               <h2 className="font-display text-4xl lg:text-6xl font-bold leading-[0.95]">
-                Минимум кликов.<br />
-                <span className="text-muted-foreground/60">Максимум фактов.</span>
+                О компании.<br />
+                <span className="text-muted-foreground/60">Надёжность и масштаб.</span>
               </h2>
             </div>
             <div className="font-mono text-xs text-muted-foreground uppercase tracking-widest hidden md:block">
-              [ 03 / шага ]
+              [ ГК ГРОСС ]
             </div>
           </div>
 
-          {/* 3 шага */}
-          {[
-            { n: "01", t: "Поиск", d: "Артикул, OEM или название. Каталог 40 000+ позиций.", icon: Search },
-            { n: "02", t: "Наличие", d: "Сразу: склад, цена с вашей скидкой, срок отгрузки.", icon: Activity },
-            { n: "03", t: "Заявка", d: "Один клик — менеджер, документы и счёт в кабинете.", icon: Send },
-          ].map((s, idx) => (
-            <div
-              key={s.n}
-              className="lg:col-span-4 group relative border border-border bg-background hover:bg-surface transition-colors p-8 lg:p-10 overflow-hidden"
-            >
-              <div className="absolute -top-10 -right-10 h-40 w-40 rounded-full bg-brand/0 group-hover:bg-brand/10 blur-3xl transition-all duration-500" />
-              <div className="flex items-start justify-between mb-12">
-                <span className="font-mono text-xs tracking-[0.3em] text-muted-foreground uppercase">шаг · {s.n}</span>
-                <s.icon className="h-5 w-5 text-foreground/40 group-hover:text-brand transition-colors" />
-              </div>
-              <div className="font-display text-7xl lg:text-8xl font-bold text-foreground/10 group-hover:text-brand/30 transition-colors leading-none mb-6 tabular-nums">
-                {s.n}
-              </div>
-              <h3 className="font-display text-2xl mb-2">{s.t}</h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">{s.d}</p>
-              {idx < 2 && (
-                <div className="hidden lg:block absolute top-1/2 -right-2 z-10 h-3 w-3 rotate-45 border-r border-t border-brand bg-background" />
-              )}
+          {/* Вступление */}
+          <div className="lg:col-span-12 border border-border bg-background p-8 lg:p-10">
+            <p className="text-base lg:text-lg text-foreground/85 leading-relaxed max-w-4xl">
+              Компания ООО «Русский Дом Экспорта» входит в состав <span className="font-semibold text-foreground">ГК ГРОСС</span>, что подтверждает её надёжность, устойчивость и высокий уровень компетенций в сфере поставок комплектующих для коммерческого транспорта и специализированной техники.
+            </p>
+          </div>
+
+          {/* Филиальная сеть + карта */}
+          <div className="lg:col-span-5 border border-border bg-surface/50 p-8 lg:p-10 flex flex-col justify-between gap-6">
+            <div className="space-y-4">
+              <h3 className="font-display text-2xl lg:text-3xl font-bold leading-tight">
+                Развитая филиальная сеть и масштабная инфраструктура
+              </h3>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                Деятельность компании охватывает ключевые регионы страны. Собственные филиалы «Русского Дома Экспорта» расположены в городах:
+              </p>
+              <ul className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm font-mono">
+                {["Санкт-Петербург", "Москва", "Краснодар", "Самара", "Челябинск", "Екатеринбург", "Новосибирск"].map((c) => (
+                  <li key={c} className="flex items-center gap-2">
+                    <MapPin className="h-3.5 w-3.5 text-accent-blue shrink-0" />
+                    <span>{c}</span>
+                  </li>
+                ))}
+              </ul>
             </div>
-          ))}
+            <div className="grid grid-cols-2 gap-4 pt-4 border-t border-border">
+              <div>
+                <div className="font-display text-3xl lg:text-4xl font-bold text-accent-blue tabular-nums">10 150 м²</div>
+                <div className="text-xs text-muted-foreground mt-1 uppercase tracking-wider">складских площадей</div>
+              </div>
+              <div>
+                <div className="font-display text-3xl lg:text-4xl font-bold text-accent-blue tabular-nums">3 млрд ₽</div>
+                <div className="text-xs text-muted-foreground mt-1 uppercase tracking-wider">складских запасов</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Карта */}
+          <div className="lg:col-span-7 border border-border bg-background p-4 lg:p-6 flex items-center justify-center">
+            <img
+              src={russiaMap}
+              alt="Карта филиалов: Санкт-Петербург, Москва, Краснодар, Самара, Челябинск, Екатеринбург, Новосибирск"
+              loading="lazy"
+              className="w-full h-auto"
+            />
+          </div>
+
+          {/* Описание ассортимента */}
+          <div className="lg:col-span-12 border border-border bg-background p-8 lg:p-10 space-y-5">
+            <h3 className="font-display text-2xl lg:text-3xl font-bold">
+              Комплексный подход к товарам и услугам
+            </h3>
+            <p className="text-base text-foreground/85 leading-relaxed max-w-4xl">
+              На складах компании представлены <span className="font-semibold text-foreground">более 40 000 наименований</span> оригинальных запасных частей — от расходных материалов до крупных узлов и агрегатов.
+            </p>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              {[
+                "Детали для двигателей и трансмиссий",
+                "Компоненты кузовов и кабин",
+                "Гидравлическое и электрооборудование",
+                "Элементы тормозных систем",
+                "Фильтры и расходные материалы",
+                "Запчасти для снятых с производства моделей",
+              ].map((item) => (
+                <div key={item} className="flex items-start gap-3 border-l-2 border-accent-orange pl-4 py-2">
+                  <span className="text-sm text-foreground/85">{item}</span>
+                </div>
+              ))}
+            </div>
+            <p className="text-sm text-muted-foreground leading-relaxed max-w-4xl pt-2">
+              Все товары соответствуют строгим требованиям производителей техники и международным стандартам качества. Поставляемые запасные части обеспечивают надёжную работу как современной техники, так и моделей, снятых с производства.
+            </p>
+          </div>
         </div>
       </section>
 
