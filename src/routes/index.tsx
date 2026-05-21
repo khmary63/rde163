@@ -258,7 +258,7 @@ function HomePage() {
 
             <div className="flex flex-wrap gap-3 pt-2">
               <Button asChild size="lg" className="rounded-none bg-accent-orange text-accent-orange-foreground hover:bg-background hover:text-foreground font-display tracking-wide px-7 text-base shadow-[0_15px_40px_-10px_oklch(0.72_0.19_45/0.6)]">
-                <Link to="/catalog">Каталог SITRAK <ArrowUpRight className="ml-2 h-5 w-5" /></Link>
+                <Link to="/catalog">Каталог <ArrowUpRight className="ml-2 h-5 w-5" /></Link>
               </Button>
               <Button asChild size="lg" variant="outline" className="rounded-none border-background bg-transparent text-background hover:bg-background hover:text-foreground px-7 text-base">
                 <Link to="/contacts">Запросить КП</Link>
