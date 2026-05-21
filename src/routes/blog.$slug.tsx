@@ -563,3 +563,92 @@ function MoshchnostEkonomiyaArticle() {
     </div>
   );
 }
+
+function MoshchnyyNadezhnyyArticle() {
+  return (
+    <div>
+      <P>
+        Обновленный SITRAK C7H MAX оснащен проверенными и надежными двигателями серии MC, которые обеспечивают оптимальное сочетание мощности
+        и крутящего момента для эффективной работы в самых разнообразных условиях.
+      </P>
+
+      <H2>Ключевые особенности двигателей серии MC</H2>
+      <UL>
+        <li>
+          <strong>Максимальный крутящий момент в широком диапазоне оборотов</strong> (2300–2500 Нм). Обеспечивает отличную тягу и динамику,
+          позволяя уверенно справляться с подъемами и перевозкой тяжеловесных грузов.
+        </li>
+        <li>
+          <strong>Мощность от 480 л. с.</strong> Достаточный запас мощности для выполнения самых сложных транспортных задач.
+        </li>
+        <li>
+          <strong>Экономичность.</strong> Оптимизированные настройки двигателей способствуют снижению расхода топлива, что положительно
+          сказывается на эксплуатационных расходах.
+        </li>
+        <li>
+          <strong>Надежность и долговечность.</strong> Двигатели серии MC известны прочной конструкцией и большим ресурсом — гарантия долгой
+          и бесперебойной работы автомобиля.
+        </li>
+        <li>
+          <strong>Функция EVB (Engine Valve Brake).</strong> Специально разработанная система моторного тормоза обеспечивает дополнительную
+          эффективность торможения, повышая безопасность и снижая износ основных тормозных механизмов.
+        </li>
+      </UL>
+
+      <H2>MC13.48-50 и MC13.54-50</H2>
+      <div className="my-4 overflow-x-auto rounded-lg border border-border">
+        <table className="w-full text-sm">
+          <thead className="bg-surface text-xs uppercase tracking-wider text-muted-foreground">
+            <tr>
+              <th className="px-3 py-2 text-left font-medium">Параметр</th>
+              <th className="px-3 py-2 text-left font-medium">MC13.48-50</th>
+              <th className="px-3 py-2 text-left font-medium">MC13.54-50</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-border">
+            <tr>
+              <td className="px-3 py-2">Тип</td>
+              <td className="px-3 py-2" colSpan={2}>
+                Рядный, 6-цилиндровый, с турбонаддувом и промежуточным охлаждением
+              </td>
+            </tr>
+            <tr>
+              <td className="px-3 py-2">Объем, л</td>
+              <td className="px-3 py-2">12,42</td>
+              <td className="px-3 py-2">12,42</td>
+            </tr>
+            <tr>
+              <td className="px-3 py-2">Степень сжатия</td>
+              <td className="px-3 py-2">19</td>
+              <td className="px-3 py-2">19</td>
+            </tr>
+            <tr>
+              <td className="px-3 py-2">Макс. мощность, кВт / л. с. (об/мин)</td>
+              <td className="px-3 py-2">353 / 480 (1900)</td>
+              <td className="px-3 py-2">397 / 540 (1900)</td>
+            </tr>
+            <tr>
+              <td className="px-3 py-2">Макс. крутящий момент, Нм (об/мин)</td>
+              <td className="px-3 py-2">2300 (1050–1400)</td>
+              <td className="px-3 py-2">2500 (1050–1350)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div className="mt-10 rounded-xl border border-brand/40 bg-brand/5 p-6">
+        <div className="text-xs font-mono uppercase tracking-wider text-brand mb-2">Запчасти на двигатель серии MC</div>
+        <h3 className="font-display text-2xl mb-2">Подберём комплектующие для SITRAK C7H MAX</h3>
+        <p className="text-muted-foreground mb-4">
+          Менеджер уточнит модификацию двигателя, сверит каталожные номера и подтвердит наличие на складе.
+        </p>
+        <Link
+          to="/contacts"
+          className="inline-flex items-center rounded-md bg-brand px-5 py-2.5 text-sm font-medium text-brand-foreground hover:bg-brand/90"
+        >
+          Оставить заявку на подбор
+        </Link>
+      </div>
+    </div>
+  );
+}
