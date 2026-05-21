@@ -2,6 +2,7 @@
 // На шаге B будут заменены на запросы к Lovable Cloud.
 import blogSitrakHowoCover from "@/assets/blog-sitrak-howo-articul.jpg";
 import blogSitrakHowoOriginalVsAnalog from "@/assets/blog-sitrak-howo-original-vs-analog.jpg";
+import blogNadezhnayaSilovayaLiniya from "@/assets/blog-nadezhnaya-silovaya-liniya.jpg";
 
 
 export type StockStatus = "in_stock" | "expected" | "out";
@@ -260,6 +261,17 @@ export const mockOrders: Order[] = [
 ];
 
 export const blogPosts: BlogPost[] = [
+  {
+    slug: "nadezhnaya-silovaya-liniya",
+    title: "Надежная силовая линия SITRAK: двигатели MC, коробки ZF и мосты SINOTRUK",
+    excerpt:
+      "Из чего складывается силовая линия SITRAK: двигатели серии MC по технологиям MAN, коробки ZF, мосты SINOTRUK с дисковыми и барабанными тормозами.",
+    category: "Техника SITRAK",
+    date: "2025-05-21",
+    readTime: 6,
+    cover: blogNadezhnayaSilovayaLiniya,
+    body: "Двигатели серии МС, коробки ZF и мосты SINOTRUK — основа надежной силовой линии SITRAK для бизнеса без простоев.",
+  },
   {
     slug: "original-ili-analog-sitrak-howo",
     title: "Оригинал или аналог: что выбрать для SITRAK и HOWO",
