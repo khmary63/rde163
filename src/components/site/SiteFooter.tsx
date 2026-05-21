@@ -36,6 +36,7 @@ export function SiteFooter() {
             <li><Link to="/blog" className="text-muted-foreground hover:text-brand transition-colors">Блог</Link></li>
             <li><Link to="/reviews" className="text-muted-foreground hover:text-brand transition-colors">Отзывы</Link></li>
             <li><Link to="/contacts" className="text-muted-foreground hover:text-brand transition-colors">Контакты</Link></li>
+            <li><Link to="/requisites" className="text-muted-foreground hover:text-brand transition-colors">Реквизиты</Link></li>
           </ul>
         </div>
 
@@ -43,8 +44,8 @@ export function SiteFooter() {
           <h4 className="font-display text-sm tracking-wide text-foreground/80 uppercase">Контакты</h4>
           <ul className="space-y-2 text-sm text-muted-foreground">
             <li className="flex items-start gap-2"><Phone className="h-4 w-4 text-brand mt-0.5 shrink-0" /><a href={`tel:${adminContact.phone}`} className="hover:text-brand">{adminContact.phone}</a></li>
-            <li className="flex items-start gap-2"><Mail className="h-4 w-4 text-brand mt-0.5 shrink-0" /><a href={`mailto:${adminContact.email}`} className="hover:text-brand">{adminContact.email}</a></li>
-            <li className="flex items-start gap-2"><MapPin className="h-4 w-4 text-brand mt-0.5 shrink-0" /><span>Самара, ул. Демократическая, 63а</span></li>
+            <li className="flex items-start gap-2"><Mail className="h-4 w-4 text-brand mt-0.5 shrink-0" /><a href="mailto:rusdomexport@gmail.com" className="hover:text-brand">rusdomexport@gmail.com</a></li>
+            <li className="flex items-start gap-2"><MapPin className="h-4 w-4 text-brand mt-0.5 shrink-0" /><span>443031 г. Самара, ул. Демократическая, зд. 63а, КОМНАТА 301</span></li>
           </ul>
           <div className="flex items-center gap-3 pt-1">
             <a href="#" aria-label="Telegram" className="text-muted-foreground hover:text-brand transition-colors"><Send className="h-4 w-4" /></a>
@@ -56,7 +57,7 @@ export function SiteFooter() {
       <div className="border-t border-border/40">
         <div className="mx-auto max-w-[1400px] px-4 py-5 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-muted-foreground">
           <span>© 2026 ООО «Русский Дом Экспорта». Все права защищены.</span>
-          <span className="font-mono">ИНН 6315000000 · ОГРН 1156315000000</span>
+          <span className="font-mono">ИНН 6315001344 · ОГРН 1156315000742</span>
         </div>
       </div>
     </footer>

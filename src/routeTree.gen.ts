@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as UnsubscribeRouteImport } from './routes/unsubscribe'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as ReviewsRouteImport } from './routes/reviews'
+import { Route as RequisitesRouteImport } from './routes/requisites'
 import { Route as RegisterRouteImport } from './routes/register'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as ContactsRouteImport } from './routes/contacts'
@@ -55,6 +56,11 @@ const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
 const ReviewsRoute = ReviewsRouteImport.update({
   id: '/reviews',
   path: '/reviews',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RequisitesRoute = RequisitesRouteImport.update({
+  id: '/requisites',
+  path: '/requisites',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RegisterRoute = RegisterRouteImport.update({
@@ -215,6 +221,7 @@ export interface FileRoutesByFullPath {
   '/contacts': typeof ContactsRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
+  '/requisites': typeof RequisitesRoute
   '/reviews': typeof ReviewsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/unsubscribe': typeof UnsubscribeRoute
@@ -248,6 +255,7 @@ export interface FileRoutesByTo {
   '/contacts': typeof ContactsRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
+  '/requisites': typeof RequisitesRoute
   '/reviews': typeof ReviewsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/unsubscribe': typeof UnsubscribeRoute
@@ -283,6 +291,7 @@ export interface FileRoutesById {
   '/contacts': typeof ContactsRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
+  '/requisites': typeof RequisitesRoute
   '/reviews': typeof ReviewsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/unsubscribe': typeof UnsubscribeRoute
@@ -319,6 +328,7 @@ export interface FileRouteTypes {
     | '/contacts'
     | '/login'
     | '/register'
+    | '/requisites'
     | '/reviews'
     | '/sitemap.xml'
     | '/unsubscribe'
@@ -352,6 +362,7 @@ export interface FileRouteTypes {
     | '/contacts'
     | '/login'
     | '/register'
+    | '/requisites'
     | '/reviews'
     | '/sitemap.xml'
     | '/unsubscribe'
@@ -386,6 +397,7 @@ export interface FileRouteTypes {
     | '/contacts'
     | '/login'
     | '/register'
+    | '/requisites'
     | '/reviews'
     | '/sitemap.xml'
     | '/unsubscribe'
@@ -421,6 +433,7 @@ export interface RootRouteChildren {
   ContactsRoute: typeof ContactsRoute
   LoginRoute: typeof LoginRoute
   RegisterRoute: typeof RegisterRoute
+  RequisitesRoute: typeof RequisitesRoute
   ReviewsRoute: typeof ReviewsRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   UnsubscribeRoute: typeof UnsubscribeRoute
@@ -456,6 +469,13 @@ declare module '@tanstack/react-router' {
       path: '/reviews'
       fullPath: '/reviews'
       preLoaderRoute: typeof ReviewsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/requisites': {
+      id: '/requisites'
+      path: '/requisites'
+      fullPath: '/requisites'
+      preLoaderRoute: typeof RequisitesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/register': {
@@ -724,6 +744,7 @@ const rootRouteChildren: RootRouteChildren = {
   ContactsRoute: ContactsRoute,
   LoginRoute: LoginRoute,
   RegisterRoute: RegisterRoute,
+  RequisitesRoute: RequisitesRoute,
   ReviewsRoute: ReviewsRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   UnsubscribeRoute: UnsubscribeRoute,
