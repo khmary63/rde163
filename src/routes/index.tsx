@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Search, Truck, Shield, Users, FileText, RotateCw, MapPin, ArrowRight, ArrowUpRight, Zap, Package, Headphones, Upload, Layers, CheckCircle2, Activity, Radio, Cpu, Boxes } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { warehouses, brands, reviews, blogPosts } from "@/data/mock";
+import { warehouses, reviews, blogPosts } from "@/data/mock";
 import { formatNumber, formatDate } from "@/lib/format";
 import { LiveStockCounter } from "@/components/site/LiveStockCounter";
 import heroImage from "@/assets/hero-hitech.jpg";
@@ -267,30 +267,6 @@ function HomePage() {
             <div className="absolute -top-3 -left-3 right-3 bottom-3 border-2 border-accent-orange" />
             <div className="relative overflow-hidden">
               <img src={sitrakFleet} alt="Линейка SITRAK" loading="lazy" className="w-full h-auto object-cover" />
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ============== ASYMMETRIC: бренды + большая цифра ============== */}
-      <section className="relative border-y border-border bg-surface/50">
-        <div className="mx-auto max-w-[1480px] px-6 py-20 grid lg:grid-cols-[auto_1fr] gap-12 items-center">
-          <div className="space-y-3">
-            <div className="font-mono text-[11px] text-accent-blue uppercase tracking-[0.3em]">/ 03 · partners</div>
-            <div className="font-display font-bold leading-[0.85]">
-              <div className="text-7xl lg:text-9xl tabular-nums">10<span className="text-accent-blue">+</span></div>
-              <div className="text-xl lg:text-2xl text-muted-foreground mt-2">брендов · прямые поставки</div>
-            </div>
-          </div>
-          <div className="relative">
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-px bg-border border border-border">
-              {brands.slice(0, 10).map((b) => (
-                <div key={b.id} className="bg-background flex items-center justify-center h-24 group hover:bg-surface transition-colors">
-                  <span className="font-display text-xl tracking-wider text-muted-foreground group-hover:text-foreground transition-colors">
-                    {b.name}
-                  </span>
-                </div>
-              ))}
             </div>
           </div>
         </div>
