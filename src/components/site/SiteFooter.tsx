@@ -38,6 +38,7 @@ export function SiteFooter() {
             <li><Link to="/reviews" className="text-muted-foreground hover:text-brand transition-colors">Отзывы</Link></li>
             <li><Link to="/contacts" className="text-muted-foreground hover:text-brand transition-colors">Контакты</Link></li>
             <li><Link to="/certificates" className="text-muted-foreground hover:text-brand transition-colors">Лицензии и сертификаты</Link></li>
+            <li><Link to="/personal-data" className="text-muted-foreground hover:text-brand transition-colors">Соглашение о персональных данных</Link></li>
             <li><Link to="/requisites" className="text-muted-foreground hover:text-brand transition-colors">Реквизиты</Link></li>
           </ul>
         </div>
