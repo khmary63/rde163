@@ -16,6 +16,7 @@ import { Route as RequisitesRouteImport } from './routes/requisites'
 import { Route as RegisterRouteImport } from './routes/register'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as ContactsRouteImport } from './routes/contacts'
+import { Route as CertificatesRouteImport } from './routes/certificates'
 import { Route as CatalogRouteImport } from './routes/catalog'
 import { Route as CartRouteImport } from './routes/cart'
 import { Route as AdminRouteImport } from './routes/admin'
@@ -76,6 +77,11 @@ const LoginRoute = LoginRouteImport.update({
 const ContactsRoute = ContactsRouteImport.update({
   id: '/contacts',
   path: '/contacts',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CertificatesRoute = CertificatesRouteImport.update({
+  id: '/certificates',
+  path: '/certificates',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CatalogRoute = CatalogRouteImport.update({
@@ -218,6 +224,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRouteWithChildren
   '/cart': typeof CartRoute
   '/catalog': typeof CatalogRouteWithChildren
+  '/certificates': typeof CertificatesRoute
   '/contacts': typeof ContactsRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
@@ -252,6 +259,7 @@ export interface FileRoutesByTo {
   '/account': typeof AccountRoute
   '/cart': typeof CartRoute
   '/catalog': typeof CatalogRouteWithChildren
+  '/certificates': typeof CertificatesRoute
   '/contacts': typeof ContactsRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
@@ -288,6 +296,7 @@ export interface FileRoutesById {
   '/admin': typeof AdminRouteWithChildren
   '/cart': typeof CartRoute
   '/catalog': typeof CatalogRouteWithChildren
+  '/certificates': typeof CertificatesRoute
   '/contacts': typeof ContactsRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
@@ -325,6 +334,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/cart'
     | '/catalog'
+    | '/certificates'
     | '/contacts'
     | '/login'
     | '/register'
@@ -359,6 +369,7 @@ export interface FileRouteTypes {
     | '/account'
     | '/cart'
     | '/catalog'
+    | '/certificates'
     | '/contacts'
     | '/login'
     | '/register'
@@ -394,6 +405,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/cart'
     | '/catalog'
+    | '/certificates'
     | '/contacts'
     | '/login'
     | '/register'
@@ -430,6 +442,7 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRouteWithChildren
   CartRoute: typeof CartRoute
   CatalogRoute: typeof CatalogRouteWithChildren
+  CertificatesRoute: typeof CertificatesRoute
   ContactsRoute: typeof ContactsRoute
   LoginRoute: typeof LoginRoute
   RegisterRoute: typeof RegisterRoute
@@ -497,6 +510,13 @@ declare module '@tanstack/react-router' {
       path: '/contacts'
       fullPath: '/contacts'
       preLoaderRoute: typeof ContactsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/certificates': {
+      id: '/certificates'
+      path: '/certificates'
+      fullPath: '/certificates'
+      preLoaderRoute: typeof CertificatesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/catalog': {
@@ -741,6 +761,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRoute: AdminRouteWithChildren,
   CartRoute: CartRoute,
   CatalogRoute: CatalogRouteWithChildren,
+  CertificatesRoute: CertificatesRoute,
   ContactsRoute: ContactsRoute,
   LoginRoute: LoginRoute,
   RegisterRoute: RegisterRoute,
