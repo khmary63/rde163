@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { warehouses, reviews, blogPosts } from "@/data/mock";
 import { formatNumber, formatDate } from "@/lib/format";
 import { LiveStockCounter } from "@/components/site/LiveStockCounter";
+import { LiveStockTicker } from "@/components/site/LiveStockTicker";
 import heroImage from "@/assets/hero-hitech.jpg";
 import sitrakTruck1 from "@/assets/sitrak-truck-1.jpg";
 import sitrakTruck2 from "@/assets/sitrak-truck-2.jpg";
@@ -47,16 +48,6 @@ const trustItems = [
   { icon: RotateCw, title: "Повтор заказа в 1 клик", text: "Шаблоны для регулярных закупок", code: "TPL.X1" },
 ];
 
-const tickerItems = [
-  "SDLG · в наличии 4 218 поз.",
-  "XCMG · в наличии 3 904 поз.",
-  "SHANTUI · в наличии 2 117 поз.",
-  "SHACMAN · в наличии 5 442 поз.",
-  "HOWO · в наличии 6 081 поз.",
-  "LIUGONG · в наличии 1 873 поз.",
-  "ZOOMLION · в наличии 992 поз.",
-  "FOTON · в наличии 2 055 поз.",
-];
 
 function HomePage() {
   return (
@@ -156,24 +147,8 @@ function HomePage() {
           </div>
         </div>
 
-        {/* TICKER-лента */}
-        <div className="relative border-y-2 border-foreground bg-foreground text-background overflow-hidden">
-          <div className="flex items-center">
-            <div className="shrink-0 border-r border-background/20 bg-accent-orange text-accent-orange-foreground px-5 py-3 font-mono text-xs uppercase tracking-widest flex items-center gap-2 font-bold">
-              <Radio className="h-3.5 w-3.5 animate-pulse" /> live · stock
-            </div>
-            <div className="relative flex-1 overflow-hidden">
-              <div className="flex gap-10 whitespace-nowrap py-3 animate-[ticker_40s_linear_infinite] font-mono text-sm">
-                {[...tickerItems, ...tickerItems, ...tickerItems].map((t, i) => (
-                  <span key={i} className="flex items-center gap-3">
-                    <span className="text-accent-orange">▸</span>
-                    {t}
-                  </span>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
+        {/* TICKER-лента — реальные остатки по брендам */}
+        <LiveStockTicker />
       </section>
 
       {/* ============== BENTO: «Нашёл за 30 секунд» + сценарии ============== */}
