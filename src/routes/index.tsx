@@ -19,6 +19,7 @@ import warehouseNovosibirsk from "@/assets/warehouse-novosibirsk.jpg";
 import warehouseChelyabinsk from "@/assets/warehouse-chelyabinsk.jpg";
 import warehouseMoscow from "@/assets/warehouse-moscow.jpg";
 import managerKhabarov from "@/assets/manager-khabarov.jpg";
+import warehouseSamaraAgropark from "@/assets/warehouse-samara-agropark.jpg";
 
 
 const organizationJsonLd = {
@@ -354,6 +355,7 @@ function HomePage() {
               { src: warehouseEkaterinburg, city: "Екатеринбург", address: "ул. Завокзальная, 29" },
               { src: warehouseChelyabinsk, city: "Челябинск", address: "Троицкий тракт, 11Б" },
               { src: warehouseNovosibirsk, city: "Новосибирск", address: "ул. Большевистская, 177" },
+              { src: warehouseSamaraAgropark, city: "Самара Агропарк", address: "Агро-парк" },
             ].map((w) => (
               <figure key={w.city} className="group relative overflow-hidden border border-border bg-surface aspect-[4/3]">
                 <img
