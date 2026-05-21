@@ -108,7 +108,7 @@ function HomePage() {
           <div className="mt-12 max-w-2xl">
             <div>
               <p className="text-base lg:text-lg text-foreground/80 max-w-2xl leading-relaxed">
-                <span className="font-mono text-accent-orange font-bold">→</span> Официальный спрос на SITRAK · оригинал и аналоги. Введите артикул — получите наличие, склад и цену с вашей договорной скидкой.
+                <span className="font-mono text-accent-orange font-bold">→</span> Официальный дистрибьютор запасных частей SITRAK и HOWO в Российской Федерации · Оригинал и аналоги · Введите артикул — получите наличие, склад и цену с вашей договорной скидкой.
               </p>
 
               {/* Поисковая строка */}
