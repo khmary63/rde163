@@ -1,5 +1,7 @@
 // Моковые данные для прототипа интернет-магазина ГРОСС Запчасти
 // На шаге B будут заменены на запросы к Lovable Cloud.
+import blogSitrakHowoCover from "@/assets/blog-sitrak-howo-articul.jpg";
+
 
 export type StockStatus = "in_stock" | "expected" | "out";
 
@@ -257,6 +259,17 @@ export const mockOrders: Order[] = [
 ];
 
 export const blogPosts: BlogPost[] = [
+  {
+    slug: "podbor-zapchasti-sitrak-howo-po-artikulu",
+    title: "Как подобрать запчасть для китайской спецтехники SITRAK и HOWO по артикулу",
+    excerpt:
+      "Пошаговый алгоритм: где найти каталожный номер SITRAK / HOWO, как сверить деталь по VIN, выбрать оригинал или аналог и не нарваться на подделку.",
+    category: "Как подобрать запчасть",
+    date: "2026-05-21",
+    readTime: 9,
+    cover: blogSitrakHowoCover,
+    body: "Правильный подбор запчастей для SITRAK и HOWO по артикулу позволяет избежать простоев, ошибок при заказе и лишних затрат на ремонт.",
+  },
   {
     slug: "kak-podobrat-zapchast-po-artikulu",
     title: "Как подобрать запчасть для китайской спецтехники по артикулу",
