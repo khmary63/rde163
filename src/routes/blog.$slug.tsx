@@ -56,6 +56,7 @@ const richContent: Record<string, () => ReactNode> = {
   "nadezhnaya-silovaya-liniya": () => <NadezhnayaSilovayaLiniyaArticle />,
   "moshchnost-i-ekonomiya-topliva": () => <MoshchnostEkonomiyaArticle />,
   "moshchnyy-i-nadezhnyy-dvigatel": () => <MoshchnyyNadezhnyyArticle />,
+  "modifitsirovannaya-moshchnost": () => <ModifitsirovannayaMoshchnostArticle />,
 };
 
 function BlogPost() {
@@ -639,6 +640,88 @@ function MoshchnyyNadezhnyyArticle() {
       <div className="mt-10 rounded-xl border border-brand/40 bg-brand/5 p-6">
         <div className="text-xs font-mono uppercase tracking-wider text-brand mb-2">Запчасти на двигатель серии MC</div>
         <h3 className="font-display text-2xl mb-2">Подберём комплектующие для SITRAK C7H MAX</h3>
+        <p className="text-muted-foreground mb-4">
+          Менеджер уточнит модификацию двигателя, сверит каталожные номера и подтвердит наличие на складе.
+        </p>
+        <Link
+          to="/contacts"
+          className="inline-flex items-center rounded-md bg-brand px-5 py-2.5 text-sm font-medium text-brand-foreground hover:bg-brand/90"
+        >
+          Оставить заявку на подбор
+        </Link>
+      </div>
+    </div>
+  );
+}
+
+function ModifitsirovannayaMoshchnostArticle() {
+  return (
+    <div>
+      <H2>MC13.48-50 и МС13.54-50</H2>
+      <P>
+        Обновлённый SITRAK C7H с полным приводом оснащается двигателями серии <strong>MC13.48–50 и MC13.54–50</strong>. Это флагманы
+        надёжности и экономичности, разработанные на базе технологий MAN и адаптированные под реалии интенсивной эксплуатации.
+      </P>
+
+      <UL>
+        <li>
+          <strong>Мощность до 540 л. с.</strong> и крутящий момент до <strong>2500 Нм</strong> для уверенной работы в самых тяжёлых условиях.
+        </li>
+        <li>Широкий диапазон оборотов: стабильная тяга и низкий расход топлива.</li>
+        <li>
+          Моторный тормоз <strong>EVB (Engine Valve Brake)</strong> — повышенная эффективность торможения, особенно на спусках и в сложных
+          дорожных ситуациях.
+        </li>
+      </UL>
+
+      <div className="my-4 overflow-x-auto rounded-lg border border-border">
+        <table className="w-full text-sm">
+          <thead className="bg-surface text-xs uppercase tracking-wider text-muted-foreground">
+            <tr>
+              <th className="px-3 py-2 text-left font-medium">Параметр</th>
+              <th className="px-3 py-2 text-left font-medium">MC13.48-50</th>
+              <th className="px-3 py-2 text-left font-medium">MC13.54-50</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-border">
+            <tr>
+              <td className="px-3 py-2">Тип</td>
+              <td className="px-3 py-2" colSpan={2}>
+                Рядный, 6-цилиндровый, с турбонаддувом и промежуточным охлаждением
+              </td>
+            </tr>
+            <tr>
+              <td className="px-3 py-2">Объём, л</td>
+              <td className="px-3 py-2">12,42</td>
+              <td className="px-3 py-2">12,42</td>
+            </tr>
+            <tr>
+              <td className="px-3 py-2">Степень сжатия</td>
+              <td className="px-3 py-2">19</td>
+              <td className="px-3 py-2">19</td>
+            </tr>
+            <tr>
+              <td className="px-3 py-2">Макс. мощность, кВт / л. с. (об/мин)</td>
+              <td className="px-3 py-2">353 / 480 (1900)</td>
+              <td className="px-3 py-2">397 / 540 (1900)</td>
+            </tr>
+            <tr>
+              <td className="px-3 py-2">Макс. крутящий момент, Нм (об/мин)</td>
+              <td className="px-3 py-2">2300 (1050–1400)</td>
+              <td className="px-3 py-2">2500 (1050–1350)</td>
+            </tr>
+            <tr>
+              <td className="px-3 py-2">Вес, кг</td>
+              <td className="px-3 py-2">975</td>
+              <td className="px-3 py-2">975</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div className="mt-10 rounded-xl border border-brand/40 bg-brand/5 p-6">
+        <div className="text-xs font-mono uppercase tracking-wider text-brand mb-2">Запчасти на двигатели MC13</div>
+        <h3 className="font-display text-2xl mb-2">Подберём комплектующие для SITRAK C7H 6×6</h3>
         <p className="text-muted-foreground mb-4">
           Менеджер уточнит модификацию двигателя, сверит каталожные номера и подтвердит наличие на складе.
         </p>
