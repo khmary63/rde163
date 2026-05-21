@@ -245,7 +245,7 @@ function CartPage() {
                 )}
               </Button>
               <p className="mt-2 text-center text-[11px] text-muted-foreground">
-                Ответ менеджера ~ 30 минут в рабочее время
+                <br />
               </p>
             </Card>
           </aside>
