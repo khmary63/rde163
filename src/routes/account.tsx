@@ -111,7 +111,7 @@ function AccountPage() {
 
           {/* Разделы */}
           <div className="grid sm:grid-cols-2 gap-3">
-            <NavTile to="/catalog" icon={ShoppingBag} title="Каталог" desc="40 000+ позиций" />
+            <NavTile to="/catalog" icon={ShoppingBag} title="Каталог" desc="5 000+ позиций" />
             <NavTile to="/cart" icon={Repeat} title="Корзина" desc="Активная заявка" />
           </div>
         </div>

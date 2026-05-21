@@ -19,7 +19,7 @@ export const Route = createFileRoute("/catalog")({
       { title: "Каталог запчастей для китайской спецтехники — РДЭ" },
       { name: "description", content: "Каталог из 40 000+ оригинальных запчастей CNHTC, HOWO, XGMA, Shacman, Sitrak. 8 складов по России, наличие в реальном времени, персональные цены." },
       { property: "og:title", content: "Каталог запчастей — РДЭ" },
-      { property: "og:description", content: "40 000+ позиций, наличие на 8 складах, персональные цены для юрлиц." },
+      { property: "og:description", content: "5 000+ позиций, наличие на 8 складах, персональные цены для юрлиц." },
       { property: "og:url", content: "https://rde163.ru/catalog" },
     ],
     links: [{ rel: "canonical", href: "https://rde163.ru/catalog" }],
