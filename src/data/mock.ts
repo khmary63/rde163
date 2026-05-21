@@ -262,6 +262,17 @@ export const mockOrders: Order[] = [
 
 export const blogPosts: BlogPost[] = [
   {
+    slug: "nadezhnaya-silovaya-liniya",
+    title: "Надежная силовая линия SITRAK: двигатели MC, коробки ZF и мосты SINOTRUK",
+    excerpt:
+      "Из чего складывается силовая линия SITRAK: двигатели серии MC по технологиям MAN, коробки ZF, мосты SINOTRUK с дисковыми и барабанными тормозами.",
+    category: "Техника SITRAK",
+    date: "2025-05-21",
+    readTime: 6,
+    cover: blogNadezhnayaSilovayaLiniya,
+    body: "Двигатели серии МС, коробки ZF и мосты SINOTRUK — основа надежной силовой линии SITRAK для бизнеса без простоев.",
+  },
+  {
     slug: "original-ili-analog-sitrak-howo",
     title: "Оригинал или аналог: что выбрать для SITRAK и HOWO",
     excerpt:
