@@ -378,7 +378,7 @@ function HomePage() {
         <div className="grid lg:grid-cols-12 gap-8 lg:gap-12 items-center">
           <div className="lg:col-span-4 relative">
             <div className="absolute -top-3 -left-3 right-3 bottom-3 border-2 border-accent-orange pointer-events-none" />
-            <div className="relative overflow-hidden border border-border bg-surface aspect-[3/4] max-w-[380px] mx-auto lg:mx-1">
+            <div className="relative overflow-hidden border border-border bg-surface aspect-[3/4] max-w-[260px] mx-auto lg:mx-1">
               <img
                 src={managerKhabarov}
                 alt="Хабаров Роман Сергеевич — региональный менеджер по продажам ООО «Русский Дом Экспорта»"
