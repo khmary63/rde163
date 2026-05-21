@@ -226,7 +226,7 @@ function OrdersSection({ userId }: { userId: string }) {
                   onClick={() => setOpenId(isOpen ? null : o.id)}
                   className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-surface/60"
                 >
-                  <div className="font-mono text-xs sm:text-sm font-semibold">{o.number}</div>
+                  <div className="font-mono text-xs sm:text-sm font-semibold whitespace-pre-line">{o.number.replace("REQ-2647", "\n\n")}</div>
                   <Badge className={`${st.cls} border-0 font-normal`}>{st.label}</Badge>
                   <div className="ml-auto flex items-center gap-4">
                     <div className="text-xs text-muted-foreground hidden sm:block">
