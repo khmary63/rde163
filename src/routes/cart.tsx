@@ -80,7 +80,7 @@ function CartPage() {
         <CheckCircle2 className="mx-auto h-16 w-16 text-brand" />
         <h1 className="mt-6 font-display text-3xl uppercase">ЗАКАЗ ПРИНЯТ</h1>
         <p className="mt-3 text-muted-foreground">
-          <br />
+          Номер заявки <span className="font-mono font-semibold text-foreground">{done.number}</span>. Спасибо за покупку.
         </p>
         <div className="mt-8 flex justify-center gap-3">
           <Button asChild variant="outline"><Link to="/catalog">Продолжить покупки</Link></Button>
