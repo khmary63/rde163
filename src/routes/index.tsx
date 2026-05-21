@@ -222,7 +222,7 @@ function HomePage() {
               Комплексный подход к товарам и услугам
             </h3>
             <p className="text-base text-foreground/85 leading-relaxed max-w-4xl">
-              На складах компании представлены <span className="font-semibold text-foreground">более 40 000 наименований</span> оригинальных запасных частей — от расходных материалов до крупных узлов и агрегатов.
+              На складах компании представлены <span className="font-semibold text-foreground">более 5 000 наименований</span> оригинальных запасных частей — от расходных материалов до крупных узлов и агрегатов.
             </p>
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
               {[
