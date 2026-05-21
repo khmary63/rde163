@@ -14,6 +14,7 @@ import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as ReviewsRouteImport } from './routes/reviews'
 import { Route as RequisitesRouteImport } from './routes/requisites'
 import { Route as RegisterRouteImport } from './routes/register'
+import { Route as PrivacyPolicyRouteImport } from './routes/privacy-policy'
 import { Route as PersonalDataRouteImport } from './routes/personal-data'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as ContactsRouteImport } from './routes/contacts'
@@ -68,6 +69,11 @@ const RequisitesRoute = RequisitesRouteImport.update({
 const RegisterRoute = RegisterRouteImport.update({
   id: '/register',
   path: '/register',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyPolicyRoute = PrivacyPolicyRouteImport.update({
+  id: '/privacy-policy',
+  path: '/privacy-policy',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PersonalDataRoute = PersonalDataRouteImport.update({
@@ -234,6 +240,7 @@ export interface FileRoutesByFullPath {
   '/contacts': typeof ContactsRoute
   '/login': typeof LoginRoute
   '/personal-data': typeof PersonalDataRoute
+  '/privacy-policy': typeof PrivacyPolicyRoute
   '/register': typeof RegisterRoute
   '/requisites': typeof RequisitesRoute
   '/reviews': typeof ReviewsRoute
@@ -270,6 +277,7 @@ export interface FileRoutesByTo {
   '/contacts': typeof ContactsRoute
   '/login': typeof LoginRoute
   '/personal-data': typeof PersonalDataRoute
+  '/privacy-policy': typeof PrivacyPolicyRoute
   '/register': typeof RegisterRoute
   '/requisites': typeof RequisitesRoute
   '/reviews': typeof ReviewsRoute
@@ -308,6 +316,7 @@ export interface FileRoutesById {
   '/contacts': typeof ContactsRoute
   '/login': typeof LoginRoute
   '/personal-data': typeof PersonalDataRoute
+  '/privacy-policy': typeof PrivacyPolicyRoute
   '/register': typeof RegisterRoute
   '/requisites': typeof RequisitesRoute
   '/reviews': typeof ReviewsRoute
@@ -347,6 +356,7 @@ export interface FileRouteTypes {
     | '/contacts'
     | '/login'
     | '/personal-data'
+    | '/privacy-policy'
     | '/register'
     | '/requisites'
     | '/reviews'
@@ -383,6 +393,7 @@ export interface FileRouteTypes {
     | '/contacts'
     | '/login'
     | '/personal-data'
+    | '/privacy-policy'
     | '/register'
     | '/requisites'
     | '/reviews'
@@ -420,6 +431,7 @@ export interface FileRouteTypes {
     | '/contacts'
     | '/login'
     | '/personal-data'
+    | '/privacy-policy'
     | '/register'
     | '/requisites'
     | '/reviews'
@@ -458,6 +470,7 @@ export interface RootRouteChildren {
   ContactsRoute: typeof ContactsRoute
   LoginRoute: typeof LoginRoute
   PersonalDataRoute: typeof PersonalDataRoute
+  PrivacyPolicyRoute: typeof PrivacyPolicyRoute
   RegisterRoute: typeof RegisterRoute
   RequisitesRoute: typeof RequisitesRoute
   ReviewsRoute: typeof ReviewsRoute
@@ -509,6 +522,13 @@ declare module '@tanstack/react-router' {
       path: '/register'
       fullPath: '/register'
       preLoaderRoute: typeof RegisterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy-policy': {
+      id: '/privacy-policy'
+      path: '/privacy-policy'
+      fullPath: '/privacy-policy'
+      preLoaderRoute: typeof PrivacyPolicyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/personal-data': {
@@ -785,6 +805,7 @@ const rootRouteChildren: RootRouteChildren = {
   ContactsRoute: ContactsRoute,
   LoginRoute: LoginRoute,
   PersonalDataRoute: PersonalDataRoute,
+  PrivacyPolicyRoute: PrivacyPolicyRoute,
   RegisterRoute: RegisterRoute,
   RequisitesRoute: RequisitesRoute,
   ReviewsRoute: ReviewsRoute,
