@@ -78,7 +78,7 @@ function CartPage() {
     return (
       <div className="mx-auto max-w-2xl px-4 py-20 text-center">
         <CheckCircle2 className="mx-auto h-16 w-16 text-brand" />
-        <h1 className="mt-6 font-display text-3xl uppercase">Заявка отправлена</h1>
+        <h1 className="mt-6 font-display text-3xl uppercase">ЗАКАЗ ПРИНЯТ</h1>
         <p className="mt-3 text-muted-foreground">
           Номер заявки <span className="font-mono font-semibold text-foreground">{done.number}</span>. Менеджер свяжется с вами в течение 30 минут в рабочее время.
         </p>
