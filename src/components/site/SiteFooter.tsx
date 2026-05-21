@@ -44,8 +44,8 @@ export function SiteFooter() {
           <h4 className="font-display text-sm tracking-wide text-foreground/80 uppercase">Контакты</h4>
           <ul className="space-y-2 text-sm text-muted-foreground">
             <li className="flex items-start gap-2"><Phone className="h-4 w-4 text-brand mt-0.5 shrink-0" /><a href={`tel:${adminContact.phone}`} className="hover:text-brand">{adminContact.phone}</a></li>
-            <li className="flex items-start gap-2"><Mail className="h-4 w-4 text-brand mt-0.5 shrink-0" /><a href={`mailto:${adminContact.email}`} className="hover:text-brand">{adminContact.email}</a></li>
-            <li className="flex items-start gap-2"><MapPin className="h-4 w-4 text-brand mt-0.5 shrink-0" /><span>Самара, ул. Демократическая, 63а</span></li>
+            <li className="flex items-start gap-2"><Mail className="h-4 w-4 text-brand mt-0.5 shrink-0" /><a href="mailto:rusdomexport@gmail.com" className="hover:text-brand">rusdomexport@gmail.com</a></li>
+            <li className="flex items-start gap-2"><MapPin className="h-4 w-4 text-brand mt-0.5 shrink-0" /><span>443031 г. Самара, ул. Демократическая, зд. 63а, КОМНАТА 301</span></li>
           </ul>
           <div className="flex items-center gap-3 pt-1">
             <a href="#" aria-label="Telegram" className="text-muted-foreground hover:text-brand transition-colors"><Send className="h-4 w-4" /></a>
