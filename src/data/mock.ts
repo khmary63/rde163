@@ -4,6 +4,7 @@ import blogSitrakHowoCover from "@/assets/blog-sitrak-howo-articul.jpg";
 import blogSitrakHowoOriginalVsAnalog from "@/assets/blog-sitrak-howo-original-vs-analog.jpg";
 import blogNadezhnayaSilovayaLiniya from "@/assets/blog-nadezhnaya-silovaya-liniya.jpg";
 import blogMoshchnostEkonomiya from "@/assets/blog-moshchnost-ekonomiya.jpg";
+import blogMoshchnyyNadezhnyy from "@/assets/blog-moshchnyy-nadezhnyy-dvigatel.jpg";
 
 
 export type StockStatus = "in_stock" | "expected" | "out";
@@ -262,6 +263,17 @@ export const mockOrders: Order[] = [
 ];
 
 export const blogPosts: BlogPost[] = [
+  {
+    slug: "moshchnyy-i-nadezhnyy-dvigatel",
+    title: "Мощный и надежный двигатель SITRAK C7H MAX",
+    excerpt:
+      "Двигатели серии MC13.48-50 и MC13.54-50 для SITRAK C7H MAX: мощность от 480 л. с., крутящий момент до 2500 Нм, экономичность и моторный тормоз EVB.",
+    category: "Техника SITRAK",
+    date: "2025-05-21",
+    readTime: 4,
+    cover: blogMoshchnyyNadezhnyy,
+    body: "Обновленный SITRAK C7H MAX оснащен проверенными и надежными двигателями серии MC.",
+  },
   {
     slug: "moshchnost-i-ekonomiya-topliva",
     title: "Мощность и экономия топлива: двигатели MC13 для SITRAK C9H",
