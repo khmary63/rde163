@@ -10,6 +10,14 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { useCart, type CartItem } from "@/hooks/use-cart";
 import { toast } from "sonner";
+import managerKhabarovPhoto from "@/assets/manager-khabarov.jpg";
+
+const DEFAULT_MANAGER = {
+  full_name: "Хабаров Роман",
+  phone: "8 937-219-49-26",
+  email: "hrs@gross.ru",
+  photo_url: managerKhabarovPhoto,
+};
 
 export const Route = createFileRoute("/account")({
   head: () => ({ meta: [{ title: "Личный кабинет — РДЭ Запчасти" }] }),
@@ -139,30 +147,23 @@ function NavTile({ to, icon: Icon, title, desc }: { to: string; icon: typeof Sho
 }
 
 function ManagerCard({ manager }: { manager?: { full_name: string; phone?: string | null; email?: string | null; photo_url?: string | null } | null }) {
+  const m = manager ?? DEFAULT_MANAGER;
   return (
     <div className="border border-border bg-foreground text-background p-6 rounded-md h-fit">
-      <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-brand mb-3">/ ваш менеджер</div>
-      {manager ? (
-        <>
-          <div className="flex items-center gap-4">
-            <div className="h-14 w-14 rounded-full bg-brand/20 overflow-hidden flex items-center justify-center text-brand">
-              {manager.photo_url ? <img src={manager.photo_url} alt={manager.full_name} className="h-full w-full object-cover" /> : <UserIcon className="h-7 w-7" />}
-            </div>
-            <div>
-              <div className="font-display text-lg">{manager.full_name}</div>
-              <div className="text-xs text-background/60">Закреплён за вашим аккаунтом</div>
-            </div>
-          </div>
-          <div className="mt-5 space-y-2 text-sm">
-            {manager.phone && <a href={`tel:${manager.phone}`} className="flex items-center gap-2 hover:text-brand"><Phone className="h-4 w-4" />{manager.phone}</a>}
-            {manager.email && <a href={`mailto:${manager.email}`} className="flex items-center gap-2 hover:text-brand"><Mail className="h-4 w-4" />{manager.email}</a>}
-          </div>
-        </>
-      ) : (
-        <div className="text-sm text-background/70">
-          Менеджер пока не закреплён. Мы свяжемся с вами после первой заявки.
+      <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-brand mb-3">/ ваш персональный менеджер</div>
+      <div className="flex items-center gap-4">
+        <div className="h-16 w-16 rounded-full bg-brand/20 overflow-hidden flex items-center justify-center text-brand">
+          {m.photo_url ? <img src={m.photo_url} alt={m.full_name} className="h-full w-full object-cover" /> : <UserIcon className="h-7 w-7" />}
         </div>
-      )}
+        <div>
+          <div className="font-display text-lg">{m.full_name}</div>
+          <div className="text-xs text-background/60">Закреплён за вашим аккаунтом</div>
+        </div>
+      </div>
+      <div className="mt-5 space-y-2 text-sm">
+        {m.phone && <a href={`tel:${m.phone.replace(/\s/g, "")}`} className="flex items-center gap-2 hover:text-brand"><Phone className="h-4 w-4" />{m.phone}</a>}
+        {m.email && <a href={`mailto:${m.email}`} className="flex items-center gap-2 hover:text-brand"><Mail className="h-4 w-4" />{m.email}</a>}
+      </div>
     </div>
   );
 }
