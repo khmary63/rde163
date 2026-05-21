@@ -125,6 +125,10 @@ function CartPage() {
                         <td className="px-4 py-3">
                           <div className="font-medium leading-tight">{it.name}</div>
                           <div className="mt-0.5 font-mono text-xs text-muted-foreground">{it.sku} · {it.brand}</div>
+                          <div className="mt-1 text-xs">
+                            <span className="text-muted-foreground">Склад отгрузки:</span>{" "}
+                            <span className="font-medium text-foreground">{g.warehouseName}</span>
+                          </div>
                         </td>
                         <td className="px-2 py-3">
                           <div className="inline-flex items-center rounded-md border border-border">
