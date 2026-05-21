@@ -8,17 +8,39 @@ const BASE = "https://rde163.ru";
 export const Route = createFileRoute("/blog/$slug")({
   head: ({ params }) => {
     const post = blogPosts.find((p) => p.slug === params.slug);
-    if (!post) return { meta: [{ title: "Статья не найдена" }] };
+    if (!post) {
+      return {
+        meta: [
+          { title: "Статья не найдена — Блог РДЭ" },
+          { name: "robots", content: "noindex, follow" },
+        ],
+      };
+    }
+    const url = `${BASE}/blog/${post.slug}`;
+    const coverAbs = post.cover.startsWith("http") ? post.cover : `${BASE}${post.cover}`;
+    const seoTitle = post.seoTitle ?? post.title;
+    const seoDescription = post.seoDescription ?? post.excerpt;
+    const titleTag = `${seoTitle} — Блог РДЭ`;
+    const updatedAt = post.updatedAt ?? post.date;
     const jsonLd = {
       "@context": "https://schema.org",
       "@type": "BlogPosting",
-      headline: post.title,
-      description: post.excerpt,
-      image: post.cover,
+      headline: seoTitle,
+      name: post.title,
+      description: seoDescription,
+      image: [coverAbs],
       datePublished: post.date,
-      author: { "@type": "Organization", name: "Русский Дом Экспорта" },
-      publisher: { "@type": "Organization", name: "Русский Дом Экспорта" },
-      mainEntityOfPage: `${BASE}/blog/${post.slug}`,
+      dateModified: updatedAt,
+      inLanguage: "ru-RU",
+      articleSection: post.category,
+      keywords: post.keywords?.join(", "),
+      author: { "@type": "Organization", name: "Русский Дом Экспорта", url: BASE },
+      publisher: {
+        "@type": "Organization",
+        name: "Русский Дом Экспорта",
+        logo: { "@type": "ImageObject", url: `${BASE}/favicon.ico` },
+      },
+      mainEntityOfPage: { "@type": "WebPage", "@id": url },
     };
     const breadcrumbs = {
       "@context": "https://schema.org",
@@ -26,21 +48,35 @@ export const Route = createFileRoute("/blog/$slug")({
       itemListElement: [
         { "@type": "ListItem", position: 1, name: "Главная", item: BASE },
         { "@type": "ListItem", position: 2, name: "Блог", item: `${BASE}/blog` },
-        { "@type": "ListItem", position: 3, name: post.title, item: `${BASE}/blog/${post.slug}` },
+        { "@type": "ListItem", position: 3, name: post.title, item: url },
       ],
     };
     return {
       meta: [
-        { title: `${post.title} — Блог РДЭ` },
-        { name: "description", content: post.excerpt },
-        { property: "og:title", content: post.title },
-        { property: "og:description", content: post.excerpt },
+        { title: titleTag },
+        { name: "description", content: seoDescription },
+        ...(post.keywords?.length ? [{ name: "keywords", content: post.keywords.join(", ") }] : []),
+        { name: "author", content: "Русский Дом Экспорта" },
+        { name: "robots", content: "index, follow, max-image-preview:large, max-snippet:-1" },
+        { property: "og:title", content: seoTitle },
+        { property: "og:description", content: seoDescription },
         { property: "og:type", content: "article" },
-        { property: "og:url", content: `${BASE}/blog/${post.slug}` },
-        { property: "og:image", content: post.cover },
-        { name: "twitter:image", content: post.cover },
+        { property: "og:url", content: url },
+        { property: "og:image", content: coverAbs },
+        { property: "og:image:alt", content: post.title },
+        { property: "og:site_name", content: "Русский Дом Экспорта" },
+        { property: "og:locale", content: "ru_RU" },
+        { property: "article:published_time", content: post.date },
+        { property: "article:modified_time", content: updatedAt },
+        { property: "article:section", content: post.category },
+        ...(post.keywords?.map((tag) => ({ property: "article:tag", content: tag })) ?? []),
+        { name: "twitter:card", content: "summary_large_image" },
+        { name: "twitter:title", content: seoTitle },
+        { name: "twitter:description", content: seoDescription },
+        { name: "twitter:image", content: coverAbs },
+        { name: "twitter:image:alt", content: post.title },
       ],
-      links: [{ rel: "canonical", href: `${BASE}/blog/${post.slug}` }],
+      links: [{ rel: "canonical", href: url }],
       scripts: [
         { type: "application/ld+json", children: JSON.stringify(jsonLd) },
         { type: "application/ld+json", children: JSON.stringify(breadcrumbs) },
