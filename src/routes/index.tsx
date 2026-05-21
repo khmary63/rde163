@@ -18,6 +18,7 @@ import warehouseEkaterinburg from "@/assets/warehouse-ekaterinburg.jpg";
 import warehouseNovosibirsk from "@/assets/warehouse-novosibirsk.jpg";
 import warehouseChelyabinsk from "@/assets/warehouse-chelyabinsk.jpg";
 import warehouseMoscow from "@/assets/warehouse-moscow.jpg";
+import managerKhabarov from "@/assets/manager-khabarov.jpg";
 
 
 const organizationJsonLd = {
