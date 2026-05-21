@@ -240,7 +240,7 @@ function HomePage() {
               <span className="block text-[clamp(1.5rem,3.5vw,3.5rem)] text-background mt-1">флагман нашего каталога</span>
             </h2>
             <p className="text-lg text-background/80 max-w-xl leading-relaxed">
-              Карьерные самосвалы, тягачи C7H, MAX, T7H. <span className="text-accent-orange font-bold">12 000+ артикулов</span> только по линейке SITRAK — двигатели, ТНВД, мосты, кабина, расходники.
+              Важно! Если Вы ищете оригинальные запчасти на SITRAK и HOWO, обратите внимание на бренд CNHTC. В ООО "Русский дом экспорта" оригинальные запчасти идут именно под этим брендом.
             </p>
 
             <div className="grid grid-cols-3 gap-4 pt-2">
