@@ -48,16 +48,6 @@ const trustItems = [
   { icon: RotateCw, title: "Повтор заказа в 1 клик", text: "Шаблоны для регулярных закупок", code: "TPL.X1" },
 ];
 
-const tickerItems = [
-  "SDLG · в наличии 4 218 поз.",
-  "XCMG · в наличии 3 904 поз.",
-  "SHANTUI · в наличии 2 117 поз.",
-  "SHACMAN · в наличии 5 442 поз.",
-  "HOWO · в наличии 6 081 поз.",
-  "LIUGONG · в наличии 1 873 поз.",
-  "ZOOMLION · в наличии 992 поз.",
-  "FOTON · в наличии 2 055 поз.",
-];
 
 function HomePage() {
   return (
