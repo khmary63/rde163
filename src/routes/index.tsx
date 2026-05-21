@@ -375,6 +375,18 @@ function HomePage() {
               </figure>
             ))}
           </div>
+          <div className="mt-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-t border-border pt-6">
+            <p className="text-sm text-muted-foreground max-w-lg">
+              Прямая отгрузка с ближайшего склада. Самовывоз или транспортная компания на ваш выбор.
+            </p>
+            <Link
+              to="/contacts"
+              className="inline-flex items-center gap-2 font-mono text-xs uppercase tracking-widest text-accent-orange hover:text-foreground transition-colors"
+            >
+              Все контакты
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
         </div>
       </section>
 
