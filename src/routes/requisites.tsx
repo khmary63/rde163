@@ -23,7 +23,7 @@ const fields: { label: string; value: string }[] = [
   { label: "ОКВЭД", value: "46.90" },
   { label: "ОГРН", value: "1156315000742" },
   { label: "Юр./фактический адрес", value: "443031 г. Самара, ул. Демократическая, зд. 63а, КОМНАТА 301" },
-  { label: "E-mail", value: "rusdomexport@gmail.com" },
+  { label: "E-mail", value: "hrs@gross.ru" },
 ];
 
 function RequisitesPage() {
