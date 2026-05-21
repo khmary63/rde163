@@ -1,6 +1,7 @@
 // Моковые данные для прототипа интернет-магазина ГРОСС Запчасти
 // На шаге B будут заменены на запросы к Lovable Cloud.
 import blogSitrakHowoCover from "@/assets/blog-sitrak-howo-articul.jpg";
+import blogSitrakHowoOriginalVsAnalog from "@/assets/blog-sitrak-howo-original-vs-analog.jpg";
 
 
 export type StockStatus = "in_stock" | "expected" | "out";
@@ -259,6 +260,17 @@ export const mockOrders: Order[] = [
 ];
 
 export const blogPosts: BlogPost[] = [
+  {
+    slug: "original-ili-analog-sitrak-howo",
+    title: "Оригинал или аналог: что выбрать для SITRAK и HOWO",
+    excerpt:
+      "Разбираем, чем оригинальные запчасти SINOTRUK отличаются от аналогов, какие альтернативы безопасны для SITRAK и HOWO и где экономия оборачивается простоем.",
+    category: "Оригинал или аналог",
+    date: "2025-05-21",
+    readTime: 7,
+    cover: blogSitrakHowoOriginalVsAnalog,
+    body: "Владельцы грузовой техники SITRAK и HOWO часто сталкиваются с выбором между оригинальными запчастями и их аналогами.",
+  },
   {
     slug: "podbor-zapchasti-sitrak-howo-po-artikulu",
     title: "Как подобрать запчасть для китайской спецтехники SITRAK и HOWO по артикулу",
