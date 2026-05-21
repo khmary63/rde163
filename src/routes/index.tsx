@@ -460,8 +460,8 @@ function HomePage() {
 
           <form className="relative space-y-3 bg-background text-foreground p-8 border border-accent-teal/40 shadow-[0_30px_80px_-20px_oklch(0.72_0.13_195/0.5)]" onSubmit={(e) => e.preventDefault()}>
             <div className="flex items-center justify-between mb-4">
-              <span className="font-mono text-xs uppercase tracking-widest text-muted-foreground">// заявка</span>
-              <span className="font-mono text-xs text-brand">REQ-{Math.floor(Math.random() * 9000 + 1000)}</span>
+              <span className="font-mono text-xs uppercase tracking-widest text-muted-foreground whitespace-pre-line">// ЗАЯВКА{"\n\n"}</span>
+              <span className="font-mono text-xs text-brand"></span>
             </div>
             <input type="text" placeholder="Артикул или название детали" className="w-full h-12 border border-border bg-background px-4 text-sm focus:outline-none focus:border-accent-teal rounded-none" />
             <input type="tel" placeholder="Ваш телефон" className="w-full h-12 border border-border bg-background px-4 text-sm focus:outline-none focus:border-accent-teal rounded-none" />
