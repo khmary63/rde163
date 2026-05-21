@@ -3,6 +3,7 @@
 import blogSitrakHowoCover from "@/assets/blog-sitrak-howo-articul.jpg";
 import blogSitrakHowoOriginalVsAnalog from "@/assets/blog-sitrak-howo-original-vs-analog.jpg";
 import blogNadezhnayaSilovayaLiniya from "@/assets/blog-nadezhnaya-silovaya-liniya.jpg";
+import blogMoshchnostEkonomiya from "@/assets/blog-moshchnost-ekonomiya.jpg";
 
 
 export type StockStatus = "in_stock" | "expected" | "out";
@@ -261,6 +262,17 @@ export const mockOrders: Order[] = [
 ];
 
 export const blogPosts: BlogPost[] = [
+  {
+    slug: "moshchnost-i-ekonomiya-topliva",
+    title: "Мощность и экономия топлива: двигатели MC13 для SITRAK C9H",
+    excerpt:
+      "Версии MC13.48-50A (480 л. с.) и MC13.54-50A (540 л. с.), обновлённый моторный тормоз EVB до 370 кВт и широкий диапазон крутящего момента 900–1400 об/мин.",
+    category: "Техника SITRAK",
+    date: "2025-05-21",
+    readTime: 5,
+    cover: blogMoshchnostEkonomiya,
+    body: "SITRAK C9H оснащен передовыми двигателями серии MC13, разработанными для оптимального баланса мощности и топливной экономичности.",
+  },
   {
     slug: "nadezhnaya-silovaya-liniya",
     title: "Надежная силовая линия SITRAK: двигатели MC, коробки ZF и мосты SINOTRUK",

@@ -54,6 +54,7 @@ const richContent: Record<string, () => ReactNode> = {
   "podbor-zapchasti-sitrak-howo-po-artikulu": () => <SitrakHowoArticulArticle />,
   "original-ili-analog-sitrak-howo": () => <OriginalVsAnalogArticle />,
   "nadezhnaya-silovaya-liniya": () => <NadezhnayaSilovayaLiniyaArticle />,
+  "moshchnost-i-ekonomiya-topliva": () => <MoshchnostEkonomiyaArticle />,
 };
 
 function BlogPost() {
@@ -443,6 +444,113 @@ function NadezhnayaSilovayaLiniyaArticle() {
         <h3 className="font-display text-2xl mb-2">Подберём двигатель, КПП и мосты</h3>
         <p className="text-muted-foreground mb-4">
           Менеджер уточнит конфигурацию вашего тягача или самосвала, сверит каталожные номера и подтвердит наличие на складе.
+        </p>
+        <Link
+          to="/contacts"
+          className="inline-flex items-center rounded-md bg-brand px-5 py-2.5 text-sm font-medium text-brand-foreground hover:bg-brand/90"
+        >
+          Оставить заявку на подбор
+        </Link>
+      </div>
+    </div>
+  );
+}
+
+function MoshchnostEkonomiyaArticle() {
+  return (
+    <div>
+      <P>
+        SITRAK C9H оснащен передовыми двигателями серии MC13, разработанными для обеспечения оптимального баланса мощности и топливной
+        экономичности. Эти агрегаты отвечают самым высоким стандартам производительности и надежности, что позволит уверенно справиться с
+        любыми задачами.
+      </P>
+
+      <H2>Ключевые особенности новых двигателей</H2>
+      <UL>
+        <li>
+          <strong>Мощные и экономичные модели.</strong> Доступны версии MC13.48-50A (480 л. с.) и MC13.54-50A (540 л. с.), обеспечивающие
+          высокую мощность при сниженном расходе топлива.
+        </li>
+        <li>
+          <strong>Повышенный КПД.</strong> Улучшенное смесеобразование в камере сгорания, новая поршневая система и модернизированный
+          интеркулер значительно повысили эффективность двигателей.
+        </li>
+        <li>
+          <strong>Обновленный моторный тормоз EVB.</strong> Мощность торможения увеличена до 370 кВт — повышенная безопасность, более высокая
+          средняя коммерческая скорость и сниженные эксплуатационные расходы. На низких оборотах (1000–1400 об/мин) эффективность EVB
+          выросла на 100–178% по сравнению с предыдущими версиями.
+        </li>
+        <li>
+          <strong>Соответствие нормам Евро-5.</strong> Забота об окружающей среде без компромиссов в производительности.
+        </li>
+        <li>
+          <strong>Надежная конструкция.</strong> Рядные 6-цилиндровые двигатели с турбонаддувом и промежуточным охлаждением отличаются
+          долговечностью и большим ресурсом.
+        </li>
+        <li>
+          <strong>Широкий диапазон крутящего момента.</strong> Максимальный крутящий момент доступен в диапазоне 900–1400 об/мин — отличная
+          тяга в различных дорожных условиях.
+        </li>
+      </UL>
+
+      <H2>Новые двигатели MC13.48-50A и MC13.54-50A</H2>
+      <P>
+        Новые двигатели MC13.48-50A и MC13.54-50A обладают повышенным КПД за счет улучшенного смесеобразования в камере сгорания, новой
+        поршневой системы и улучшенного интеркулера по сравнению с предыдущими версиями двигателей MC.
+      </P>
+
+      <div className="my-4 overflow-x-auto rounded-lg border border-border">
+        <table className="w-full text-sm">
+          <thead className="bg-surface text-xs uppercase tracking-wider text-muted-foreground">
+            <tr>
+              <th className="px-3 py-2 text-left font-medium">Параметр</th>
+              <th className="px-3 py-2 text-left font-medium">MC13.48-50A</th>
+              <th className="px-3 py-2 text-left font-medium">MC13.54-50A</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-border">
+            <tr>
+              <td className="px-3 py-2">Тип</td>
+              <td className="px-3 py-2" colSpan={2}>
+                Рядный, 6-цилиндровый, с турбонаддувом и промежуточным охлаждением
+              </td>
+            </tr>
+            <tr>
+              <td className="px-3 py-2">Объем, л</td>
+              <td className="px-3 py-2">12,419</td>
+              <td className="px-3 py-2">12,419</td>
+            </tr>
+            <tr>
+              <td className="px-3 py-2">Степень сжатия</td>
+              <td className="px-3 py-2">21</td>
+              <td className="px-3 py-2">21</td>
+            </tr>
+            <tr>
+              <td className="px-3 py-2">Макс. мощность, кВт / л. с. (об/мин)</td>
+              <td className="px-3 py-2">353 / 480 (1800)</td>
+              <td className="px-3 py-2">397 / 540 (1800)</td>
+            </tr>
+            <tr>
+              <td className="px-3 py-2">Макс. крутящий момент, Нм (об/мин)</td>
+              <td className="px-3 py-2">2400 (900–1400)</td>
+              <td className="px-3 py-2">2600 (900–1400)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <H2>Обновленный моторный тормоз EVB</H2>
+      <P>
+        Помогает повысить безопасность, среднюю коммерческую скорость и снизить эксплуатационные расходы. Мощность EVB увеличена с 270 до
+        370 кВт и приближается к мощности гидравлического замедлителя (400 кВт). На низких оборотах (от 1000 до 1400 об/мин) новый EVB
+        эффективнее прежнего на 100–178%.
+      </P>
+
+      <div className="mt-10 rounded-xl border border-brand/40 bg-brand/5 p-6">
+        <div className="text-xs font-mono uppercase tracking-wider text-brand mb-2">Запчасти на двигатель MC13</div>
+        <h3 className="font-display text-2xl mb-2">Подберём комплектующие для SITRAK C9H</h3>
+        <p className="text-muted-foreground mb-4">
+          Менеджер уточнит модификацию двигателя, сверит каталожные номера и подтвердит наличие на складе.
         </p>
         <Link
           to="/contacts"
