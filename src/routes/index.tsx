@@ -376,9 +376,9 @@ function HomePage() {
       {/* ============== РЕГИОНАЛЬНЫЙ МЕНЕДЖЕР ============== */}
       <section className="mx-auto max-w-[1480px] px-6 py-20 lg:py-28">
         <div className="grid lg:grid-cols-12 gap-8 lg:gap-12 items-center">
-          <div className="lg:col-span-5 relative">
+          <div className="lg:col-span-4 relative">
             <div className="absolute -top-3 -left-3 right-3 bottom-3 border-2 border-accent-orange pointer-events-none" />
-            <div className="relative overflow-hidden border border-border bg-surface aspect-[4/5]">
+            <div className="relative overflow-hidden border border-border bg-surface aspect-[3/4] max-w-[380px] mx-auto lg:mx-1">
               <img
                 src={managerKhabarov}
                 alt="Хабаров Роман Сергеевич — региональный менеджер по продажам ООО «Русский Дом Экспорта»"
@@ -388,7 +388,7 @@ function HomePage() {
             </div>
           </div>
 
-          <div className="lg:col-span-7 space-y-6">
+          <div className="lg:col-span-8 space-y-6">
             <div className="font-mono text-[11px] text-accent-blue uppercase tracking-[0.3em]">/ ваш менеджер</div>
             <h2 className="font-display text-4xl lg:text-5xl font-bold leading-[0.95]">
               Хабаров<br />
