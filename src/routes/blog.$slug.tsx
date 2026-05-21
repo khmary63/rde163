@@ -55,6 +55,7 @@ const richContent: Record<string, () => ReactNode> = {
   "original-ili-analog-sitrak-howo": () => <OriginalVsAnalogArticle />,
   "nadezhnaya-silovaya-liniya": () => <NadezhnayaSilovayaLiniyaArticle />,
   "moshchnost-i-ekonomiya-topliva": () => <MoshchnostEkonomiyaArticle />,
+  "moshchnyy-i-nadezhnyy-dvigatel": () => <MoshchnyyNadezhnyyArticle />,
 };
 
 function BlogPost() {
