@@ -233,7 +233,7 @@ function HomePage() {
           <div className="space-y-7">
             <div className="inline-flex items-center gap-3 border border-accent-orange bg-accent-orange/10 px-3 py-1.5 font-mono text-[11px] tracking-[0.3em] uppercase text-accent-orange">
               <span className="h-2 w-2 rounded-full bg-accent-orange animate-pulse" />
-              / featured · spotlight
+              / FEATURED
             </div>
             <h2 className="font-display font-bold leading-[0.85]">
               <span className="block text-[clamp(3rem,8vw,8rem)] text-accent-orange">SITRAK</span>
