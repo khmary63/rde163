@@ -303,15 +303,6 @@ function HomePage() {
         </div>
       </section>
 
-      {/* ============== «Почему нам доверяют» — терминал-стиль ============== */}
-      <section className="mx-auto max-w-[1480px] px-6 py-24 lg:py-32">
-        <div className="flex items-end justify-between mb-12 gap-6 flex-wrap">
-          <div>
-            <div className="font-mono text-[11px] text-accent-blue uppercase tracking-[0.3em] mb-3">/ 04 · why us</div>
-            <h2 className="font-display text-4xl lg:text-6xl font-bold leading-[0.95]">
-              Конкретика,<br />не обещания.
-            </h2>
-          </div>
       {/* ============== БЛОК 04 · Гарантии и сервис + галерея складов ============== */}
       <section className="mx-auto max-w-[1480px] px-6 py-24 lg:py-32">
         <div className="flex items-end justify-between mb-12 gap-6 flex-wrap">
