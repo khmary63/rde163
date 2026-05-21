@@ -239,7 +239,7 @@ function CartPage() {
                 {submitting ? (
                   <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Отправляем…</>
                 ) : user ? (
-                  "Отправить заявку менеджеру"
+                  "Купить"
                 ) : (
                   "Войти и оформить"
                 )}
