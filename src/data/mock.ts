@@ -2,6 +2,7 @@
 // На шаге B будут заменены на запросы к Lovable Cloud.
 import blogSitrakHowoCover from "@/assets/blog-sitrak-howo-articul.jpg";
 import blogSitrakHowoOriginalVsAnalog from "@/assets/blog-sitrak-howo-original-vs-analog.jpg";
+import blogNadezhnayaSilovayaLiniya from "@/assets/blog-nadezhnaya-silovaya-liniya.jpg";
 
 
 export type StockStatus = "in_stock" | "expected" | "out";
