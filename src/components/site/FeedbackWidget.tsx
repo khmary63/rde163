@@ -24,14 +24,18 @@ export function FeedbackWidget() {
       user_id: user?.id ?? null,
       email: user?.email ?? null,
     };
-    const { error } = await supabase.from("feedback_messages").insert(payload);
-    if (error) {
+    const { data: inserted, error } = await supabase
+      .from("feedback_messages")
+      .insert(payload)
+      .select("id")
+      .single();
+    if (error || !inserted) {
       setLoading(false);
       toast.error("Не удалось отправить сообщение");
       return;
     }
     // Параллельно уведомим менеджера в MAX (ошибка не блокирует UX)
-    notify({ data: { name: form.name, phone: form.phone, email: user?.email ?? null, message: form.message } }).catch(() => {});
+    notify({ data: { feedback_id: inserted.id } }).catch(() => {});
     setLoading(false);
     setSent(true);
     setForm({ name: "", phone: "", message: "" });
