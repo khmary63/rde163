@@ -377,7 +377,7 @@ function HomePage() {
           </div>
           <div className="mt-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-t border-border pt-6">
             <p className="text-sm text-muted-foreground max-w-lg">
-              Прямая отгрузка с ближайшего склада. Самовывоз или транспортная компания на ваш выбор.
+              Прямая отгрузка с ближайшего склада.<br />Самовывоз или транспортная компания на ваш выбор.
             </p>
             <Link
               to="/contacts"
