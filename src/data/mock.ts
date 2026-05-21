@@ -5,6 +5,7 @@ import blogSitrakHowoOriginalVsAnalog from "@/assets/blog-sitrak-howo-original-v
 import blogNadezhnayaSilovayaLiniya from "@/assets/blog-nadezhnaya-silovaya-liniya.jpg";
 import blogMoshchnostEkonomiya from "@/assets/blog-moshchnost-ekonomiya.jpg";
 import blogMoshchnyyNadezhnyy from "@/assets/blog-moshchnyy-nadezhnyy-dvigatel.jpg";
+import blogModifitsirovannayaMoshchnost from "@/assets/blog-modifitsirovannaya-moshchnost.jpg";
 
 
 export type StockStatus = "in_stock" | "expected" | "out";
@@ -263,6 +264,17 @@ export const mockOrders: Order[] = [
 ];
 
 export const blogPosts: BlogPost[] = [
+  {
+    slug: "modifitsirovannaya-moshchnost",
+    title: "Модифицированная мощность: двигатели MC13 для SITRAK C7H 6×6",
+    excerpt:
+      "Полноприводный SITRAK C7H с двигателями MC13.48-50 и MC13.54-50: до 540 л. с., крутящий момент до 2500 Нм и моторный тормоз EVB для тяжёлых условий.",
+    category: "Техника SITRAK",
+    date: "2025-05-21",
+    readTime: 4,
+    cover: blogModifitsirovannayaMoshchnost,
+    body: "Обновлённый полноприводный SITRAK C7H оснащается флагманскими двигателями серии MC13, разработанными на базе технологий MAN.",
+  },
   {
     slug: "moshchnyy-i-nadezhnyy-dvigatel",
     title: "Мощный и надежный двигатель SITRAK C7H MAX",
