@@ -347,13 +347,13 @@ function HomePage() {
           </div>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
             {[
-              { src: warehouseMoscow, city: "Москва" },
-              { src: warehouseSpb, city: "Санкт-Петербург" },
-              { src: warehouseSamara, city: "Самара" },
-              { src: warehouseKrasnodar, city: "Краснодар" },
-              { src: warehouseEkaterinburg, city: "Екатеринбург" },
-              { src: warehouseChelyabinsk, city: "Челябинск" },
-              { src: warehouseNovosibirsk, city: "Новосибирск" },
+              { src: warehouseMoscow, city: "Москва", address: "Дмитровское ш., 100с2" },
+              { src: warehouseSpb, city: "Санкт-Петербург", address: "Софийская ул., 14" },
+              { src: warehouseSamara, city: "Самара", address: "ул. Демократическая, 63а" },
+              { src: warehouseKrasnodar, city: "Краснодар", address: "ул. Уральская, 75/2" },
+              { src: warehouseEkaterinburg, city: "Екатеринбург", address: "ул. Завокзальная, 29" },
+              { src: warehouseChelyabinsk, city: "Челябинск", address: "Троицкий тракт, 11Б" },
+              { src: warehouseNovosibirsk, city: "Новосибирск", address: "ул. Большевистская, 177" },
             ].map((w) => (
               <figure key={w.city} className="group relative overflow-hidden border border-border bg-surface aspect-[4/3]">
                 <img
@@ -363,9 +363,12 @@ function HomePage() {
                   className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-foreground/85 via-foreground/20 to-transparent opacity-90 group-hover:opacity-100 transition-opacity" />
-                <figcaption className="absolute bottom-0 left-0 right-0 p-4 flex items-center gap-2 text-background">
-                  <MapPin className="h-4 w-4 text-accent-orange shrink-0" />
-                  <span className="font-display text-base lg:text-lg font-bold tracking-tight">{w.city}</span>
+                <figcaption className="absolute bottom-0 left-0 right-0 p-4 flex flex-col gap-0.5 text-background">
+                  <div className="flex items-center gap-2">
+                    <MapPin className="h-4 w-4 text-accent-orange shrink-0" />
+                    <span className="font-display text-base lg:text-lg font-bold tracking-tight">{w.city}</span>
+                  </div>
+                  <span className="text-xs text-background/80 pl-6">{w.address}</span>
                 </figcaption>
               </figure>
             ))}
