@@ -5,6 +5,7 @@ import { warehouses, reviews, blogPosts } from "@/data/mock";
 import { formatNumber, formatDate } from "@/lib/format";
 import { LiveStockCounter } from "@/components/site/LiveStockCounter";
 import { LiveStockTicker } from "@/components/site/LiveStockTicker";
+import { HudCorner as Corner } from "@/components/site/HudCorner";
 import heroImage from "@/assets/hero-hitech.jpg";
 import sitrakTruck1 from "@/assets/sitrak-truck-1.jpg";
 import sitrakTruck2 from "@/assets/sitrak-truck-2.jpg";
@@ -514,21 +515,3 @@ function HomePage() {
   );
 }
 
-/* HUD-уголки */
-function Corner({ className = "", pos, color = "brand" }: { className?: string; pos: "tl" | "tr" | "bl" | "br"; color?: "brand" | "orange" }) {
-  const map = {
-    tl: "border-l border-t",
-    tr: "border-r border-t",
-    bl: "border-l border-b",
-    br: "border-r border-b",
-  };
-  const colorClass = color === "orange" ? "border-accent-orange" : "border-brand";
-  return (
-    <div className={`pointer-events-none absolute z-10 h-6 w-6 ${colorClass} ${map[pos]} ${className}`} />
-  );
-}
-
-/* Иконка-плейсхолдер для шагов */
-function Send(props: { className?: string }) {
-  return <ArrowUpRight {...props} />;
-}
