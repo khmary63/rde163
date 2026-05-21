@@ -143,8 +143,18 @@ function useProducts(filters: Filters) {
       if (filters.brandIds.length > 0) {
         q = q.in("brand_id", filters.brandIds);
       }
-      if (filters.originality === "original") q = q.eq("is_original", true);
-      else if (filters.originality === "analog") q = q.eq("is_original", false);
+      // "Оригинал" = бренд CNHTC, всё остальное — аналоги
+      if (filters.originality === "original" || filters.originality === "analog") {
+        const { data: cnhtc } = await supabase
+          .from("brands")
+          .select("id")
+          .ilike("name", "CNHTC")
+          .maybeSingle();
+        if (cnhtc?.id) {
+          if (filters.originality === "original") q = q.eq("brand_id", cnhtc.id);
+          else q = q.neq("brand_id", cnhtc.id);
+        }
+      }
 
       if (filters.warehouseIds.length > 0) {
         q = q.in("stock.warehouse_id", filters.warehouseIds);
@@ -346,7 +356,7 @@ function CatalogPage() {
                             <Badge variant="secondary" className="font-normal">
                               {p.brand?.name ?? "—"}
                             </Badge>
-                            {!p.is_original && (
+                            {p.brand?.name && p.brand.name.toUpperCase() !== "CNHTC" && (
                               <Badge variant="outline" className="ml-1 font-normal">аналог</Badge>
                             )}
                           </td>
