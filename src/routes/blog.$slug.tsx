@@ -53,6 +53,7 @@ export const Route = createFileRoute("/blog/$slug")({
 const richContent: Record<string, () => ReactNode> = {
   "podbor-zapchasti-sitrak-howo-po-artikulu": () => <SitrakHowoArticulArticle />,
   "original-ili-analog-sitrak-howo": () => <OriginalVsAnalogArticle />,
+  "nadezhnaya-silovaya-liniya": () => <NadezhnayaSilovayaLiniyaArticle />,
 };
 
 function BlogPost() {
