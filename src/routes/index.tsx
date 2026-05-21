@@ -344,7 +344,7 @@ function HomePage() {
               <div className="font-mono text-[11px] text-accent-blue uppercase tracking-[0.3em] mb-2">/ наши склады</div>
               <h3 className="font-display text-2xl lg:text-3xl font-bold">Склады в наших филиалах</h3>
             </div>
-            <span className="font-mono text-xs text-muted-foreground uppercase tracking-widest">7 городов · 10 150 м²</span>
+            <span className="font-mono text-xs text-muted-foreground uppercase tracking-widest">8 складов · 10 150 м²</span>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
             {[
