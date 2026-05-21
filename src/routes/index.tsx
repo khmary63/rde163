@@ -19,6 +19,7 @@ import warehouseNovosibirsk from "@/assets/warehouse-novosibirsk.jpg";
 import warehouseChelyabinsk from "@/assets/warehouse-chelyabinsk.jpg";
 import warehouseMoscow from "@/assets/warehouse-moscow.jpg";
 import managerKhabarov from "@/assets/manager-khabarov.jpg";
+import warehouseSamaraAgropark from "@/assets/warehouse-samara-agropark.jpg";
 
 
 const organizationJsonLd = {
@@ -343,7 +344,7 @@ function HomePage() {
               <div className="font-mono text-[11px] text-accent-blue uppercase tracking-[0.3em] mb-2">/ наши склады</div>
               <h3 className="font-display text-2xl lg:text-3xl font-bold">Склады в наших филиалах</h3>
             </div>
-            <span className="font-mono text-xs text-muted-foreground uppercase tracking-widest">7 городов · 10 150 м²</span>
+            <span className="font-mono text-xs text-muted-foreground uppercase tracking-widest">8 складов · 10 150 м²</span>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
             {[
@@ -354,6 +355,7 @@ function HomePage() {
               { src: warehouseEkaterinburg, city: "Екатеринбург", address: "ул. Завокзальная, 29" },
               { src: warehouseChelyabinsk, city: "Челябинск", address: "Троицкий тракт, 11Б" },
               { src: warehouseNovosibirsk, city: "Новосибирск", address: "ул. Большевистская, 177" },
+              { src: warehouseSamaraAgropark, city: "Самара Агропарк", address: "Агро-парк" },
             ].map((w) => (
               <figure key={w.city} className="group relative overflow-hidden border border-border bg-surface aspect-[4/3]">
                 <img
