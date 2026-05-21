@@ -10,6 +10,13 @@ import sitrakTruck1 from "@/assets/sitrak-truck-1.jpg";
 import sitrakTruck2 from "@/assets/sitrak-truck-2.jpg";
 import sitrakFleet from "@/assets/sitrak-fleet.png";
 import russiaMap from "@/assets/russia-map.png";
+import warehouseSamara from "@/assets/warehouse-samara.jpg";
+import warehouseSpb from "@/assets/warehouse-spb.jpg";
+import warehouseKrasnodar from "@/assets/warehouse-krasnodar.jpg";
+import warehouseEkaterinburg from "@/assets/warehouse-ekaterinburg.jpg";
+import warehouseNovosibirsk from "@/assets/warehouse-novosibirsk.jpg";
+import warehouseChelyabinsk from "@/assets/warehouse-chelyabinsk.jpg";
+import warehouseMoscow from "@/assets/warehouse-moscow.jpg";
 
 
 const organizationJsonLd = {
