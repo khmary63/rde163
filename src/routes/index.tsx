@@ -47,14 +47,6 @@ export const Route = createFileRoute("/")({
   component: HomePage,
 });
 
-const trustItems = [
-  { icon: Package, title: "40 000+ позиций", text: "Прямые поставки от производителей Китая", code: "SKU.40K" },
-  { icon: Truck, title: "8 складов по РФ", text: "Самара, Москва, СПб, Новосибирск, Екатеринбург", code: "WH.08" },
-  { icon: Shield, title: "Персональные скидки", text: "По договору для юрлиц — цены в кабинете", code: "B2B.PRC" },
-  { icon: Users, title: "Закреплённый менеджер", text: "Один контакт по всем вопросам", code: "PM.01" },
-  { icon: FileText, title: "Документы в день заказа", text: "Счёт, счёт-фактура — в личный кабинет", code: "DOC.D0" },
-  { icon: RotateCw, title: "Повтор заказа в 1 клик", text: "Шаблоны для регулярных закупок", code: "TPL.X1" },
-];
 
 
 function HomePage() {
