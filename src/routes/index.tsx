@@ -557,35 +557,6 @@ function HomePage() {
           </div>
         </div>
       </section>
-
-      {/* ============== КОНТАКТЫ + СКЛАДЫ ============== */}
-      <section className="border-t border-border">
-        <div className="mx-auto max-w-[1480px] px-6 py-24 grid lg:grid-cols-[1fr_1.5fr] gap-12">
-          <div className="space-y-7">
-            <div className="font-mono text-[11px] text-accent-blue uppercase tracking-[0.3em]">/ 08 · network</div>
-            <h2 className="font-display text-4xl lg:text-6xl font-bold leading-[0.95]">8 складов<br/>по России</h2>
-            <p className="text-muted-foreground text-lg max-w-md">
-              Прямая отгрузка с ближайшего склада. Самовывоз или транспортная компания на ваш выбор.
-            </p>
-            <Button asChild className="rounded-none bg-foreground text-background hover:bg-accent-blue hover:text-accent-blue-foreground h-12 px-6">
-              <Link to="/contacts">Все контакты <ArrowUpRight className="ml-2 h-4 w-4" /></Link>
-            </Button>
-          </div>
-
-          <ul className="grid sm:grid-cols-2 gap-px bg-border border border-border">
-            {warehouses.slice(0, 8).map((w, i) => (
-              <li key={w.id} className="bg-background p-6 flex items-start gap-4 group hover:bg-surface transition-colors">
-                <div className="font-mono text-xs text-muted-foreground tabular-nums">/{String(i + 1).padStart(2, '0')}</div>
-                <div className="flex-1">
-                  <div className="font-display text-xl mb-1 group-hover:text-accent-blue transition-colors">{w.city}</div>
-                  <div className="text-xs text-muted-foreground leading-relaxed">{w.address}</div>
-                </div>
-                <MapPin className="h-4 w-4 text-foreground/30 group-hover:text-accent-blue transition-colors mt-1" />
-              </li>
-            ))}
-          </ul>
-        </div>
-      </section>
     </div>
   );
 }
