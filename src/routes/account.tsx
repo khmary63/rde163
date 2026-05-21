@@ -152,8 +152,8 @@ function ManagerCard({ manager }: { manager?: { full_name: string; phone?: strin
     <div className="border border-border bg-foreground text-background p-6 rounded-md h-fit">
       <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-brand mb-3">/ ваш персональный менеджер</div>
       <div className="flex items-center gap-4">
-        <div className="h-16 w-16 rounded-full bg-brand/20 overflow-hidden flex items-center justify-center text-brand">
-          {m.photo_url ? <img src={m.photo_url} alt={m.full_name} className="h-full w-full object-cover" /> : <UserIcon className="h-7 w-7" />}
+        <div className="h-11 w-11 rounded-full bg-brand/20 overflow-hidden flex items-center justify-center text-brand shrink-0">
+          {m.photo_url ? <img src={m.photo_url} alt={m.full_name} className="h-full w-full object-cover" /> : <UserIcon className="h-5 w-5" />}
         </div>
         <div>
           <div className="font-display text-lg">{m.full_name}</div>
