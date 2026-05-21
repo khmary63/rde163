@@ -373,6 +373,61 @@ function HomePage() {
         </div>
       </section>
 
+      {/* ============== РЕГИОНАЛЬНЫЙ МЕНЕДЖЕР ============== */}
+      <section className="mx-auto max-w-[1480px] px-6 py-20 lg:py-28">
+        <div className="grid lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+          <div className="lg:col-span-5 relative">
+            <div className="absolute -top-3 -left-3 right-3 bottom-3 border-2 border-accent-orange pointer-events-none" />
+            <div className="relative overflow-hidden border border-border bg-surface aspect-[4/5]">
+              <img
+                src={managerKhabarov}
+                alt="Хабаров Роман Сергеевич — региональный менеджер по продажам ООО «Русский Дом Экспорта»"
+                loading="lazy"
+                className="absolute inset-0 h-full w-full object-cover"
+              />
+            </div>
+          </div>
+
+          <div className="lg:col-span-7 space-y-6">
+            <div className="font-mono text-[11px] text-accent-blue uppercase tracking-[0.3em]">/ ваш менеджер</div>
+            <h2 className="font-display text-4xl lg:text-5xl font-bold leading-[0.95]">
+              Хабаров<br />
+              <span className="text-muted-foreground/60">Роман Сергеевич</span>
+            </h2>
+            <p className="text-base lg:text-lg text-foreground/80 leading-relaxed max-w-2xl">
+              Региональный менеджер по продажам и администратор магазина. Подберёт оригинал или аналог, рассчитает персональную цену и логистику до вашего города.
+            </p>
+
+            <div className="grid sm:grid-cols-2 gap-4 pt-2 max-w-2xl">
+              <a
+                href="tel:+79372194926"
+                className="group flex items-center gap-4 border border-border bg-background hover:border-accent-orange transition-colors p-5"
+              >
+                <div className="h-11 w-11 shrink-0 flex items-center justify-center bg-accent-orange/10 text-accent-orange group-hover:bg-accent-orange group-hover:text-accent-orange-foreground transition-colors">
+                  <Headphones className="h-5 w-5" strokeWidth={1.8} />
+                </div>
+                <div className="min-w-0">
+                  <div className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground mb-1">телефон</div>
+                  <div className="font-display text-base lg:text-lg font-bold tabular-nums">8 937-219-49-26</div>
+                </div>
+              </a>
+              <a
+                href="mailto:hrs@gross.ru"
+                className="group flex items-center gap-4 border border-border bg-background hover:border-accent-blue transition-colors p-5"
+              >
+                <div className="h-11 w-11 shrink-0 flex items-center justify-center bg-accent-blue/10 text-accent-blue group-hover:bg-accent-blue group-hover:text-background transition-colors">
+                  <FileText className="h-5 w-5" strokeWidth={1.8} />
+                </div>
+                <div className="min-w-0">
+                  <div className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground mb-1">e-mail</div>
+                  <div className="font-display text-base lg:text-lg font-bold truncate">hrs@gross.ru</div>
+                </div>
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* ============== «Не нашли деталь?» — split panel ============== */}
       <section className="relative border-y border-border bg-foreground text-background overflow-hidden">
         <div className="absolute inset-0 opacity-[0.07]"
