@@ -57,7 +57,7 @@ export function SiteFooter() {
       <div className="border-t border-border/40">
         <div className="mx-auto max-w-[1400px] px-4 py-5 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-muted-foreground">
           <span>© 2026 ООО «Русский Дом Экспорта». Все права защищены.</span>
-          <span className="font-mono">ИНН 6315000000 · ОГРН 1156315000000</span>
+          <span className="font-mono">ИНН 6315001344 · ОГРН 1156315000742</span>
         </div>
       </div>
     </footer>
