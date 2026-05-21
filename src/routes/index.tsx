@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Search, Truck, Shield, Users, FileText, RotateCw, MapPin, ArrowRight, ArrowUpRight, Zap, Package, Headphones, Upload, Layers, CheckCircle2, Activity, Radio, Cpu, Boxes } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { warehouses, brands, reviews, blogPosts } from "@/data/mock";
+import { warehouses, reviews, blogPosts } from "@/data/mock";
 import { formatNumber, formatDate } from "@/lib/format";
 import { LiveStockCounter } from "@/components/site/LiveStockCounter";
 import heroImage from "@/assets/hero-hitech.jpg";
