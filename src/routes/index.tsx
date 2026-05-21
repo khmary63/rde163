@@ -5,6 +5,7 @@ import { warehouses, reviews, blogPosts } from "@/data/mock";
 import { formatNumber, formatDate } from "@/lib/format";
 import { LiveStockCounter } from "@/components/site/LiveStockCounter";
 import { LiveStockTicker } from "@/components/site/LiveStockTicker";
+import { HudCorner as Corner } from "@/components/site/HudCorner";
 import heroImage from "@/assets/hero-hitech.jpg";
 import sitrakTruck1 from "@/assets/sitrak-truck-1.jpg";
 import sitrakTruck2 from "@/assets/sitrak-truck-2.jpg";
