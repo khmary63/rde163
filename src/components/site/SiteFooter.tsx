@@ -37,6 +37,7 @@ export function SiteFooter() {
             <li><Link to="/blog" className="text-muted-foreground hover:text-brand transition-colors">Блог</Link></li>
             <li><Link to="/reviews" className="text-muted-foreground hover:text-brand transition-colors">Отзывы</Link></li>
             <li><Link to="/contacts" className="text-muted-foreground hover:text-brand transition-colors">Контакты</Link></li>
+            <li><Link to="/faq" className="text-muted-foreground hover:text-brand transition-colors">Вопросы и ответы</Link></li>
             <li><Link to="/certificates" className="text-muted-foreground hover:text-brand transition-colors">Лицензии и сертификаты</Link></li>
             <li><Link to="/privacy-policy" className="text-muted-foreground hover:text-brand transition-colors">Политика в отношении обработки персональных данных</Link></li>
             <li><Link to="/personal-data" className="text-muted-foreground hover:text-brand transition-colors">Соглашение о персональных данных</Link></li>
