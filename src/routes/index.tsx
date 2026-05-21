@@ -245,7 +245,7 @@ function HomePage() {
 
             <div className="grid grid-cols-3 gap-4 pt-2">
               {[
-                { v: "2,5K+", l: "SKU SITRAK" },
+                { v: "2,5K+", l: "SKU" },
                 { v: "98%", l: "со склада" },
                 { v: "1–7", l: "дня доставка" },
               ].map((s) => (
