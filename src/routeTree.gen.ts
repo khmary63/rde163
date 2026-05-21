@@ -17,6 +17,7 @@ import { Route as RegisterRouteImport } from './routes/register'
 import { Route as PrivacyPolicyRouteImport } from './routes/privacy-policy'
 import { Route as PersonalDataRouteImport } from './routes/personal-data'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as FaqRouteImport } from './routes/faq'
 import { Route as ContactsRouteImport } from './routes/contacts'
 import { Route as CertificatesRouteImport } from './routes/certificates'
 import { Route as CatalogRouteImport } from './routes/catalog'
@@ -84,6 +85,11 @@ const PersonalDataRoute = PersonalDataRouteImport.update({
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FaqRoute = FaqRouteImport.update({
+  id: '/faq',
+  path: '/faq',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ContactsRoute = ContactsRouteImport.update({
@@ -238,6 +244,7 @@ export interface FileRoutesByFullPath {
   '/catalog': typeof CatalogRouteWithChildren
   '/certificates': typeof CertificatesRoute
   '/contacts': typeof ContactsRoute
+  '/faq': typeof FaqRoute
   '/login': typeof LoginRoute
   '/personal-data': typeof PersonalDataRoute
   '/privacy-policy': typeof PrivacyPolicyRoute
@@ -275,6 +282,7 @@ export interface FileRoutesByTo {
   '/catalog': typeof CatalogRouteWithChildren
   '/certificates': typeof CertificatesRoute
   '/contacts': typeof ContactsRoute
+  '/faq': typeof FaqRoute
   '/login': typeof LoginRoute
   '/personal-data': typeof PersonalDataRoute
   '/privacy-policy': typeof PrivacyPolicyRoute
@@ -314,6 +322,7 @@ export interface FileRoutesById {
   '/catalog': typeof CatalogRouteWithChildren
   '/certificates': typeof CertificatesRoute
   '/contacts': typeof ContactsRoute
+  '/faq': typeof FaqRoute
   '/login': typeof LoginRoute
   '/personal-data': typeof PersonalDataRoute
   '/privacy-policy': typeof PrivacyPolicyRoute
@@ -354,6 +363,7 @@ export interface FileRouteTypes {
     | '/catalog'
     | '/certificates'
     | '/contacts'
+    | '/faq'
     | '/login'
     | '/personal-data'
     | '/privacy-policy'
@@ -391,6 +401,7 @@ export interface FileRouteTypes {
     | '/catalog'
     | '/certificates'
     | '/contacts'
+    | '/faq'
     | '/login'
     | '/personal-data'
     | '/privacy-policy'
@@ -429,6 +440,7 @@ export interface FileRouteTypes {
     | '/catalog'
     | '/certificates'
     | '/contacts'
+    | '/faq'
     | '/login'
     | '/personal-data'
     | '/privacy-policy'
@@ -468,6 +480,7 @@ export interface RootRouteChildren {
   CatalogRoute: typeof CatalogRouteWithChildren
   CertificatesRoute: typeof CertificatesRoute
   ContactsRoute: typeof ContactsRoute
+  FaqRoute: typeof FaqRoute
   LoginRoute: typeof LoginRoute
   PersonalDataRoute: typeof PersonalDataRoute
   PrivacyPolicyRoute: typeof PrivacyPolicyRoute
@@ -543,6 +556,13 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/faq': {
+      id: '/faq'
+      path: '/faq'
+      fullPath: '/faq'
+      preLoaderRoute: typeof FaqRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/contacts': {
@@ -803,6 +823,7 @@ const rootRouteChildren: RootRouteChildren = {
   CatalogRoute: CatalogRouteWithChildren,
   CertificatesRoute: CertificatesRoute,
   ContactsRoute: ContactsRoute,
+  FaqRoute: FaqRoute,
   LoginRoute: LoginRoute,
   PersonalDataRoute: PersonalDataRoute,
   PrivacyPolicyRoute: PrivacyPolicyRoute,
