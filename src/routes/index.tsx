@@ -247,7 +247,7 @@ function HomePage() {
               {[
                 { v: "12K+", l: "SKU SITRAK" },
                 { v: "98%", l: "со склада" },
-                { v: "1–3", l: "дня доставка" },
+                { v: "1–7", l: "дня доставка" },
               ].map((s) => (
                 <div key={s.l} className="border-l-2 border-accent-orange pl-4">
                   <div className="font-display text-3xl lg:text-4xl font-bold text-accent-orange tabular-nums">{s.v}</div>
