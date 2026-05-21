@@ -27,7 +27,7 @@ const organizationJsonLd = {
   name: "Русский Дом Экспорта",
   alternateName: "РДЭ Запчасти",
   url: "https://rde163.ru",
-  description: "B2B каталог запчастей для китайской спецтехники и грузовиков. 40 000+ позиций, 8 складов по РФ.",
+  description: "B2B каталог запчастей для китайской спецтехники и грузовиков. 5 000+ позиций, 8 складов по РФ.",
   areaServed: "RU",
   sameAs: [],
 };
@@ -36,9 +36,9 @@ export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "РДЭ — B2B каталог запчастей для китайской техники" },
-      { name: "description", content: "40 000+ наименований в наличии на 8 складах по РФ. Персональные цены для юрлиц, заявка менеджеру за 30 секунд." },
+      { name: "description", content: "5 000+ наименований в наличии на 8 складах по РФ. Персональные цены для юрлиц, заявка менеджеру за 30 секунд." },
       { property: "og:title", content: "РДЭ — B2B каталог запчастей для китайской техники" },
-      { property: "og:description", content: "40 000+ позиций, 8 складов по РФ, персональные цены для юрлиц." },
+      { property: "og:description", content: "5 000+ позиций, 8 складов по РФ, персональные цены для юрлиц." },
       { property: "og:url", content: "https://rde163.ru/" },
     ],
     links: [{ rel: "canonical", href: "https://rde163.ru/" }],
