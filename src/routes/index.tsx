@@ -10,6 +10,13 @@ import sitrakTruck1 from "@/assets/sitrak-truck-1.jpg";
 import sitrakTruck2 from "@/assets/sitrak-truck-2.jpg";
 import sitrakFleet from "@/assets/sitrak-fleet.png";
 import russiaMap from "@/assets/russia-map.png";
+import warehouseSamara from "@/assets/warehouse-samara.jpg";
+import warehouseSpb from "@/assets/warehouse-spb.jpg";
+import warehouseKrasnodar from "@/assets/warehouse-krasnodar.jpg";
+import warehouseEkaterinburg from "@/assets/warehouse-ekaterinburg.jpg";
+import warehouseNovosibirsk from "@/assets/warehouse-novosibirsk.jpg";
+import warehouseChelyabinsk from "@/assets/warehouse-chelyabinsk.jpg";
+import warehouseMoscow from "@/assets/warehouse-moscow.jpg";
 
 
 const organizationJsonLd = {
@@ -40,14 +47,6 @@ export const Route = createFileRoute("/")({
   component: HomePage,
 });
 
-const trustItems = [
-  { icon: Package, title: "40 000+ позиций", text: "Прямые поставки от производителей Китая", code: "SKU.40K" },
-  { icon: Truck, title: "8 складов по РФ", text: "Самара, Москва, СПб, Новосибирск, Екатеринбург", code: "WH.08" },
-  { icon: Shield, title: "Персональные скидки", text: "По договору для юрлиц — цены в кабинете", code: "B2B.PRC" },
-  { icon: Users, title: "Закреплённый менеджер", text: "Один контакт по всем вопросам", code: "PM.01" },
-  { icon: FileText, title: "Документы в день заказа", text: "Счёт, счёт-фактура — в личный кабинет", code: "DOC.D0" },
-  { icon: RotateCw, title: "Повтор заказа в 1 клик", text: "Шаблоны для регулярных закупок", code: "TPL.X1" },
-];
 
 
 function HomePage() {
@@ -296,13 +295,13 @@ function HomePage() {
         </div>
       </section>
 
-      {/* ============== «Почему нам доверяют» — терминал-стиль ============== */}
+      {/* ============== БЛОК 04 · Гарантии и сервис + галерея складов ============== */}
       <section className="mx-auto max-w-[1480px] px-6 py-24 lg:py-32">
         <div className="flex items-end justify-between mb-12 gap-6 flex-wrap">
           <div>
-            <div className="font-mono text-[11px] text-accent-blue uppercase tracking-[0.3em] mb-3">/ 04 · why us</div>
+            <div className="font-mono text-[11px] text-accent-blue uppercase tracking-[0.3em] mb-3">/ 04 · гарантии и сервис</div>
             <h2 className="font-display text-4xl lg:text-6xl font-bold leading-[0.95]">
-              Конкретика,<br />не обещания.
+              Гарантия<br /><span className="text-muted-foreground/60">и забота о клиенте.</span>
             </h2>
           </div>
           <Button asChild variant="outline" className="rounded-none border-foreground hover:bg-foreground hover:text-background h-12 px-6">
@@ -310,18 +309,64 @@ function HomePage() {
           </Button>
         </div>
 
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-px bg-border border border-border">
-          {trustItems.map((t) => (
-            <div key={t.title} className="bg-background p-8 group hover:bg-surface transition-colors relative">
-              <div className="absolute top-4 right-4 font-mono text-[10px] tracking-widest text-muted-foreground/60">
-                {t.code}
-              </div>
-              <t.icon className="h-7 w-7 text-foreground group-hover:text-accent-blue transition-colors mb-6" strokeWidth={1.5} />
-              <div className="font-display text-xl mb-2">{t.title}</div>
-              <div className="text-sm text-muted-foreground leading-relaxed">{t.text}</div>
-              <div className="absolute bottom-0 left-0 h-px w-0 bg-accent-blue group-hover:w-full transition-all duration-500" />
+        <div className="grid lg:grid-cols-2 gap-px bg-border border border-border mb-16">
+          <div className="bg-background p-8 lg:p-10 space-y-4">
+            <div className="flex items-center gap-3">
+              <Shield className="h-7 w-7 text-accent-blue" strokeWidth={1.5} />
+              <h3 className="font-display text-2xl font-bold">Гарантийные обязательства</h3>
             </div>
-          ))}
+            <p className="text-base text-foreground/85 leading-relaxed">
+              ООО «Русский Дом Экспорта» предоставляет гарантию на запасные части в соответствии с директивами заводов-изготовителей. Это обеспечивает клиентам уверенность в качестве приобретаемых компонентов и защищённость на протяжении всего гарантийного периода.
+            </p>
+          </div>
+          <div className="bg-background p-8 lg:p-10 space-y-4">
+            <div className="flex items-center gap-3">
+              <Users className="h-7 w-7 text-accent-orange" strokeWidth={1.5} />
+              <h3 className="font-display text-2xl font-bold">Персональный подход</h3>
+            </div>
+            <p className="text-base text-foreground/85 leading-relaxed">
+              Мы придерживаемся принципа индивидуальной работы с каждым клиентом. Процессы обслуживания выстроены так, чтобы клиент получал не просто товар, а комплексное решение для бесперебойной работы своей техники.
+            </p>
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              Компания постоянно совершенствует внутренние процессы и расширяет складские запасы — это позволяет поддерживать долгосрочные партнёрские отношения с клиентами по всей стране.
+            </p>
+          </div>
+        </div>
+
+        {/* Галерея складов */}
+        <div>
+          <div className="flex items-end justify-between mb-6 gap-4 flex-wrap">
+            <div>
+              <div className="font-mono text-[11px] text-accent-blue uppercase tracking-[0.3em] mb-2">/ наши склады</div>
+              <h3 className="font-display text-2xl lg:text-3xl font-bold">Склады в наших филиалах</h3>
+            </div>
+            <span className="font-mono text-xs text-muted-foreground uppercase tracking-widest">7 городов · 10 150 м²</span>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+            {[
+              { src: warehouseMoscow, city: "Москва" },
+              { src: warehouseSpb, city: "Санкт-Петербург" },
+              { src: warehouseSamara, city: "Самара" },
+              { src: warehouseKrasnodar, city: "Краснодар" },
+              { src: warehouseEkaterinburg, city: "Екатеринбург" },
+              { src: warehouseChelyabinsk, city: "Челябинск" },
+              { src: warehouseNovosibirsk, city: "Новосибирск" },
+            ].map((w) => (
+              <figure key={w.city} className="group relative overflow-hidden border border-border bg-surface aspect-[4/3]">
+                <img
+                  src={w.src}
+                  alt={`Склад «Русский Дом Экспорта» — ${w.city}`}
+                  loading="lazy"
+                  className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-foreground/85 via-foreground/20 to-transparent opacity-90 group-hover:opacity-100 transition-opacity" />
+                <figcaption className="absolute bottom-0 left-0 right-0 p-4 flex items-center gap-2 text-background">
+                  <MapPin className="h-4 w-4 text-accent-orange shrink-0" />
+                  <span className="font-display text-base lg:text-lg font-bold tracking-tight">{w.city}</span>
+                </figcaption>
+              </figure>
+            ))}
+          </div>
         </div>
       </section>
 
