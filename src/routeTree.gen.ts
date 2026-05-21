@@ -14,6 +14,7 @@ import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as ReviewsRouteImport } from './routes/reviews'
 import { Route as RequisitesRouteImport } from './routes/requisites'
 import { Route as RegisterRouteImport } from './routes/register'
+import { Route as PersonalDataRouteImport } from './routes/personal-data'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as ContactsRouteImport } from './routes/contacts'
 import { Route as CertificatesRouteImport } from './routes/certificates'
@@ -67,6 +68,11 @@ const RequisitesRoute = RequisitesRouteImport.update({
 const RegisterRoute = RegisterRouteImport.update({
   id: '/register',
   path: '/register',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PersonalDataRoute = PersonalDataRouteImport.update({
+  id: '/personal-data',
+  path: '/personal-data',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -227,6 +233,7 @@ export interface FileRoutesByFullPath {
   '/certificates': typeof CertificatesRoute
   '/contacts': typeof ContactsRoute
   '/login': typeof LoginRoute
+  '/personal-data': typeof PersonalDataRoute
   '/register': typeof RegisterRoute
   '/requisites': typeof RequisitesRoute
   '/reviews': typeof ReviewsRoute
@@ -262,6 +269,7 @@ export interface FileRoutesByTo {
   '/certificates': typeof CertificatesRoute
   '/contacts': typeof ContactsRoute
   '/login': typeof LoginRoute
+  '/personal-data': typeof PersonalDataRoute
   '/register': typeof RegisterRoute
   '/requisites': typeof RequisitesRoute
   '/reviews': typeof ReviewsRoute
@@ -299,6 +307,7 @@ export interface FileRoutesById {
   '/certificates': typeof CertificatesRoute
   '/contacts': typeof ContactsRoute
   '/login': typeof LoginRoute
+  '/personal-data': typeof PersonalDataRoute
   '/register': typeof RegisterRoute
   '/requisites': typeof RequisitesRoute
   '/reviews': typeof ReviewsRoute
@@ -337,6 +346,7 @@ export interface FileRouteTypes {
     | '/certificates'
     | '/contacts'
     | '/login'
+    | '/personal-data'
     | '/register'
     | '/requisites'
     | '/reviews'
@@ -372,6 +382,7 @@ export interface FileRouteTypes {
     | '/certificates'
     | '/contacts'
     | '/login'
+    | '/personal-data'
     | '/register'
     | '/requisites'
     | '/reviews'
@@ -408,6 +419,7 @@ export interface FileRouteTypes {
     | '/certificates'
     | '/contacts'
     | '/login'
+    | '/personal-data'
     | '/register'
     | '/requisites'
     | '/reviews'
@@ -445,6 +457,7 @@ export interface RootRouteChildren {
   CertificatesRoute: typeof CertificatesRoute
   ContactsRoute: typeof ContactsRoute
   LoginRoute: typeof LoginRoute
+  PersonalDataRoute: typeof PersonalDataRoute
   RegisterRoute: typeof RegisterRoute
   RequisitesRoute: typeof RequisitesRoute
   ReviewsRoute: typeof ReviewsRoute
@@ -496,6 +509,13 @@ declare module '@tanstack/react-router' {
       path: '/register'
       fullPath: '/register'
       preLoaderRoute: typeof RegisterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/personal-data': {
+      id: '/personal-data'
+      path: '/personal-data'
+      fullPath: '/personal-data'
+      preLoaderRoute: typeof PersonalDataRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -764,6 +784,7 @@ const rootRouteChildren: RootRouteChildren = {
   CertificatesRoute: CertificatesRoute,
   ContactsRoute: ContactsRoute,
   LoginRoute: LoginRoute,
+  PersonalDataRoute: PersonalDataRoute,
   RegisterRoute: RegisterRoute,
   RequisitesRoute: RequisitesRoute,
   ReviewsRoute: ReviewsRoute,
@@ -782,3 +803,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
