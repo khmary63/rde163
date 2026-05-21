@@ -2,24 +2,36 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { sendMaxMessage } from "./max.server";
 import { sendInternalTransactionalEmail } from "./email/send.server";
+import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
 const FeedbackInput = z.object({
-  name: z.string().max(200).optional().nullable(),
-  phone: z.string().max(40).optional().nullable(),
-  email: z.string().max(200).optional().nullable(),
-  message: z.string().min(1).max(4000),
+  feedback_id: z.string().uuid(),
 });
 
 export const notifyNewFeedback = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => FeedbackInput.parse(input))
   .handler(async ({ data }) => {
+    // Look up the feedback row to ensure it exists in the DB.
+    // This ties every notification to a real, RLS-validated row and prevents
+    // attackers from spamming managers by hitting this endpoint directly.
+    const { data: row, error } = await supabaseAdmin
+      .from("feedback_messages")
+      .select("id, name, phone, email, message, created_at")
+      .eq("id", data.feedback_id)
+      .maybeSingle();
+
+    if (error || !row) {
+      // Don't reveal details; just no-op.
+      return { ok: false };
+    }
+
     const lines = [
       "🔔 Новое сообщение из виджета РДЭ",
-      data.name ? `Имя: ${data.name}` : null,
-      data.phone ? `Телефон: ${data.phone}` : null,
-      data.email ? `Email: ${data.email}` : null,
+      row.name ? `Имя: ${row.name}` : null,
+      row.phone ? `Телефон: ${row.phone}` : null,
+      row.email ? `Email: ${row.email}` : null,
       "",
-      data.message,
+      row.message,
     ].filter(Boolean) as string[];
 
     await Promise.allSettled([
@@ -27,10 +39,10 @@ export const notifyNewFeedback = createServerFn({ method: "POST" })
       sendInternalTransactionalEmail({
         templateName: "new-feedback",
         templateData: {
-          name: data.name ?? undefined,
-          phone: data.phone ?? undefined,
-          email: data.email ?? undefined,
-          message: data.message,
+          name: row.name ?? undefined,
+          phone: row.phone ?? undefined,
+          email: row.email ?? undefined,
+          message: row.message,
         },
       }),
     ]);
