@@ -90,9 +90,14 @@ export async function runCatalogSync(trigger: "manual" | "cron" = "manual"): Pro
     }
 
     // ---- 2. Warehouses -------------------------------------------------
+    // Sheet column G ("Статус", index 6) is used as the warehouse name
+    // (e.g. "Китай", "Россия"). These are technical/internal warehouses —
+    // they are NOT shown to end customers in the public catalog
+    // (is_public=false). The 9 real customer-facing warehouses are managed
+    // manually in the admin panel.
     const whNames = new Set<string>();
     for (const r of rows) {
-      const w = String(r[5] ?? "").trim();
+      const w = String(r[6] ?? "").trim();
       if (w) whNames.add(w);
     }
     const { data: existingWh } = await supabaseAdmin.from("warehouses").select("id, name, code");
@@ -105,6 +110,7 @@ export async function runCatalogSync(trigger: "manual" | "cron" = "manual"): Pro
         name: n,
         code: `gs-${slugify(n)}-${Date.now().toString(36).slice(-4)}-${i}`,
         is_active: true,
+        is_public: false,
       }));
     if (newWh.length) {
       const { data: ins, error } = await supabaseAdmin.from("warehouses").insert(newWh).select("id, name");
