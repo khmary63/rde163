@@ -139,12 +139,22 @@ export const submitOrder = createServerFn({ method: "POST" })
       items: exportItems,
     });
 
+    const warehouseCounts = new Map<string, number>();
+    for (const it of data.items) {
+      const wname = warehouseMap.get(it.warehouse_id)?.name ?? it.warehouse_id;
+      warehouseCounts.set(wname, (warehouseCounts.get(wname) ?? 0) + 1);
+    }
+    const warehousesLine = Array.from(warehouseCounts.entries())
+      .map(([name, cnt]) => (warehouseCounts.size > 1 ? `${name} (${cnt})` : name))
+      .join(", ");
+
     const lines = [
       "📦 Новая заявка РДЭ",
       `№ ${order.number}`,
       `Клиент: ${customer}`,
       profile?.phone ? `Телефон: ${profile.phone}` : null,
       `Позиций: ${data.items.length}`,
+      `Склад отгрузки: ${warehousesLine}`,
       `Сумма: ${total.toLocaleString("ru-RU")} ₽`,
       xlsx ? `\nExcel: ${xlsx.url}` : null,
       data.notes ? `\nКомментарий: ${data.notes}` : null,
