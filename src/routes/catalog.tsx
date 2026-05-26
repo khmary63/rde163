@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Search, Loader2, ShoppingCart, ChevronLeft, ChevronRight, X } from "lucide-react";
+import { Search, Loader2, ShoppingCart, ChevronLeft, ChevronRight, X, Send } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
