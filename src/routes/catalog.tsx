@@ -411,32 +411,45 @@ function CatalogPage() {
                             <div className="text-[11px] text-muted-foreground">с учётом скидки</div>
                           </td>
                           <td className="px-4 py-3 text-right align-top">
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              className="gap-1.5"
-                              disabled={status === "out"}
-                              onClick={() => {
-                                const best = [...p.stock]
-                                  .filter((s) => s.qty > 0)
-                                  .sort((a, b) => b.qty - a.qty)[0];
-                                if (!best) return;
-                                const w = wareById.get(best.warehouse_id);
-                                cart.add({
-                                  productId: p.id,
-                                  sku: p.sku,
-                                  name: p.name,
-                                  brand: p.brand?.name ?? "",
-                                  price: Number(p.base_price),
-                                  warehouseId: best.warehouse_id,
-                                  warehouseName: w?.city ?? w?.name ?? "—",
-                                  maxQty: best.qty,
-                                });
-                                toast.success("Добавлено в корзину", { description: p.name });
-                              }}
-                            >
-                              <ShoppingCart className="h-3.5 w-3.5" /> В корзину
-                            </Button>
+                            {status === "out" ? (
+                              <Button asChild size="sm" variant="outline" className="gap-1.5">
+                                <a
+                                  href={`mailto:zakaz@rde163.ru?subject=${encodeURIComponent(
+                                    `Заказ под привоз: ${p.sku}`
+                                  )}&body=${encodeURIComponent(
+                                    `Здравствуйте! Прошу оформить заказ под привоз:\n\nАртикул: ${p.sku}\nНаименование: ${p.name}\nБренд: ${p.brand?.name ?? ""}\n\nКоличество: \nКонтакт для связи: `
+                                  )}`}
+                                >
+                                  <Send className="h-3.5 w-3.5" /> Заказать
+                                </a>
+                              </Button>
+                            ) : (
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="gap-1.5"
+                                onClick={() => {
+                                  const best = [...p.stock]
+                                    .filter((s) => s.qty > 0)
+                                    .sort((a, b) => b.qty - a.qty)[0];
+                                  if (!best) return;
+                                  const w = wareById.get(best.warehouse_id);
+                                  cart.add({
+                                    productId: p.id,
+                                    sku: p.sku,
+                                    name: p.name,
+                                    brand: p.brand?.name ?? "",
+                                    price: Number(p.base_price),
+                                    warehouseId: best.warehouse_id,
+                                    warehouseName: w?.city ?? w?.name ?? "—",
+                                    maxQty: best.qty,
+                                  });
+                                  toast.success("Добавлено в корзину", { description: p.name });
+                                }}
+                              >
+                                <ShoppingCart className="h-3.5 w-3.5" /> В корзину
+                              </Button>
+                            )}
                           </td>
                         </tr>
                       );
