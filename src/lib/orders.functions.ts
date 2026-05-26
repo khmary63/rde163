@@ -110,7 +110,7 @@ export const submitOrder = createServerFn({ method: "POST" })
       unit_price: r.unit_price,
       discount_percent: r.discount_percent,
       line_total: r.line_total,
-      action: "buy" as const,
+      action: (r.backorder ? "backorder" : "buy") as "buy" | "backorder",
     }));
 
     const { error: itemsErr } = await supabase.from("order_items").insert(rows);
