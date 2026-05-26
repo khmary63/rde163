@@ -92,6 +92,7 @@ function useWarehouses() {
         .from("warehouses")
         .select("id, code, name, city, sort_order")
         .eq("is_active", true)
+        .eq("is_public", true)
         .order("sort_order");
       if (error) throw error;
       return data as Warehouse[];
