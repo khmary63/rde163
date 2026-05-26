@@ -36,7 +36,7 @@ export const Route = createFileRoute("/contacts")({
     return {
       meta: [
         { title: "Контакты — РДЭ Запчасти" },
-        { name: "description", content: "Свяжитесь с РДЭ: телефон, email, Telegram и адреса 8 складов по России." },
+        { name: "description", content: "Свяжитесь с РДЭ: телефон, email и адреса 8 складов по России." },
         { property: "og:title", content: "Контакты РДЭ" },
         { property: "og:description", content: "Телефон, email и адреса 8 складов по России." },
         { property: "og:url", content: `${BASE}/contacts` },
