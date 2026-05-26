@@ -65,11 +65,6 @@ export const Route = createFileRoute("/contacts")({
           <div className="text-sm text-muted-foreground">Email</div>
           <div className="font-display text-xl">{adminContact.email}</div>
         </a>
-        <a href="#" className="rounded-lg border border-border bg-surface/60 p-6 hover:border-brand/60 transition-colors">
-          <Send className="h-6 w-6 text-brand mb-3" />
-          <div className="text-sm text-muted-foreground">Telegram</div>
-          <div className="font-display text-xl">{adminContact.telegram}</div>
-        </a>
       </div>
 
       <div>
