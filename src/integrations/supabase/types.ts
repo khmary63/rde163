@@ -14,6 +14,51 @@ export type Database = {
   }
   public: {
     Tables: {
+      _imp_prod: {
+        Row: {
+          brand_name: string | null
+          name: string | null
+          out_only: boolean | null
+          price: number | null
+          sku: string | null
+        }
+        Insert: {
+          brand_name?: string | null
+          name?: string | null
+          out_only?: boolean | null
+          price?: number | null
+          sku?: string | null
+        }
+        Update: {
+          brand_name?: string | null
+          name?: string | null
+          out_only?: boolean | null
+          price?: number | null
+          sku?: string | null
+        }
+        Relationships: []
+      }
+      _imp_stock: {
+        Row: {
+          brand_name: string | null
+          qty: number | null
+          sku: string | null
+          wh_code: string | null
+        }
+        Insert: {
+          brand_name?: string | null
+          qty?: number | null
+          sku?: string | null
+          wh_code?: string | null
+        }
+        Update: {
+          brand_name?: string | null
+          qty?: number | null
+          sku?: string | null
+          wh_code?: string | null
+        }
+        Relationships: []
+      }
       blog_posts: {
         Row: {
           author: string | null
