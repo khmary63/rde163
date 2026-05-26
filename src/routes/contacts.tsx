@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { warehouses, adminContact } from "@/data/mock";
-import { Phone, Mail, MapPin, Send } from "lucide-react";
+import { Phone, Mail, MapPin } from "lucide-react";
 
 const BASE = "https://rde163.ru";
 
@@ -36,7 +36,7 @@ export const Route = createFileRoute("/contacts")({
     return {
       meta: [
         { title: "Контакты — РДЭ Запчасти" },
-        { name: "description", content: "Свяжитесь с РДЭ: телефон, email, Telegram и адреса 8 складов по России." },
+        { name: "description", content: "Свяжитесь с РДЭ: телефон, email и адреса 8 складов по России." },
         { property: "og:title", content: "Контакты РДЭ" },
         { property: "og:description", content: "Телефон, email и адреса 8 складов по России." },
         { property: "og:url", content: `${BASE}/contacts` },
@@ -64,11 +64,6 @@ export const Route = createFileRoute("/contacts")({
           <Mail className="h-6 w-6 text-brand mb-3" />
           <div className="text-sm text-muted-foreground">Email</div>
           <div className="font-display text-xl">{adminContact.email}</div>
-        </a>
-        <a href="#" className="rounded-lg border border-border bg-surface/60 p-6 hover:border-brand/60 transition-colors">
-          <Send className="h-6 w-6 text-brand mb-3" />
-          <div className="text-sm text-muted-foreground">Telegram</div>
-          <div className="font-display text-xl">{adminContact.telegram}</div>
         </a>
       </div>
 

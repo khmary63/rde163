@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Phone, Mail, MapPin, Send, MessageCircle } from "lucide-react";
+import { Phone, Mail, MapPin, MessageCircle } from "lucide-react";
 import { adminContact } from "@/data/mock";
 import logoRde from "@/assets/logo-rde.png";
 
@@ -53,7 +53,7 @@ export function SiteFooter() {
             <li className="flex items-start gap-2"><MapPin className="h-4 w-4 text-brand mt-0.5 shrink-0" /><span>443031 г. Самара, ул. Демократическая, зд. 63а, КОМНАТА 301</span></li>
           </ul>
           <div className="flex items-center gap-3 pt-1">
-            <a href="#" aria-label="Telegram" className="text-muted-foreground hover:text-brand transition-colors"><Send className="h-4 w-4" /></a>
+            
             <a href="#" aria-label="WhatsApp" className="text-muted-foreground hover:text-brand transition-colors"><MessageCircle className="h-4 w-4" /></a>
           </div>
         </div>
