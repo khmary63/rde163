@@ -148,19 +148,35 @@ export async function runCatalogSync(trigger: "manual" | "cron" = "manual"): Pro
     }
 
     // ---- 4. Products upsert -------------------------------------------
+    // Paginated fetch of existing products (Supabase caps at 1000 per query).
     const skuList = [...new Set([...products.values()].map((p) => p.sku))];
-    const { data: existingProds } = await supabaseAdmin
-      .from("products")
-      .select("id, sku, brand_id, base_price, name")
-      .in("sku", skuList);
     const prodIdMap = new Map<string, string>();
+    const existingMap = new Map<string, { id: string; base_price: number }>();
+    const SKU_CHUNK = 300;
+    for (let i = 0; i < skuList.length; i += SKU_CHUNK) {
+      const skuSlice = skuList.slice(i, i + SKU_CHUNK);
+      let from = 0;
+      const PAGE = 1000;
+      // paginate in case many brands share the same sku list
+      // eslint-disable-next-line no-constant-condition
+      while (true) {
+        const { data, error } = await supabaseAdmin
+          .from("products")
+          .select("id, sku, brand_id, base_price")
+          .in("sku", skuSlice)
+          .range(from, from + PAGE - 1);
+        if (error) throw new Error(`products fetch: ${error.message}`);
+        for (const p of data ?? []) {
+          existingMap.set(`${p.brand_id}::${p.sku}`, { id: p.id, base_price: Number(p.base_price) });
+        }
+        if (!data || data.length < PAGE) break;
+        from += PAGE;
+      }
+    }
+
     const toInsert: Array<{ brand_id: string; sku: string; name: string; oem: string; base_price: number; category: string | null; is_original: boolean }> = [];
     const toUpdate: Array<{ id: string; name: string; base_price: number; category: string | null }> = [];
 
-    const existingMap = new Map<string, { id: string; base_price: number }>();
-    for (const p of existingProds ?? []) {
-      existingMap.set(`${p.brand_id}::${p.sku}`, { id: p.id, base_price: Number(p.base_price) });
-    }
     for (const [key, p] of products) {
       const ex = existingMap.get(key);
       if (ex) {
@@ -175,11 +191,16 @@ export async function runCatalogSync(trigger: "manual" | "cron" = "manual"): Pro
     const CHUNK = 200;
     for (let i = 0; i < toInsert.length; i += CHUNK) {
       const slice = toInsert.slice(i, i + CHUNK);
-      const { data, error } = await supabaseAdmin.from("products").insert(slice).select("id, sku, brand_id");
-      if (error) throw new Error(`products insert: ${error.message}`);
+      // Use upsert with onConflict to be safe against any rows we missed during fetch.
+      const { data, error } = await supabaseAdmin
+        .from("products")
+        .upsert(slice, { onConflict: "brand_id,sku", ignoreDuplicates: false })
+        .select("id, sku, brand_id");
+      if (error) throw new Error(`products upsert: ${error.message}`);
       for (const p of data ?? []) {
-        prodIdMap.set(`${p.brand_id}::${p.sku}`, p.id);
-        inserted++;
+        const key = `${p.brand_id}::${p.sku}`;
+        if (!prodIdMap.has(key)) inserted++;
+        prodIdMap.set(key, p.id);
       }
     }
 
