@@ -827,6 +827,7 @@ export type Database = {
           created_at: string
           id: string
           is_active: boolean
+          is_public: boolean
           name: string
           sort_order: number
         }
@@ -837,6 +838,7 @@ export type Database = {
           created_at?: string
           id?: string
           is_active?: boolean
+          is_public?: boolean
           name: string
           sort_order?: number
         }
@@ -847,6 +849,7 @@ export type Database = {
           created_at?: string
           id?: string
           is_active?: boolean
+          is_public?: boolean
           name?: string
           sort_order?: number
         }

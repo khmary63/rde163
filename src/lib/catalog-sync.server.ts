@@ -90,9 +90,14 @@ export async function runCatalogSync(trigger: "manual" | "cron" = "manual"): Pro
     }
 
     // ---- 2. Warehouses -------------------------------------------------
+    // Sheet column G ("Статус", index 6) is used as the warehouse name
+    // (e.g. "Китай", "Россия"). These are technical/internal warehouses —
+    // they are NOT shown to end customers in the public catalog
+    // (is_public=false). The 9 real customer-facing warehouses are managed
+    // manually in the admin panel.
     const whNames = new Set<string>();
     for (const r of rows) {
-      const w = String(r[5] ?? "").trim();
+      const w = String(r[6] ?? "").trim();
       if (w) whNames.add(w);
     }
     const { data: existingWh } = await supabaseAdmin.from("warehouses").select("id, name, code");
@@ -105,6 +110,7 @@ export async function runCatalogSync(trigger: "manual" | "cron" = "manual"): Pro
         name: n,
         code: `gs-${slugify(n)}-${Date.now().toString(36).slice(-4)}-${i}`,
         is_active: true,
+        is_public: false,
       }));
     if (newWh.length) {
       const { data: ins, error } = await supabaseAdmin.from("warehouses").insert(newWh).select("id, name");
@@ -124,8 +130,7 @@ export async function runCatalogSync(trigger: "manual" | "cron" = "manual"): Pro
       const brand = String(r[1] ?? "").trim();
       const sku = String(r[2] ?? "").trim();
       const name = String(r[3] ?? "").trim();
-      const whName = String(r[5] ?? "").trim();
-      const status = String(r[6] ?? "").trim() || null;
+      const whName = String(r[6] ?? "").trim(); // Column G "Статус" → warehouse
       const price = parseNumber(r[9]);
       const free = parseInt0(r[10]);
       if (!brand || !sku || !name) { skipped++; continue; }
@@ -134,7 +139,7 @@ export async function runCatalogSync(trigger: "manual" | "cron" = "manual"): Pro
       const key = `${brandId}::${sku}`;
       const prev = products.get(key);
       if (!prev) {
-        products.set(key, { brand_id: brandId, sku, name, oem: sku, base_price: price, category: status });
+        products.set(key, { brand_id: brandId, sku, name, oem: sku, base_price: price, category: null });
       } else if (!prev.base_price && price) {
         prev.base_price = price;
       }
