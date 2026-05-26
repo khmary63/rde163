@@ -1,6 +1,6 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { Phone, MessageCircle, Send, User, ShoppingCart, Search, Menu, X } from "lucide-react";
-import { useState } from "react";
+import { useState, type FormEvent } from "react";
 import { adminContact } from "@/data/mock";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
@@ -16,8 +16,15 @@ const nav = [
 
 export function SiteHeader() {
   const [open, setOpen] = useState(false);
+  const [query, setQuery] = useState("");
+  const navigate = useNavigate();
   const { user } = useAuth();
   const { count } = useCart();
+
+  const handleSearch = (e: FormEvent) => {
+    e.preventDefault();
+    navigate({ to: "/catalog", search: { q: query.trim() || undefined } });
+  };
 
   return (
     <header className="sticky top-0 z-40 border-b border-border/60 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
@@ -67,11 +74,22 @@ export function SiteHeader() {
 
         <div className="flex-1" />
 
-        <Link to="/catalog" className="hidden md:flex items-center gap-2 px-3 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
-          <Search className="h-4 w-4" />
-          <span>Поиск по артикулу…</span>
-          <kbd className="ml-2 hidden xl:inline-flex items-center gap-0.5 rounded border border-border/60 px-1.5 py-0.5 text-[10px] font-mono text-muted-foreground">⌘K</kbd>
-        </Link>
+        <form onSubmit={handleSearch} className="hidden md:flex flex-1 max-w-xl mx-2 relative">
+          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <input
+            type="search"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Поиск по артикулу, OEM, названию…"
+            className="w-full h-10 pl-9 pr-20 rounded-md border border-border bg-surface/60 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-brand/40 focus:border-brand transition-colors"
+          />
+          <button
+            type="submit"
+            className="absolute right-1 top-1/2 -translate-y-1/2 h-8 px-3 rounded text-xs font-semibold bg-brand text-brand-foreground hover:bg-brand/90 transition-colors"
+          >
+            Найти
+          </button>
+        </form>
 
         <Link to="/cart" className="relative inline-flex h-9 w-9 items-center justify-center rounded-md hover:bg-surface transition-colors">
           <ShoppingCart className="h-5 w-5" />

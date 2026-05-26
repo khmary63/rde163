@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Search, Loader2, ShoppingCart, ChevronLeft, ChevronRight, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -14,6 +14,9 @@ import { useCart } from "@/hooks/use-cart";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/catalog")({
+  validateSearch: (search: Record<string, unknown>): { q?: string } => ({
+    q: typeof search.q === "string" ? search.q : undefined,
+  }),
   head: () => ({
     meta: [
       { title: "Каталог запчастей для китайской спецтехники — РДЭ" },
@@ -173,7 +176,13 @@ function useProducts(filters: Filters) {
 }
 
 function CatalogPage() {
-  const [search, setSearch] = useState("");
+  const { q } = Route.useSearch();
+  const [search, setSearch] = useState(q ?? "");
+
+  useEffect(() => {
+    if (q !== undefined) setSearch(q);
+  }, [q]);
+
   const [brandIds, setBrandIds] = useState<string[]>([]);
   const [warehouseIds, setWarehouseIds] = useState<string[]>([]);
   const [originality, setOriginality] = useState<Filters["originality"]>("original");
