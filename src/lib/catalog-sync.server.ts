@@ -234,7 +234,7 @@ export async function runCatalogSync(trigger: "manual" | "cron" = "manual"): Pro
           rows_processed: rows.length,
           rows_failed: skipped,
           message: `OK (${trigger}): ${inserted} новых, ${updated} обновлено, ${stockReplaced} остатков`,
-          details: summary,
+          details: { ...summary },
         })
         .eq("id", logId);
     }
