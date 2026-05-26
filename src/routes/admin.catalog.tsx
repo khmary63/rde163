@@ -514,7 +514,7 @@ function GoogleSheetsSyncCard({ onDone }: { onDone: () => void }) {
     setResult(null);
     try {
       const r = await sync();
-      setResult(r as Record<string, number>);
+      setResult(r as unknown as Record<string, number>);
       toast.success("Синхронизация выполнена", {
         description: `Товаров: +${r.products_inserted}, обновлено: ${r.products_updated}, остатков: ${r.stock_rows}`,
       });
