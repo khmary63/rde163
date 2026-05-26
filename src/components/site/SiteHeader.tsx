@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { Phone, MessageCircle, Send, User, ShoppingCart, Search, Menu, X } from "lucide-react";
+import { Phone, MessageCircle, User, ShoppingCart, Search, Menu, X } from "lucide-react";
 import { useState, type FormEvent } from "react";
 import { adminContact } from "@/data/mock";
 import { Button } from "@/components/ui/button";
