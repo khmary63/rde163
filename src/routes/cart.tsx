@@ -32,14 +32,18 @@ function CartPage() {
   const [notes, setNotes] = useState("");
   const [grouping, setGrouping] = useState<"single" | "per_warehouse">("single");
   const [submitting, setSubmitting] = useState(false);
-  const [done, setDone] = useState<{ number: string } | null>(null);
+  const [done, setDone] = useState<{ number: string; hadBackorder: boolean } | null>(null);
+
+  const hasBackorder = useMemo(() => items.some((it) => it.backorder), [items]);
 
   const groups = useMemo(() => {
-    const map = new Map<string, { warehouseName: string; items: typeof items }>();
+    const map = new Map<string, { warehouseName: string; items: typeof items; backorder: boolean }>();
     for (const it of items) {
-      const g = map.get(it.warehouseId) ?? { warehouseName: it.warehouseName, items: [] };
+      const key = it.backorder ? "__backorder__" : it.warehouseId;
+      const name = it.backorder ? "Под заказ" : it.warehouseName;
+      const g = map.get(key) ?? { warehouseName: name, items: [], backorder: !!it.backorder };
       g.items.push(it);
-      map.set(it.warehouseId, g);
+      map.set(key, g);
     }
     return Array.from(map.entries()).map(([warehouseId, v]) => ({ warehouseId, ...v }));
   }, [items]);
@@ -66,7 +70,7 @@ function CartPage() {
         },
       });
       clear();
-      setDone({ number: res.number });
+      setDone({ number: res.number, hadBackorder: hasBackorder });
     } catch (e) {
       toast.error("Не удалось отправить заявку", { description: e instanceof Error ? e.message : "Попробуйте ещё раз" });
     } finally {
@@ -80,9 +84,15 @@ function CartPage() {
         <CheckCircle2 className="mx-auto h-16 w-16 text-brand" />
         <h1 className="mt-6 font-display text-3xl uppercase">ЗАКАЗ ПРИНЯТ</h1>
         <div className="mt-4 space-y-2 text-muted-foreground">
-          <p className="text-lg font-medium text-foreground">Спасибо за покупку.</p>
+          <p className="text-lg font-medium text-foreground">
+            {done.hadBackorder
+              ? "Спасибо, ваш заказ принят. Менеджер свяжется с вами, как только запчасть поступит в наличие."
+              : "Спасибо за покупку."}
+          </p>
           <p>Номер заявки <span className="font-mono font-semibold text-foreground">{done.number}</span>.</p>
-          <p>Счет и закрывающие документы (УПД) будут загружены в ЭДО не позднее завтрашнего дня.</p>
+          {!done.hadBackorder && (
+            <p>Счет и закрывающие документы (УПД) будут загружены в ЭДО не позднее завтрашнего дня.</p>
+          )}
         </div>
         <div className="mt-8 flex justify-center gap-3">
           <Button asChild variant="outline"><Link to="/catalog">Продолжить покупки</Link></Button>
@@ -125,11 +135,22 @@ function CartPage() {
                     {g.items.map((it) => (
                       <tr key={`${it.productId}-${it.warehouseId}`}>
                         <td className="px-4 py-3">
-                          <div className="font-medium leading-tight">{it.name}</div>
+                          <div className="flex items-start gap-2">
+                            <div className="font-medium leading-tight">{it.name}</div>
+                            {it.backorder && (
+                              <span className="rounded bg-[oklch(0.62_0.20_25/0.12)] px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-[oklch(0.62_0.20_25)]">
+                                под заказ
+                              </span>
+                            )}
+                          </div>
                           <div className="mt-0.5 font-mono text-xs text-muted-foreground">{it.sku} · {it.brand}</div>
                           <div className="mt-1 text-xs">
-                            <span className="text-muted-foreground">Склад отгрузки:</span>{" "}
-                            <span className="font-medium text-foreground">{g.warehouseName}</span>
+                            <span className="text-muted-foreground">
+                              {it.backorder ? "Поступление:" : "Склад отгрузки:"}
+                            </span>{" "}
+                            <span className="font-medium text-foreground">
+                              {it.backorder ? "Менеджер согласует склад" : g.warehouseName}
+                            </span>
                           </div>
                         </td>
                         <td className="px-2 py-3">
