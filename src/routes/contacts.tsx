@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { warehouses, adminContact } from "@/data/mock";
-import { Phone, Mail, MapPin, Send } from "lucide-react";
+import { Phone, Mail, MapPin } from "lucide-react";
 
 const BASE = "https://rde163.ru";
 
