@@ -128,7 +128,7 @@ function HomePage() {
               <div className="mt-5 flex flex-wrap gap-x-6 gap-y-2 text-xs font-mono text-muted-foreground uppercase tracking-wider">
                 <span><span className="text-accent-orange font-bold">⌘K</span> быстрый поиск</span>
                 <span><span className="text-accent-orange font-bold">↵</span> отправить</span>
-                <span><span className="text-brand font-bold">●</span> 5700 SKU ИНДЕКСИРОВАНО</span>
+                <span><span className="text-brand font-bold">●</span> 6700 SKU ИНДЕКСИРОВАНО</span>
               </div>
             </div>
           </div>
@@ -137,7 +137,7 @@ function HomePage() {
           <div className="hidden lg:flex absolute right-[6%] bottom-[14%] flex-col gap-1 font-mono text-right bg-background/85 backdrop-blur-md border border-border px-6 py-5 shadow-[0_20px_60px_-20px_oklch(0.20_0.013_250/0.35)]">
             <div className="text-[10px] uppercase tracking-[0.3em] text-foreground/70">в реальном времени</div>
             <div className="font-display text-6xl font-bold tabular-nums text-accent-orange leading-none flex items-baseline justify-end gap-2">
-              <LiveStockCounter fallback={5700} />
+              <LiveStockCounter fallback={5663} />
               <span className="relative flex h-2 w-2 self-center" aria-hidden>
                 <span className="absolute inset-0 rounded-full bg-accent-orange animate-ping opacity-75" />
                 <span className="relative inline-flex h-2 w-2 rounded-full bg-accent-orange" />

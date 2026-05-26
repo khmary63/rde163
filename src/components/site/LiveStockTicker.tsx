@@ -41,14 +41,16 @@ async function fetchBrandStockCounts(): Promise<BrandCount[]> {
 }
 
 const FALLBACK: BrandCount[] = [
-  { name: "CNHTC", qty: 2548 },
-  { name: "HOWO", qty: 1338 },
-  { name: "XGMA", qty: 464 },
-  { name: "Shaanxi", qty: 154 },
-  { name: "ZF", qty: 136 },
+  { name: "CNHTC", qty: 2612 },
+  { name: "HOWO", qty: 1331 },
+  { name: "XGMA", qty: 461 },
+  { name: "CHINA", qty: 171 },
+  { name: "Shaanxi", qty: 151 },
+  { name: "ZF", qty: 135 },
   { name: "Weichai", qty: 117 },
   { name: "XCMG", qty: 80 },
   { name: "Cummins", qty: 51 },
+  { name: "Shacman", qty: 50 },
 ];
 
 export function LiveStockTicker() {
