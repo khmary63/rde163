@@ -4,6 +4,7 @@ import { supabaseAdmin } from "@/integrations/supabase/client.server";
 export interface OrderExportItem {
   product_name: string;
   product_sku?: string | null;
+  product_brand?: string | null;
   warehouse_name: string;
   qty: number;
   unit_price: number;
@@ -22,8 +23,12 @@ export interface OrderExportInput {
 }
 
 /**
- * Build .xlsx for an order, upload to `order-docs` bucket and return a signed URL.
- * Returns null on any failure (caller should keep going — email link is best-effort).
+ * Build .xlsx in the exact "Слияние" layout used by ChatMax merge mailings:
+ *
+ *   A: Артикул в заказ    B: Производитель в заказ    C: Наименование в заказ
+ *   D: Количество         E: Цена в заказ             F: Сумма
+ *   G1 = SUM(F:F)         H: Количество в отказ       I: Сумма (=(D-H)*E)
+ *   J1 = SUM(I:I)         K1: e-mail клиента
  */
 export async function buildAndUploadOrderXlsx(
   input: OrderExportInput,
@@ -31,60 +36,56 @@ export async function buildAndUploadOrderXlsx(
   try {
     const wb = XLSX.utils.book_new();
 
-    // Header sheet
-    const header: (string | number)[][] = [
-      ["Заявка №", input.number],
-      ["Клиент", input.customer],
-      ["Телефон", input.phone ?? ""],
-      ["Email", input.email ?? ""],
-      ["Группировка счёта", input.invoice_grouping === "single" ? "Один счёт" : "По складам"],
-      ["Комментарий", input.notes ?? ""],
-      ["Итого, ₽", input.total],
-      [],
+    // Header row — single line, exactly like the sample.
+    const aoa: (string | number | { f: string } | null)[][] = [
+      [
+        "Артикул в заказ",
+        "Производитель в заказ",
+        "Наименование в заказ",
+        "Количество",
+        "Цена в заказ",
+        "Сумма",
+        { f: "SUM(F:F)" },
+        "Количество в отказ",
+        "Сумма",
+        { f: "SUM(I:I)" },
+        input.email ?? "",
+      ],
     ];
 
-    // Group items by warehouse if requested
-    const groups = new Map<string, OrderExportItem[]>();
-    if (input.invoice_grouping === "per_warehouse") {
-      for (const it of input.items) {
-        const arr = groups.get(it.warehouse_name) ?? [];
-        arr.push(it);
-        groups.set(it.warehouse_name, arr);
-      }
-    } else {
-      groups.set("Все позиции", input.items);
-    }
+    input.items.forEach((it, idx) => {
+      const row = idx + 2; // Excel row number (header is row 1)
+      aoa.push([
+        it.product_sku ?? "",
+        it.product_brand ?? "",
+        it.product_name,
+        it.qty,
+        it.unit_price,
+        it.line_total,
+        null,
+        null,
+        { f: `(D${row}-H${row})*E${row}` },
+        null,
+        null,
+      ]);
+    });
 
-    const rows: (string | number)[][] = [...header];
-    for (const [groupName, items] of groups) {
-      rows.push([`Склад / счёт: ${groupName}`]);
-      rows.push(["Артикул", "Наименование", "Склад", "Кол-во", "Цена, ₽", "Сумма, ₽"]);
-      let subtotal = 0;
-      for (const it of items) {
-        rows.push([
-          it.product_sku ?? "",
-          it.product_name,
-          it.warehouse_name,
-          it.qty,
-          it.unit_price,
-          it.line_total,
-        ]);
-        subtotal += it.line_total;
-      }
-      rows.push(["", "", "", "", "Итого по группе", subtotal]);
-      rows.push([]);
-    }
-
-    const ws = XLSX.utils.aoa_to_sheet(rows);
+    const ws = XLSX.utils.aoa_to_sheet(aoa, { cellDates: false });
     ws["!cols"] = [
-      { wch: 16 },
-      { wch: 40 },
-      { wch: 22 },
-      { wch: 10 },
-      { wch: 14 },
-      { wch: 14 },
+      { wch: 22 }, // A
+      { wch: 22 }, // B
+      { wch: 60 }, // C
+      { wch: 12 }, // D
+      { wch: 14 }, // E
+      { wch: 14 }, // F
+      { wch: 14 }, // G
+      { wch: 18 }, // H
+      { wch: 14 }, // I
+      { wch: 14 }, // J
+      { wch: 28 }, // K
     ];
-    XLSX.utils.book_append_sheet(wb, ws, "Заявка");
+
+    XLSX.utils.book_append_sheet(wb, ws, "Слияние");
 
     const buf = XLSX.write(wb, { type: "buffer", bookType: "xlsx" }) as Buffer;
 
@@ -102,7 +103,6 @@ export async function buildAndUploadOrderXlsx(
       return null;
     }
 
-    // 30-day signed URL
     const { data: signed, error: signErr } = await supabaseAdmin.storage
       .from("order-docs")
       .createSignedUrl(path, 60 * 60 * 24 * 30);

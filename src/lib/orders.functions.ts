@@ -30,7 +30,10 @@ export const submitOrder = createServerFn({ method: "POST" })
 
     const [{ data: products, error: productsErr }, { data: warehouses }, { data: profile }] =
       await Promise.all([
-        supabase.from("products").select("id, name, sku, base_price").in("id", productIds),
+        supabase
+          .from("products")
+          .select("id, name, sku, base_price, brand:brands(name)")
+          .in("id", productIds),
         supabase.from("warehouses").select("id, name").in("id", warehouseIds),
         supabase
           .from("profiles")
@@ -59,10 +62,12 @@ export const submitOrder = createServerFn({ method: "POST" })
 
     // Build priced rows server-side
     const priced = data.items.map((it) => {
-      const p = productMap.get(it.product_id)!;
+      const p = productMap.get(it.product_id)! as typeof products[number] & { brand?: { name: string } | { name: string }[] | null };
       const basePrice = Number(p.base_price);
       const unitPrice = +(basePrice * (1 - discountPercent / 100)).toFixed(2);
       const lineTotal = +(unitPrice * it.qty).toFixed(2);
+      const brandField = (p as { brand?: { name: string } | { name: string }[] | null }).brand;
+      const brandName = Array.isArray(brandField) ? brandField[0]?.name ?? null : brandField?.name ?? null;
       return {
         product_id: it.product_id,
         warehouse_id: it.warehouse_id,
@@ -72,6 +77,7 @@ export const submitOrder = createServerFn({ method: "POST" })
         line_total: lineTotal,
         product_name: p.name,
         product_sku: p.sku as string | null,
+        product_brand: brandName,
       };
     });
 
@@ -115,6 +121,7 @@ export const submitOrder = createServerFn({ method: "POST" })
     const exportItems: OrderExportItem[] = priced.map((r) => ({
       product_name: r.product_name,
       product_sku: r.product_sku,
+      product_brand: r.product_brand,
       warehouse_name: warehouseMap.get(r.warehouse_id)?.name ?? r.warehouse_id,
       qty: r.qty,
       unit_price: r.unit_price,
