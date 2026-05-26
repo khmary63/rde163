@@ -9,6 +9,7 @@ const OrderItemInput = z.object({
   product_id: z.string().uuid(),
   warehouse_id: z.string().uuid(),
   qty: z.number().int().min(1).max(10000),
+  backorder: z.boolean().optional(),
 });
 
 const SubmitInput = z.object({
