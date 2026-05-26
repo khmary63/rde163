@@ -178,6 +178,11 @@ function useProducts(filters: Filters) {
 function CatalogPage() {
   const { q } = Route.useSearch();
   const [search, setSearch] = useState(q ?? "");
+
+  useEffect(() => {
+    if (q !== undefined) setSearch(q);
+  }, [q]);
+
   const [brandIds, setBrandIds] = useState<string[]>([]);
   const [warehouseIds, setWarehouseIds] = useState<string[]>([]);
   const [originality, setOriginality] = useState<Filters["originality"]>("original");
