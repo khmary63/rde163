@@ -260,7 +260,7 @@ export const syncCatalogFromSheet = createServerFn({ method: "POST" })
           product_id: string;
           warehouse_id: string;
           qty: number;
-          status: "in" | "out" | "low" | "expected";
+          status: "in_stock" | "out" | "expected";
         }> = [];
         for (const [k, qty] of stockAgg) {
           const [brandId, sku, whId] = k.split("::");
@@ -270,7 +270,7 @@ export const syncCatalogFromSheet = createServerFn({ method: "POST" })
             product_id: pid,
             warehouse_id: whId,
             qty,
-            status: qty > 0 ? "in" : "out",
+            status: qty > 0 ? "in_stock" : "out",
           });
         }
         for (let i = 0; i < stockRows.length; i += CHUNK) {
