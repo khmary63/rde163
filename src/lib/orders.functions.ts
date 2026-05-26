@@ -79,6 +79,7 @@ export const submitOrder = createServerFn({ method: "POST" })
         product_name: p.name,
         product_sku: p.sku as string | null,
         product_brand: brandName,
+        backorder: !!it.backorder,
       };
     });
 
