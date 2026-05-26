@@ -433,7 +433,7 @@ function CatalogPage() {
                                     maxQty: 99,
                                     backorder: true,
                                   });
-                                  toast.success("Добавлено под заказ", {
+                                  toast.success("Добавлено в корзину", {
                                     description: `${p.name} — менеджер свяжется при поступлении`,
                                   });
                                 }}
