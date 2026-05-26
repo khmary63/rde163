@@ -64,6 +64,7 @@ function CartPage() {
             warehouse_id: it.warehouseId,
             qty: it.qty,
             unit_price: it.price,
+            backorder: it.backorder,
           })),
           notes: notes.trim() || undefined,
           invoice_grouping: grouping,
