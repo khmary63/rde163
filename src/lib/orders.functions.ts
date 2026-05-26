@@ -155,6 +155,7 @@ export const submitOrder = createServerFn({ method: "POST" })
       profile?.phone ? `Телефон: ${profile.phone}` : null,
       `Позиций: ${data.items.length}`,
       `Склад отгрузки: ${warehousesLine}`,
+      data.invoice_grouping === "per_warehouse" ? "⚠️ Оформить разными счетами (по складам)" : null,
       `Сумма: ${total.toLocaleString("ru-RU")} ₽`,
       xlsx ? `\nExcel: ${xlsx.url}` : null,
       data.notes ? `\nКомментарий: ${data.notes}` : null,
