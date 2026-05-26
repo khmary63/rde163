@@ -412,16 +412,33 @@ function CatalogPage() {
                           </td>
                           <td className="px-4 py-3 text-right align-top">
                             {status === "out" ? (
-                              <Button asChild size="sm" variant="outline" className="gap-1.5">
-                                <a
-                                  href={`mailto:zakaz@rde163.ru?subject=${encodeURIComponent(
-                                    `Заказ под привоз: ${p.sku}`
-                                  )}&body=${encodeURIComponent(
-                                    `Здравствуйте! Прошу оформить заказ под привоз:\n\nАртикул: ${p.sku}\nНаименование: ${p.name}\nБренд: ${p.brand?.name ?? ""}\n\nКоличество: \nКонтакт для связи: `
-                                  )}`}
-                                >
-                                  <Send className="h-3.5 w-3.5" /> Заказать
-                                </a>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="gap-1.5"
+                                onClick={() => {
+                                  const fallbackWh = whQ.data?.[0];
+                                  if (!fallbackWh) {
+                                    toast.error("Не удалось добавить под заказ");
+                                    return;
+                                  }
+                                  cart.add({
+                                    productId: p.id,
+                                    sku: p.sku,
+                                    name: p.name,
+                                    brand: p.brand?.name ?? "",
+                                    price: Number(p.base_price),
+                                    warehouseId: fallbackWh.id,
+                                    warehouseName: "Под заказ",
+                                    maxQty: 99,
+                                    backorder: true,
+                                  });
+                                  toast.success("Добавлено под заказ", {
+                                    description: `${p.name} — менеджер свяжется при поступлении`,
+                                  });
+                                }}
+                              >
+                                <Send className="h-3.5 w-3.5" /> Заказать
                               </Button>
                             ) : (
                               <Button
