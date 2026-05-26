@@ -6,7 +6,7 @@ import { BarChart3, Download, ChevronDown, ChevronRight, Users, Package, Shoppin
 import { getSalesAnalytics, getCustomerDetail, type AnalyticsResult, type CustomerDetail } from "@/lib/analytics.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { formatRub } from "@/lib/format";
+import { formatPrice as formatRub } from "@/lib/format";
 
 export const Route = createFileRoute("/admin/analytics")({
   component: AdminAnalyticsPage,

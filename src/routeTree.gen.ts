@@ -38,6 +38,7 @@ import { Route as AdminCustomersRouteImport } from './routes/admin.customers'
 import { Route as AdminCrossesRouteImport } from './routes/admin.crosses'
 import { Route as AdminContentRouteImport } from './routes/admin.content'
 import { Route as AdminCatalogRouteImport } from './routes/admin.catalog'
+import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
 import { Route as CatalogBrandSlugRouteImport } from './routes/catalog.brand.$slug'
 import { Route as AdminOrdersIdRouteImport } from './routes/admin.orders.$id'
@@ -193,6 +194,11 @@ const AdminCatalogRoute = AdminCatalogRouteImport.update({
   path: '/catalog',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminAnalyticsRoute = AdminAnalyticsRouteImport.update({
+  id: '/analytics',
+  path: '/analytics',
+  getParentRoute: () => AdminRoute,
+} as any)
 const LovableEmailSuppressionRoute = LovableEmailSuppressionRouteImport.update({
   id: '/lovable/email/suppression',
   path: '/lovable/email/suppression',
@@ -260,6 +266,7 @@ export interface FileRoutesByFullPath {
   '/reviews': typeof ReviewsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/unsubscribe': typeof UnsubscribeRoute
+  '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/catalog': typeof AdminCatalogRoute
   '/admin/content': typeof AdminContentRoute
   '/admin/crosses': typeof AdminCrossesRoute
@@ -299,6 +306,7 @@ export interface FileRoutesByTo {
   '/reviews': typeof ReviewsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/unsubscribe': typeof UnsubscribeRoute
+  '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/catalog': typeof AdminCatalogRoute
   '/admin/content': typeof AdminContentRoute
   '/admin/crosses': typeof AdminCrossesRoute
@@ -340,6 +348,7 @@ export interface FileRoutesById {
   '/reviews': typeof ReviewsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/unsubscribe': typeof UnsubscribeRoute
+  '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/catalog': typeof AdminCatalogRoute
   '/admin/content': typeof AdminContentRoute
   '/admin/crosses': typeof AdminCrossesRoute
@@ -382,6 +391,7 @@ export interface FileRouteTypes {
     | '/reviews'
     | '/sitemap.xml'
     | '/unsubscribe'
+    | '/admin/analytics'
     | '/admin/catalog'
     | '/admin/content'
     | '/admin/crosses'
@@ -421,6 +431,7 @@ export interface FileRouteTypes {
     | '/reviews'
     | '/sitemap.xml'
     | '/unsubscribe'
+    | '/admin/analytics'
     | '/admin/catalog'
     | '/admin/content'
     | '/admin/crosses'
@@ -461,6 +472,7 @@ export interface FileRouteTypes {
     | '/reviews'
     | '/sitemap.xml'
     | '/unsubscribe'
+    | '/admin/analytics'
     | '/admin/catalog'
     | '/admin/content'
     | '/admin/crosses'
@@ -719,6 +731,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminCatalogRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/analytics': {
+      id: '/admin/analytics'
+      path: '/analytics'
+      fullPath: '/admin/analytics'
+      preLoaderRoute: typeof AdminAnalyticsRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/lovable/email/suppression': {
       id: '/lovable/email/suppression'
       path: '/lovable/email/suppression'
@@ -798,6 +817,7 @@ const AdminOrdersRouteWithChildren = AdminOrdersRoute._addFileChildren(
 )
 
 interface AdminRouteChildren {
+  AdminAnalyticsRoute: typeof AdminAnalyticsRoute
   AdminCatalogRoute: typeof AdminCatalogRoute
   AdminContentRoute: typeof AdminContentRoute
   AdminCrossesRoute: typeof AdminCrossesRoute
@@ -811,6 +831,7 @@ interface AdminRouteChildren {
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
+  AdminAnalyticsRoute: AdminAnalyticsRoute,
   AdminCatalogRoute: AdminCatalogRoute,
   AdminContentRoute: AdminContentRoute,
   AdminCrossesRoute: AdminCrossesRoute,
