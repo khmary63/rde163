@@ -1,5 +1,6 @@
 // MAX Bot API helper — server only.
-// API: https://botapi.max.ru — POST /messages?access_token=...&chat_id=...
+// API: https://botapi.max.ru — POST /messages?chat_id=...
+// Auth: Authorization: Bearer <token> (access_token query param is deprecated)
 // Body: { text: string }
 
 export async function sendMaxMessage(text: string): Promise<void> {
@@ -9,11 +10,14 @@ export async function sendMaxMessage(text: string): Promise<void> {
     console.warn("[max] MAX_BOT_TOKEN / MAX_MANAGER_CHAT_ID not configured");
     return;
   }
-  const url = `https://botapi.max.ru/messages?access_token=${encodeURIComponent(token)}&chat_id=${encodeURIComponent(chatId)}`;
+  const url = `https://botapi.max.ru/messages?chat_id=${encodeURIComponent(chatId)}`;
   try {
     const res = await fetch(url, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
       body: JSON.stringify({ text: text.slice(0, 4000) }),
     });
     if (!res.ok) {
