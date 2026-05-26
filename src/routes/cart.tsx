@@ -70,7 +70,7 @@ function CartPage() {
         },
       });
       clear();
-      setDone({ number: res.number });
+      setDone({ number: res.number, hadBackorder: hasBackorder });
     } catch (e) {
       toast.error("Не удалось отправить заявку", { description: e instanceof Error ? e.message : "Попробуйте ещё раз" });
     } finally {
