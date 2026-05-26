@@ -30,7 +30,10 @@ export const submitOrder = createServerFn({ method: "POST" })
 
     const [{ data: products, error: productsErr }, { data: warehouses }, { data: profile }] =
       await Promise.all([
-        supabase.from("products").select("id, name, sku, base_price").in("id", productIds),
+        supabase
+          .from("products")
+          .select("id, name, sku, base_price, brand:brands(name)")
+          .in("id", productIds),
         supabase.from("warehouses").select("id, name").in("id", warehouseIds),
         supabase
           .from("profiles")
