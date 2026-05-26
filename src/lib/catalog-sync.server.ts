@@ -130,8 +130,7 @@ export async function runCatalogSync(trigger: "manual" | "cron" = "manual"): Pro
       const brand = String(r[1] ?? "").trim();
       const sku = String(r[2] ?? "").trim();
       const name = String(r[3] ?? "").trim();
-      const whName = String(r[5] ?? "").trim();
-      const status = String(r[6] ?? "").trim() || null;
+      const whName = String(r[6] ?? "").trim(); // Column G "Статус" → warehouse
       const price = parseNumber(r[9]);
       const free = parseInt0(r[10]);
       if (!brand || !sku || !name) { skipped++; continue; }
@@ -140,7 +139,7 @@ export async function runCatalogSync(trigger: "manual" | "cron" = "manual"): Pro
       const key = `${brandId}::${sku}`;
       const prev = products.get(key);
       if (!prev) {
-        products.set(key, { brand_id: brandId, sku, name, oem: sku, base_price: price, category: status });
+        products.set(key, { brand_id: brandId, sku, name, oem: sku, base_price: price, category: null });
       } else if (!prev.base_price && price) {
         prev.base_price = price;
       }
