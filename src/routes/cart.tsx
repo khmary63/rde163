@@ -135,11 +135,22 @@ function CartPage() {
                     {g.items.map((it) => (
                       <tr key={`${it.productId}-${it.warehouseId}`}>
                         <td className="px-4 py-3">
-                          <div className="font-medium leading-tight">{it.name}</div>
+                          <div className="flex items-start gap-2">
+                            <div className="font-medium leading-tight">{it.name}</div>
+                            {it.backorder && (
+                              <span className="rounded bg-[oklch(0.62_0.20_25/0.12)] px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-[oklch(0.62_0.20_25)]">
+                                под заказ
+                              </span>
+                            )}
+                          </div>
                           <div className="mt-0.5 font-mono text-xs text-muted-foreground">{it.sku} · {it.brand}</div>
                           <div className="mt-1 text-xs">
-                            <span className="text-muted-foreground">Склад отгрузки:</span>{" "}
-                            <span className="font-medium text-foreground">{g.warehouseName}</span>
+                            <span className="text-muted-foreground">
+                              {it.backorder ? "Поступление:" : "Склад отгрузки:"}
+                            </span>{" "}
+                            <span className="font-medium text-foreground">
+                              {it.backorder ? "Менеджер согласует склад" : g.warehouseName}
+                            </span>
                           </div>
                         </td>
                         <td className="px-2 py-3">
