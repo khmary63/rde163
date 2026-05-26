@@ -42,7 +42,7 @@ export function SiteHeader() {
             </a>
           </div>
           <div className="flex items-center gap-3">
-            <a href="#" aria-label="Telegram" className="hover:text-brand transition-colors"><Send className="h-3.5 w-3.5" /></a>
+            
             <a href="#" aria-label="WhatsApp" className="hover:text-brand transition-colors"><MessageCircle className="h-3.5 w-3.5" /></a>
             <span className="hidden md:inline">Пн–Пт 8:00–19:00 МСК</span>
           </div>
