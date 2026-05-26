@@ -56,7 +56,7 @@ function useAnimatedNumber(target: number, durationMs = 800) {
   return display;
 }
 
-export function LiveStockCounter({ fallback = 5700 }: { fallback?: number }) {
+export function LiveStockCounter({ fallback = 5663 }: { fallback?: number }) {
   const { data } = useQuery({
     queryKey: ["live-stock-count"],
     queryFn: fetchInStockCount,
