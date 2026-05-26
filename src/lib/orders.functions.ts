@@ -62,10 +62,12 @@ export const submitOrder = createServerFn({ method: "POST" })
 
     // Build priced rows server-side
     const priced = data.items.map((it) => {
-      const p = productMap.get(it.product_id)!;
+      const p = productMap.get(it.product_id)! as typeof products[number] & { brand?: { name: string } | { name: string }[] | null };
       const basePrice = Number(p.base_price);
       const unitPrice = +(basePrice * (1 - discountPercent / 100)).toFixed(2);
       const lineTotal = +(unitPrice * it.qty).toFixed(2);
+      const brandField = (p as { brand?: { name: string } | { name: string }[] | null }).brand;
+      const brandName = Array.isArray(brandField) ? brandField[0]?.name ?? null : brandField?.name ?? null;
       return {
         product_id: it.product_id,
         warehouse_id: it.warehouse_id,
@@ -75,6 +77,7 @@ export const submitOrder = createServerFn({ method: "POST" })
         line_total: lineTotal,
         product_name: p.name,
         product_sku: p.sku as string | null,
+        product_brand: brandName,
       };
     });
 
