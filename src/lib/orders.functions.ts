@@ -121,6 +121,7 @@ export const submitOrder = createServerFn({ method: "POST" })
     const exportItems: OrderExportItem[] = priced.map((r) => ({
       product_name: r.product_name,
       product_sku: r.product_sku,
+      product_brand: r.product_brand,
       warehouse_name: warehouseMap.get(r.warehouse_id)?.name ?? r.warehouse_id,
       qty: r.qty,
       unit_price: r.unit_price,
