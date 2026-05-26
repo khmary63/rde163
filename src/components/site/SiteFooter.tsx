@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Phone, Mail, MapPin, Send, MessageCircle } from "lucide-react";
+import { Phone, Mail, MapPin, MessageCircle } from "lucide-react";
 import { adminContact } from "@/data/mock";
 import logoRde from "@/assets/logo-rde.png";
 
