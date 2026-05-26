@@ -84,9 +84,15 @@ function CartPage() {
         <CheckCircle2 className="mx-auto h-16 w-16 text-brand" />
         <h1 className="mt-6 font-display text-3xl uppercase">ЗАКАЗ ПРИНЯТ</h1>
         <div className="mt-4 space-y-2 text-muted-foreground">
-          <p className="text-lg font-medium text-foreground">Спасибо за покупку.</p>
+          <p className="text-lg font-medium text-foreground">
+            {done.hadBackorder
+              ? "Спасибо, ваш заказ принят. Менеджер свяжется с вами, как только запчасть поступит в наличие."
+              : "Спасибо за покупку."}
+          </p>
           <p>Номер заявки <span className="font-mono font-semibold text-foreground">{done.number}</span>.</p>
-          <p>Счет и закрывающие документы (УПД) будут загружены в ЭДО не позднее завтрашнего дня.</p>
+          {!done.hadBackorder && (
+            <p>Счет и закрывающие документы (УПД) будут загружены в ЭДО не позднее завтрашнего дня.</p>
+          )}
         </div>
         <div className="mt-8 flex justify-center gap-3">
           <Button asChild variant="outline"><Link to="/catalog">Продолжить покупки</Link></Button>
