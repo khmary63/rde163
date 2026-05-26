@@ -109,8 +109,8 @@ function ReviewsPage() {
               <div className="flex items-center justify-between pt-2 border-t border-border/60">
                 <div>
                   <div className="font-medium text-sm">{r.author}</div>
-                  {r.company && <div className="text-xs text-muted-foreground">{r.company}</div>}
                 </div>
+
                 <span className="text-xs font-mono text-muted-foreground">{formatDate(r.date)}</span>
               </div>
               {r.reply && <div className="rounded-md bg-background border-l-2 border-brand p-3 text-xs"><span className="font-semibold text-brand">Ответ магазина: </span>{r.reply}</div>}
