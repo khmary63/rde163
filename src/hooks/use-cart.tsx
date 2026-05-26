@@ -10,6 +10,7 @@ export type CartItem = {
   warehouseId: string;
   warehouseName: string;
   maxQty: number;
+  backorder?: boolean;
 };
 
 type CartCtx = {
