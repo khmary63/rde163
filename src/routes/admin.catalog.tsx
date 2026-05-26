@@ -1,13 +1,16 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Upload, FileSpreadsheet, CheckCircle2, AlertTriangle, Loader2, Download } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
+import { Upload, FileSpreadsheet, CheckCircle2, AlertTriangle, Loader2, Download, RefreshCw } from "lucide-react";
 import * as XLSX from "xlsx";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
+import { syncCatalogFromSheet } from "@/lib/catalog-sync.functions";
+
 
 export const Route = createFileRoute("/admin/catalog")({
   head: () => ({ meta: [{ title: "Прайс — Админка" }, { name: "robots", content: "noindex" }] }),
@@ -337,7 +340,10 @@ function CatalogUploadPage() {
         </div>
       </div>
 
+      <GoogleSheetsSyncCard onDone={() => { qc.invalidateQueries({ queryKey: ["catalog-stats"] }); qc.invalidateQueries({ queryKey: ["warehouses-admin"] }); }} />
+
       {/* Spec */}
+
       <Card className="p-5">
         <h2 className="font-display text-sm uppercase tracking-wider text-muted-foreground">Формат файла</h2>
         <p className="mt-2 text-sm">Принимаются файлы <strong>Excel (.xlsx, .xls)</strong> и <strong>CSV</strong> (UTF-8, разделитель — запятая или точка с запятой). Первая строка — заголовки.</p>
@@ -497,6 +503,63 @@ function CatalogUploadPage() {
     </div>
   );
 }
+
+function GoogleSheetsSyncCard({ onDone }: { onDone: () => void }) {
+  const sync = useServerFn(syncCatalogFromSheet);
+  const [busy, setBusy] = useState(false);
+  const [result, setResult] = useState<null | Record<string, number>>(null);
+
+  const run = async () => {
+    setBusy(true);
+    setResult(null);
+    try {
+      const r = await sync();
+      setResult(r as Record<string, number>);
+      toast.success("Синхронизация выполнена", {
+        description: `Товаров: +${r.products_inserted}, обновлено: ${r.products_updated}, остатков: ${r.stock_rows}`,
+      });
+      onDone();
+    } catch (e) {
+      toast.error("Ошибка синхронизации", { description: e instanceof Error ? e.message : String(e) });
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <Card className="p-5 border-primary/40">
+      <div className="flex items-start justify-between gap-4 flex-wrap">
+        <div>
+          <h2 className="font-display text-sm uppercase tracking-wider text-muted-foreground">Синхронизация с Google Sheets</h2>
+          <p className="mt-2 text-sm">
+            Каталог и остатки подтягиваются из таблицы{" "}
+            <a
+              href="https://docs.google.com/spreadsheets/d/1wqUakDJVX2-dP0gF0VuZhUC61DP5r2mJa38CKFzua6E/edit?gid=1212612956"
+              target="_blank" rel="noreferrer"
+              className="underline"
+            >«Ожидаемые поступления Контейнеры»</a>, лист «Запчасти».
+          </p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Колонки: B — Производитель, C — артикул, D — наименование, F — локация (склад), G — статус, J — цена, K — свободно. Существующие товары обновляются, остатки полностью пересчитываются.
+          </p>
+          {result && (
+            <div className="mt-3 text-xs text-muted-foreground space-y-0.5">
+              <div>Строк прочитано: <strong>{result.rows_total}</strong>, пропущено: {result.rows_skipped}</div>
+              <div>Новых брендов: {result.brands_added}, новых складов: {result.warehouses_added}</div>
+              <div>Товаров добавлено: <strong>{result.products_inserted}</strong>, обновлено: {result.products_updated}</div>
+              <div>Записей об остатках: <strong>{result.stock_rows}</strong></div>
+            </div>
+          )}
+        </div>
+        <Button onClick={run} disabled={busy} className="gap-1.5">
+          {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
+          {busy ? "Синхронизация…" : "Синхронизировать сейчас"}
+        </Button>
+      </div>
+    </Card>
+  );
+}
+
 
 function Row({ col, required, label, desc, ex }: { col: string; required: boolean; label: string; desc: string; ex: string }) {
   return (
