@@ -14,6 +14,9 @@ import { useCart } from "@/hooks/use-cart";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/catalog")({
+  validateSearch: (search: Record<string, unknown>): { q?: string } => ({
+    q: typeof search.q === "string" ? search.q : undefined,
+  }),
   head: () => ({
     meta: [
       { title: "Каталог запчастей для китайской спецтехники — РДЭ" },
