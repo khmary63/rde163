@@ -124,7 +124,7 @@ export const submitOrder = createServerFn({ method: "POST" })
       product_name: r.product_name,
       product_sku: r.product_sku,
       product_brand: r.product_brand,
-      warehouse_name: warehouseMap.get(r.warehouse_id)?.name ?? r.warehouse_id,
+      warehouse_name: r.backorder ? "Под заказ" : (warehouseMap.get(r.warehouse_id)?.name ?? r.warehouse_id),
       qty: r.qty,
       unit_price: r.unit_price,
       line_total: r.line_total,
@@ -142,13 +142,23 @@ export const submitOrder = createServerFn({ method: "POST" })
     });
 
     const warehouseCounts = new Map<string, number>();
-    for (const it of data.items) {
-      const wname = warehouseMap.get(it.warehouse_id)?.name ?? it.warehouse_id;
+    let backorderCount = 0;
+    for (const r of priced) {
+      if (r.backorder) {
+        backorderCount += 1;
+        continue;
+      }
+      const wname = warehouseMap.get(r.warehouse_id)?.name ?? r.warehouse_id;
       warehouseCounts.set(wname, (warehouseCounts.get(wname) ?? 0) + 1);
     }
-    const warehousesLine = Array.from(warehouseCounts.entries())
-      .map(([name, cnt]) => (warehouseCounts.size > 1 ? `${name} (${cnt})` : name))
-      .join(", ");
+    const parts: string[] = [];
+    for (const [name, cnt] of warehouseCounts.entries()) {
+      parts.push(warehouseCounts.size + (backorderCount > 0 ? 1 : 0) > 1 ? `${name} (${cnt})` : name);
+    }
+    if (backorderCount > 0) {
+      parts.push(backorderCount > 1 || warehouseCounts.size > 0 ? `на заказ (${backorderCount})` : "на заказ");
+    }
+    const warehousesLine = parts.join(", ");
 
     const lines = [
       "📦 Новая заявка РДЭ",
