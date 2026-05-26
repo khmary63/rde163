@@ -340,7 +340,10 @@ function CatalogUploadPage() {
         </div>
       </div>
 
+      <GoogleSheetsSyncCard onDone={() => { qc.invalidateQueries({ queryKey: ["catalog-stats"] }); qc.invalidateQueries({ queryKey: ["warehouses-admin"] }); }} />
+
       {/* Spec */}
+
       <Card className="p-5">
         <h2 className="font-display text-sm uppercase tracking-wider text-muted-foreground">Формат файла</h2>
         <p className="mt-2 text-sm">Принимаются файлы <strong>Excel (.xlsx, .xls)</strong> и <strong>CSV</strong> (UTF-8, разделитель — запятая или точка с запятой). Первая строка — заголовки.</p>
