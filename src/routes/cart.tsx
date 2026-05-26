@@ -32,14 +32,18 @@ function CartPage() {
   const [notes, setNotes] = useState("");
   const [grouping, setGrouping] = useState<"single" | "per_warehouse">("single");
   const [submitting, setSubmitting] = useState(false);
-  const [done, setDone] = useState<{ number: string } | null>(null);
+  const [done, setDone] = useState<{ number: string; hadBackorder: boolean } | null>(null);
+
+  const hasBackorder = useMemo(() => items.some((it) => it.backorder), [items]);
 
   const groups = useMemo(() => {
-    const map = new Map<string, { warehouseName: string; items: typeof items }>();
+    const map = new Map<string, { warehouseName: string; items: typeof items; backorder: boolean }>();
     for (const it of items) {
-      const g = map.get(it.warehouseId) ?? { warehouseName: it.warehouseName, items: [] };
+      const key = it.backorder ? "__backorder__" : it.warehouseId;
+      const name = it.backorder ? "Под заказ" : it.warehouseName;
+      const g = map.get(key) ?? { warehouseName: name, items: [], backorder: !!it.backorder };
       g.items.push(it);
-      map.set(it.warehouseId, g);
+      map.set(key, g);
     }
     return Array.from(map.entries()).map(([warehouseId, v]) => ({ warehouseId, ...v }));
   }, [items]);
