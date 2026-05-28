@@ -166,7 +166,7 @@ function CartPage() {
                             <input
                               type="number"
                               min={1}
-                              max={it.maxQty}
+                              max={it.backorder ? undefined : it.maxQty}
                               value={it.qty}
                               onChange={(e) => setQty(it.productId, it.warehouseId, Number(e.target.value) || 1)}
                               className="w-14 border-x border-border bg-transparent py-1 text-center text-sm focus:outline-none"
@@ -174,13 +174,15 @@ function CartPage() {
                             <button
                               className="px-2 py-1.5 hover:bg-surface disabled:opacity-40"
                               onClick={() => setQty(it.productId, it.warehouseId, it.qty + 1)}
-                              disabled={it.qty >= it.maxQty}
+                              disabled={!it.backorder && it.qty >= it.maxQty}
                               aria-label="Увеличить"
                             >
                               <Plus className="h-3.5 w-3.5" />
                             </button>
                           </div>
-                          <div className="mt-1 text-[11px] text-muted-foreground">макс. {it.maxQty}</div>
+                          {!it.backorder && (
+                            <div className="mt-1 text-[11px] text-muted-foreground">макс. {it.maxQty}</div>
+                          )}
                         </td>
                         <td className="px-4 py-3 text-right whitespace-nowrap">
                           <div className="font-display text-base font-semibold">
