@@ -362,7 +362,7 @@ function HomePage() {
             </h2>
             <p className="text-base lg:text-lg text-foreground/80 leading-relaxed max-w-2xl">
               Региональный менеджер по продажам и администратор магазина.<br />
-              Подберёт оригинал или аналог, рассчитает персональную цену и логистику до вашего города.
+              Подберёт оригинал или аналог, рассчитает персональную цену.
             </p>
 
             <div className="grid sm:grid-cols-2 gap-4 pt-2 max-w-2xl">
