@@ -431,7 +431,7 @@ function CatalogPage() {
                                     price: Number(p.base_price),
                                     warehouseId: fallbackWh.id,
                                     warehouseName: "Под заказ",
-                                    maxQty: 99,
+                                    maxQty: Number.MAX_SAFE_INTEGER,
                                     backorder: true,
                                   });
                                   toast.success("Добавлено в корзину", {
