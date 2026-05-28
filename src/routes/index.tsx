@@ -76,12 +76,12 @@ function HomePage() {
         <Corner className="top-4 right-4" pos="tr" color="brand" />
 
 
-        <div className="relative mx-auto max-w-[1480px] px-6 pt-20 pb-32 lg:pt-28 lg:pb-40">
+        <div className="relative mx-auto max-w-[1480px] px-6 pt-4 pb-32 lg:pt-6 lg:pb-40">
           {/* Метка-чип перенесена в карточку счётчика ниже */}
 
 
           {/* Поисковая строка — наверху, сразу под чипом */}
-          <div className="mt-8 w-full md:w-2/3 mx-auto">
+          <div className="w-full md:w-2/3 mx-auto">
             <div className="flex flex-col sm:flex-row gap-2">
               <div className="flex-1 flex items-center gap-3 rounded-none border-b-2 border-foreground bg-background/80 backdrop-blur px-4 h-16 focus-within:border-accent-orange transition-colors">
                 <span className="font-mono text-xs text-accent-orange tracking-widest font-bold">01</span>
