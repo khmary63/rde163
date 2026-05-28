@@ -186,8 +186,8 @@ function CatalogPage() {
 
   const [brandIds, setBrandIds] = useState<string[]>([]);
   const [warehouseIds, setWarehouseIds] = useState<string[]>([]);
-  const [originality, setOriginality] = useState<Filters["originality"]>("original");
-  const [inStockOnly, setInStockOnly] = useState(true);
+  const [originality, setOriginality] = useState<Filters["originality"]>("all");
+  const [inStockOnly, setInStockOnly] = useState(false);
   const [page, setPage] = useState(0);
   const cart = useCart();
 
