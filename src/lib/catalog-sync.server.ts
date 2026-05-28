@@ -90,33 +90,25 @@ export async function runCatalogSync(trigger: "manual" | "cron" = "manual"): Pro
     }
 
     // ---- 2. Warehouses -------------------------------------------------
-    // Sheet column G ("Статус", index 6) is used as the warehouse name
-    // (e.g. "Китай", "Россия"). These are technical/internal warehouses —
-    // they are NOT shown to end customers in the public catalog
-    // (is_public=false). The 9 real customer-facing warehouses are managed
-    // manually in the admin panel.
-    const whNames = new Set<string>();
-    for (const r of rows) {
-      const w = String(r[6] ?? "").trim();
-      if (w) whNames.add(w);
-    }
-    const { data: existingWh } = await supabaseAdmin.from("warehouses").select("id, name, code");
+    // Warehouses are NEVER auto-created from the sheet. There are only
+    // 9 real customer-facing warehouses + the "Китай" warehouse (means
+    // "out of stock, on order from China"). All of them are added manually
+    // by managers in the admin panel. Rows referencing warehouse names that
+    // are not present in the DB are silently skipped for the stock step.
+    const { data: existingWh } = await supabaseAdmin
+      .from("warehouses")
+      .select("id, name, code");
     const whMap = new Map<string, string>(
-      (existingWh ?? []).map((w) => [w.name.toLowerCase(), w.id]),
+      (existingWh ?? []).map((w) => [w.name.trim().toLowerCase(), w.id]),
     );
-    const newWh = [...whNames]
-      .filter((n) => !whMap.has(n.toLowerCase()))
-      .map((n, i) => ({
-        name: n,
-        code: `gs-${slugify(n)}-${Date.now().toString(36).slice(-4)}-${i}`,
-        is_active: true,
-        is_public: false,
-      }));
-    if (newWh.length) {
-      const { data: ins, error } = await supabaseAdmin.from("warehouses").insert(newWh).select("id, name");
-      if (error) throw new Error(`warehouses insert: ${error.message}`);
-      for (const w of ins ?? []) whMap.set(w.name.toLowerCase(), w.id);
-    }
+    // Detect the "Китай" warehouse — stock rows pointing to it are
+    // recorded as "expected" (ожидается / на заказ), not "in_stock".
+    const chinaWhId =
+      whMap.get("китай") ??
+      whMap.get("china") ??
+      null;
+    const unknownWh = new Set<string>();
+
 
     // ---- 3. Aggregate --------------------------------------------------
     const products = new Map<string, {
@@ -148,8 +140,11 @@ export async function runCatalogSync(trigger: "manual" | "cron" = "manual"): Pro
         if (whId) {
           const k2 = `${key}::${whId}`;
           stockAgg.set(k2, (stockAgg.get(k2) ?? 0) + free);
+        } else {
+          unknownWh.add(whName);
         }
       }
+
     }
 
     // ---- 4. Products upsert -------------------------------------------
@@ -231,7 +226,13 @@ export async function runCatalogSync(trigger: "manual" | "cron" = "manual"): Pro
         const [brandId, sku, whId] = k.split("::");
         const pid = prodIdMap.get(`${brandId}::${sku}`);
         if (!pid) continue;
-        stockRows.push({ product_id: pid, warehouse_id: whId, qty, status: qty > 0 ? "in_stock" : "out" });
+        const isChina = chinaWhId && whId === chinaWhId;
+        stockRows.push({
+          product_id: pid,
+          warehouse_id: whId,
+          qty,
+          status: isChina ? "expected" : qty > 0 ? "in_stock" : "out",
+        });
       }
       for (let i = 0; i < stockRows.length; i += CHUNK) {
         const slice = stockRows.slice(i, i + CHUNK);
@@ -245,7 +246,7 @@ export async function runCatalogSync(trigger: "manual" | "cron" = "manual"): Pro
       rows_total: rows.length,
       rows_skipped: skipped,
       brands_added: newBrands.length,
-      warehouses_added: newWh.length,
+      warehouses_added: 0,
       products_inserted: inserted,
       products_updated: updated,
       stock_rows: stockReplaced,
@@ -259,8 +260,12 @@ export async function runCatalogSync(trigger: "manual" | "cron" = "manual"): Pro
           finished_at: new Date().toISOString(),
           rows_processed: rows.length,
           rows_failed: skipped,
-          message: `OK (${trigger}): ${inserted} новых, ${updated} обновлено, ${stockReplaced} остатков`,
-          details: { ...summary },
+          message:
+            `OK (${trigger}): ${inserted} новых, ${updated} обновлено, ${stockReplaced} остатков` +
+            (unknownWh.size
+              ? `. Пропущены неизвестные склады: ${[...unknownWh].join(", ")} (добавьте вручную в админке)`
+              : ""),
+          details: { ...summary, unknown_warehouses: [...unknownWh] },
         })
         .eq("id", logId);
     }
