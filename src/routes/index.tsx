@@ -8,8 +8,6 @@ import { LiveStockTicker } from "@/components/site/LiveStockTicker";
 import { HudCorner as Corner } from "@/components/site/HudCorner";
 import heroImage from "@/assets/hero-hitech.jpg";
 import sitrakTruck1 from "@/assets/sitrak-truck-1.jpg";
-import sitrakTruck2 from "@/assets/sitrak-truck-2.jpg";
-import sitrakFleet from "@/assets/sitrak-fleet.png";
 import russiaMap from "@/assets/russia-map.png";
 import warehouseSamara from "@/assets/warehouse-samara.jpg";
 import warehouseSpb from "@/assets/warehouse-spb.jpg";
