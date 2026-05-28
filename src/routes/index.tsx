@@ -507,14 +507,6 @@ function HomePage() {
         </div>
       </section>
 
-      {/* Технические плашки */}
-      <section className="border-t border-border bg-surface/40">
-        <div className="mx-auto max-w-[1400px] px-4 py-6 flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-xs font-mono text-muted-foreground uppercase tracking-wider">
-          <span>{"\n"}</span>
-          <span>{"\n"}</span>
-          <span>{"\n"}</span>
-        </div>
-      </section>
     </div>
   );
 }
