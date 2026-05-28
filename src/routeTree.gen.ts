@@ -12,11 +12,13 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as UnsubscribeRouteImport } from './routes/unsubscribe'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as ReviewsRouteImport } from './routes/reviews'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as RequisitesRouteImport } from './routes/requisites'
 import { Route as RegisterRouteImport } from './routes/register'
 import { Route as PrivacyPolicyRouteImport } from './routes/privacy-policy'
 import { Route as PersonalDataRouteImport } from './routes/personal-data'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as FaqRouteImport } from './routes/faq'
 import { Route as ContactsRouteImport } from './routes/contacts'
 import { Route as CertificatesRouteImport } from './routes/certificates'
@@ -64,6 +66,11 @@ const ReviewsRoute = ReviewsRouteImport.update({
   path: '/reviews',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const RequisitesRoute = RequisitesRouteImport.update({
   id: '/requisites',
   path: '/requisites',
@@ -87,6 +94,11 @@ const PersonalDataRoute = PersonalDataRouteImport.update({
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
+  id: '/forgot-password',
+  path: '/forgot-password',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FaqRoute = FaqRouteImport.update({
@@ -258,11 +270,13 @@ export interface FileRoutesByFullPath {
   '/certificates': typeof CertificatesRoute
   '/contacts': typeof ContactsRoute
   '/faq': typeof FaqRoute
+  '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
   '/personal-data': typeof PersonalDataRoute
   '/privacy-policy': typeof PrivacyPolicyRoute
   '/register': typeof RegisterRoute
   '/requisites': typeof RequisitesRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/reviews': typeof ReviewsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/unsubscribe': typeof UnsubscribeRoute
@@ -298,11 +312,13 @@ export interface FileRoutesByTo {
   '/certificates': typeof CertificatesRoute
   '/contacts': typeof ContactsRoute
   '/faq': typeof FaqRoute
+  '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
   '/personal-data': typeof PersonalDataRoute
   '/privacy-policy': typeof PrivacyPolicyRoute
   '/register': typeof RegisterRoute
   '/requisites': typeof RequisitesRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/reviews': typeof ReviewsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/unsubscribe': typeof UnsubscribeRoute
@@ -340,11 +356,13 @@ export interface FileRoutesById {
   '/certificates': typeof CertificatesRoute
   '/contacts': typeof ContactsRoute
   '/faq': typeof FaqRoute
+  '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
   '/personal-data': typeof PersonalDataRoute
   '/privacy-policy': typeof PrivacyPolicyRoute
   '/register': typeof RegisterRoute
   '/requisites': typeof RequisitesRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/reviews': typeof ReviewsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/unsubscribe': typeof UnsubscribeRoute
@@ -383,11 +401,13 @@ export interface FileRouteTypes {
     | '/certificates'
     | '/contacts'
     | '/faq'
+    | '/forgot-password'
     | '/login'
     | '/personal-data'
     | '/privacy-policy'
     | '/register'
     | '/requisites'
+    | '/reset-password'
     | '/reviews'
     | '/sitemap.xml'
     | '/unsubscribe'
@@ -423,11 +443,13 @@ export interface FileRouteTypes {
     | '/certificates'
     | '/contacts'
     | '/faq'
+    | '/forgot-password'
     | '/login'
     | '/personal-data'
     | '/privacy-policy'
     | '/register'
     | '/requisites'
+    | '/reset-password'
     | '/reviews'
     | '/sitemap.xml'
     | '/unsubscribe'
@@ -464,11 +486,13 @@ export interface FileRouteTypes {
     | '/certificates'
     | '/contacts'
     | '/faq'
+    | '/forgot-password'
     | '/login'
     | '/personal-data'
     | '/privacy-policy'
     | '/register'
     | '/requisites'
+    | '/reset-password'
     | '/reviews'
     | '/sitemap.xml'
     | '/unsubscribe'
@@ -506,11 +530,13 @@ export interface RootRouteChildren {
   CertificatesRoute: typeof CertificatesRoute
   ContactsRoute: typeof ContactsRoute
   FaqRoute: typeof FaqRoute
+  ForgotPasswordRoute: typeof ForgotPasswordRoute
   LoginRoute: typeof LoginRoute
   PersonalDataRoute: typeof PersonalDataRoute
   PrivacyPolicyRoute: typeof PrivacyPolicyRoute
   RegisterRoute: typeof RegisterRoute
   RequisitesRoute: typeof RequisitesRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
   ReviewsRoute: typeof ReviewsRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   UnsubscribeRoute: typeof UnsubscribeRoute
@@ -549,6 +575,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ReviewsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/requisites': {
       id: '/requisites'
       path: '/requisites'
@@ -582,6 +615,13 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/forgot-password': {
+      id: '/forgot-password'
+      path: '/forgot-password'
+      fullPath: '/forgot-password'
+      preLoaderRoute: typeof ForgotPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/faq': {
@@ -866,11 +906,13 @@ const rootRouteChildren: RootRouteChildren = {
   CertificatesRoute: CertificatesRoute,
   ContactsRoute: ContactsRoute,
   FaqRoute: FaqRoute,
+  ForgotPasswordRoute: ForgotPasswordRoute,
   LoginRoute: LoginRoute,
   PersonalDataRoute: PersonalDataRoute,
   PrivacyPolicyRoute: PrivacyPolicyRoute,
   RegisterRoute: RegisterRoute,
   RequisitesRoute: RequisitesRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
   ReviewsRoute: ReviewsRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   UnsubscribeRoute: UnsubscribeRoute,
