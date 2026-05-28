@@ -36,7 +36,7 @@ export function SiteHeader() {
           </div>
           <div className="flex items-center gap-3">
             
-            <a href="tel:+79372194926" aria-label="Позвонить менеджеру" className="hover:text-brand transition-colors"><MessageCircle className="h-3.5 w-3.5" /></a>
+            <a href="https://max.ru/u/f9LHodD0cOLtOegQuRGbTfeI0oQqDRMHqPnuwG3FVK8EO9mm8Mgn5nncB-k" target="_blank" rel="noopener noreferrer" aria-label="Написать менеджеру в Max" className="hover:text-brand transition-colors"><MessageCircle className="h-3.5 w-3.5" /></a>
             <span className="hidden md:inline">Пн–Пт 8:00–19:00 МСК</span>
           </div>
         </div>
