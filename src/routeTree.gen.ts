@@ -17,6 +17,7 @@ import { Route as RegisterRouteImport } from './routes/register'
 import { Route as PrivacyPolicyRouteImport } from './routes/privacy-policy'
 import { Route as PersonalDataRouteImport } from './routes/personal-data'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as FaqRouteImport } from './routes/faq'
 import { Route as ContactsRouteImport } from './routes/contacts'
 import { Route as CertificatesRouteImport } from './routes/certificates'
@@ -87,6 +88,11 @@ const PersonalDataRoute = PersonalDataRouteImport.update({
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
+  id: '/forgot-password',
+  path: '/forgot-password',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FaqRoute = FaqRouteImport.update({
@@ -258,6 +264,7 @@ export interface FileRoutesByFullPath {
   '/certificates': typeof CertificatesRoute
   '/contacts': typeof ContactsRoute
   '/faq': typeof FaqRoute
+  '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
   '/personal-data': typeof PersonalDataRoute
   '/privacy-policy': typeof PrivacyPolicyRoute
@@ -298,6 +305,7 @@ export interface FileRoutesByTo {
   '/certificates': typeof CertificatesRoute
   '/contacts': typeof ContactsRoute
   '/faq': typeof FaqRoute
+  '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
   '/personal-data': typeof PersonalDataRoute
   '/privacy-policy': typeof PrivacyPolicyRoute
@@ -340,6 +348,7 @@ export interface FileRoutesById {
   '/certificates': typeof CertificatesRoute
   '/contacts': typeof ContactsRoute
   '/faq': typeof FaqRoute
+  '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
   '/personal-data': typeof PersonalDataRoute
   '/privacy-policy': typeof PrivacyPolicyRoute
@@ -383,6 +392,7 @@ export interface FileRouteTypes {
     | '/certificates'
     | '/contacts'
     | '/faq'
+    | '/forgot-password'
     | '/login'
     | '/personal-data'
     | '/privacy-policy'
@@ -423,6 +433,7 @@ export interface FileRouteTypes {
     | '/certificates'
     | '/contacts'
     | '/faq'
+    | '/forgot-password'
     | '/login'
     | '/personal-data'
     | '/privacy-policy'
@@ -464,6 +475,7 @@ export interface FileRouteTypes {
     | '/certificates'
     | '/contacts'
     | '/faq'
+    | '/forgot-password'
     | '/login'
     | '/personal-data'
     | '/privacy-policy'
@@ -506,6 +518,7 @@ export interface RootRouteChildren {
   CertificatesRoute: typeof CertificatesRoute
   ContactsRoute: typeof ContactsRoute
   FaqRoute: typeof FaqRoute
+  ForgotPasswordRoute: typeof ForgotPasswordRoute
   LoginRoute: typeof LoginRoute
   PersonalDataRoute: typeof PersonalDataRoute
   PrivacyPolicyRoute: typeof PrivacyPolicyRoute
@@ -582,6 +595,13 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/forgot-password': {
+      id: '/forgot-password'
+      path: '/forgot-password'
+      fullPath: '/forgot-password'
+      preLoaderRoute: typeof ForgotPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/faq': {
@@ -866,6 +886,7 @@ const rootRouteChildren: RootRouteChildren = {
   CertificatesRoute: CertificatesRoute,
   ContactsRoute: ContactsRoute,
   FaqRoute: FaqRoute,
+  ForgotPasswordRoute: ForgotPasswordRoute,
   LoginRoute: LoginRoute,
   PersonalDataRoute: PersonalDataRoute,
   PrivacyPolicyRoute: PrivacyPolicyRoute,
