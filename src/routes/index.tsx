@@ -258,7 +258,7 @@ function HomePage() {
             </h2>
           </div>
           <Button asChild variant="outline" className="rounded-none border-foreground hover:bg-foreground hover:text-background h-12 px-6">
-            <a href="tel:+79372194926" target="_blank" rel="noopener noreferrer">Связаться <ArrowUpRight className="ml-2 h-4 w-4" /></a>
+            <a href="https://max.ru/u/f9LHodD0cOLtOegQuRGbTfeI0oQqDRMHqPnuwG3FVK8EO9mm8Mgn5nncB-k" target="_blank" rel="noopener noreferrer">Связаться <ArrowUpRight className="ml-2 h-4 w-4" /></a>
           </Button>
         </div>
 
