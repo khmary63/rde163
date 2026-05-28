@@ -16,6 +16,7 @@ function RegisterPage() {
   const { user } = useAuth();
   const [type, setType] = useState<"individual" | "company">("company");
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [form, setForm] = useState({
     email: "",
     password: "",
