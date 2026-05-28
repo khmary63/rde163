@@ -135,7 +135,7 @@ function HomePage() {
             <div className="flex flex-col gap-1 bg-background/85 backdrop-blur-md border border-border px-6 py-5 shadow-[0_20px_60px_-20px_oklch(0.20_0.013_250/0.35)]">
             <div className="text-[10px] uppercase tracking-[0.3em] text-foreground/70">в реальном времени</div>
             <div className="font-display text-6xl font-bold tabular-nums text-accent-orange leading-none flex items-baseline justify-end gap-2">
-              <LiveStockCounter fallback={5663} />
+              <LiveStockCounter fallback={6142} />
               <span className="relative flex h-2 w-2 self-center" aria-hidden>
                 <span className="absolute inset-0 rounded-full bg-accent-orange animate-ping opacity-75" />
                 <span className="relative inline-flex h-2 w-2 rounded-full bg-accent-orange" />
