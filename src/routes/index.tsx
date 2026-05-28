@@ -90,48 +90,48 @@ function HomePage() {
             <span className="text-accent-orange font-bold">8 СКЛАДОВ ОНЛАЙН</span>
           </div>
 
+          {/* Поисковая строка — наверху, сразу под чипом */}
+          <div className="mt-8 max-w-3xl">
+            <div className="flex flex-col sm:flex-row gap-2">
+              <div className="flex-1 flex items-center gap-3 rounded-none border-b-2 border-foreground bg-background/80 backdrop-blur px-4 h-16 focus-within:border-accent-orange transition-colors">
+                <span className="font-mono text-xs text-accent-orange tracking-widest font-bold">01</span>
+                <span className="h-6 w-px bg-border" />
+                <Search className="h-5 w-5 text-foreground shrink-0" />
+                <input
+                  type="text"
+                  placeholder="Артикул, OEM-номер или название"
+                  className="flex-1 bg-transparent outline-none text-base placeholder:text-muted-foreground/60"
+                />
+              </div>
+              <Button asChild size="lg" className="h-16 px-8 rounded-none bg-accent-orange text-accent-orange-foreground hover:bg-foreground hover:text-background font-display tracking-wide text-base group shadow-[0_15px_40px_-10px_oklch(0.72_0.19_45/0.6)]">
+                <Link to="/catalog">
+                  НАЙТИ
+                  <ArrowUpRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                </Link>
+              </Button>
+            </div>
+            <div className="mt-4 flex flex-wrap gap-x-6 gap-y-2 text-xs font-mono text-muted-foreground uppercase tracking-wider">
+              <span><span className="text-accent-orange font-bold">⌘K</span> быстрый поиск</span>
+              <span><span className="text-accent-orange font-bold">↵</span> отправить</span>
+              <span><span className="text-brand font-bold">●</span> 6700 SKU ИНДЕКСИРОВАНО</span>
+            </div>
+          </div>
+
           {/* Гигантский заголовок */}
-          <h1 className="mt-10 font-display font-bold leading-[0.85] tracking-tight">
+          <h1 className="mt-12 font-display font-bold leading-[0.85] tracking-tight">
             <span className="block text-[clamp(3.5rem,9vw,9.5rem)]">ЗАПЧАСТИ</span>
             <span className="block text-[clamp(2.2rem,5.5vw,5.5rem)] text-muted-foreground/70 mt-2">
               SITRAK <span className="text-accent-orange font-extrabold">/</span> HOWO
             </span>
           </h1>
 
-          {/* Подзаголовок + поиск */}
-          <div className="mt-12 max-w-2xl">
-            <div>
-              <p className="text-base lg:text-lg text-foreground/80 max-w-2xl leading-relaxed">
-                <span className="font-mono text-accent-orange font-bold">→</span> Официальный дистрибьютор запасных частей SITRAK и HOWO в Российской Федерации · Оригинал и аналоги · Введите артикул — получите наличие, склад и цену с вашей договорной скидкой.
-              </p>
-
-              {/* Поисковая строка */}
-              <div className="mt-7 flex flex-col sm:flex-row gap-2 max-w-2xl">
-                <div className="flex-1 flex items-center gap-3 rounded-none border-b-2 border-foreground bg-background/80 backdrop-blur px-4 h-16 focus-within:border-accent-orange transition-colors">
-                  <span className="font-mono text-xs text-accent-orange tracking-widest font-bold">01</span>
-                  <span className="h-6 w-px bg-border" />
-                  <Search className="h-5 w-5 text-foreground shrink-0" />
-                  <input
-                    type="text"
-                    placeholder="Артикул, OEM-номер или название"
-                    className="flex-1 bg-transparent outline-none text-base placeholder:text-muted-foreground/60"
-                  />
-                </div>
-                <Button asChild size="lg" className="h-16 px-8 rounded-none bg-accent-orange text-accent-orange-foreground hover:bg-foreground hover:text-background font-display tracking-wide text-base group shadow-[0_15px_40px_-10px_oklch(0.72_0.19_45/0.6)]">
-                  <Link to="/catalog">
-                    НАЙТИ
-                    <ArrowUpRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-                  </Link>
-                </Button>
-              </div>
-
-              <div className="mt-5 flex flex-wrap gap-x-6 gap-y-2 text-xs font-mono text-muted-foreground uppercase tracking-wider">
-                <span><span className="text-accent-orange font-bold">⌘K</span> быстрый поиск</span>
-                <span><span className="text-accent-orange font-bold">↵</span> отправить</span>
-                <span><span className="text-brand font-bold">●</span> 6700 SKU ИНДЕКСИРОВАНО</span>
-              </div>
-            </div>
+          {/* Подзаголовок */}
+          <div className="mt-8 max-w-2xl">
+            <p className="text-base lg:text-lg text-foreground/80 leading-relaxed">
+              <span className="font-mono text-accent-orange font-bold">→</span> Официальный дистрибьютор запасных частей SITRAK и HOWO в Российской Федерации · Оригинал и аналоги · Введите артикул — получите наличие, склад и цену с вашей договорной скидкой.
+            </p>
           </div>
+
 
           {/* Боковая статистика — позиционирована над задним колесом грузовика */}
           <div className="hidden lg:flex absolute right-[6%] bottom-[14%] flex-col gap-1 font-mono text-right bg-background/85 backdrop-blur-md border border-border px-6 py-5 shadow-[0_20px_60px_-20px_oklch(0.20_0.013_250/0.35)]">
