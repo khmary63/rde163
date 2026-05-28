@@ -79,16 +79,8 @@ function HomePage() {
 
 
         <div className="relative mx-auto max-w-[1480px] px-6 pt-20 pb-32 lg:pt-28 lg:pb-40">
-          {/* Метка-чип */}
-          <div className="inline-flex items-center gap-3 rounded-full border-2 border-accent-orange bg-background/90 backdrop-blur px-4 py-1.5 text-xs font-mono tracking-widest uppercase shadow-[0_8px_30px_-10px_oklch(0.72_0.19_45/0.6)]">
-            <span className="relative flex h-2 w-2">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent-orange opacity-75" />
-              <span className="relative inline-flex h-2 w-2 rounded-full bg-accent-orange" />
-            </span>
-            <span className="text-foreground">live</span>
-            <span className="h-3 w-px bg-border" />
-            <span className="text-accent-orange font-bold">8 СКЛАДОВ ОНЛАЙН</span>
-          </div>
+          {/* Метка-чип перенесена в карточку счётчика ниже */}
+
 
           {/* Поисковая строка — наверху, сразу под чипом */}
           <div className="mt-8 w-full md:w-2/3 mx-auto">
