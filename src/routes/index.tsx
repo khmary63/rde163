@@ -91,7 +91,7 @@ function HomePage() {
           </div>
 
           {/* Поисковая строка — наверху, сразу под чипом */}
-          <div className="mt-8 max-w-3xl">
+          <div className="mt-8 w-full md:w-2/3 mx-auto">
             <div className="flex flex-col sm:flex-row gap-2">
               <div className="flex-1 flex items-center gap-3 rounded-none border-b-2 border-foreground bg-background/80 backdrop-blur px-4 h-16 focus-within:border-accent-orange transition-colors">
                 <span className="font-mono text-xs text-accent-orange tracking-widest font-bold">01</span>
