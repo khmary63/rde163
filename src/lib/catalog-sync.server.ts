@@ -140,8 +140,11 @@ export async function runCatalogSync(trigger: "manual" | "cron" = "manual"): Pro
         if (whId) {
           const k2 = `${key}::${whId}`;
           stockAgg.set(k2, (stockAgg.get(k2) ?? 0) + free);
+        } else {
+          unknownWh.add(whName);
         }
       }
+
     }
 
     // ---- 4. Products upsert -------------------------------------------
