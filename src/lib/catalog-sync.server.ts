@@ -246,7 +246,7 @@ export async function runCatalogSync(trigger: "manual" | "cron" = "manual"): Pro
       rows_total: rows.length,
       rows_skipped: skipped,
       brands_added: newBrands.length,
-      warehouses_added: newWh.length,
+      warehouses_added: 0,
       products_inserted: inserted,
       products_updated: updated,
       stock_rows: stockReplaced,
