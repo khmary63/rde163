@@ -1,6 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
@@ -15,6 +16,7 @@ function RegisterPage() {
   const { user } = useAuth();
   const [type, setType] = useState<"individual" | "company">("company");
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [form, setForm] = useState({
     email: "",
     password: "",
@@ -99,7 +101,12 @@ function RegisterPage() {
           <input required value={form.full_name} onChange={set("full_name")} placeholder={type === "company" ? "ФИО контактного лица" : "ФИО"} className="w-full h-11 rounded-md border border-input bg-background px-3 text-sm focus:outline-none focus:border-brand" />
           <input required type="tel" value={form.phone} onChange={set("phone")} placeholder="Телефон" className="w-full h-11 rounded-md border border-input bg-background px-3 text-sm focus:outline-none focus:border-brand" />
           <input required type="email" value={form.email} onChange={set("email")} placeholder="Email" className="w-full h-11 rounded-md border border-input bg-background px-3 text-sm focus:outline-none focus:border-brand" />
-          <input required type="password" value={form.password} onChange={set("password")} placeholder="Пароль (мин. 6 символов)" className="w-full h-11 rounded-md border border-input bg-background px-3 text-sm focus:outline-none focus:border-brand" />
+          <div className="relative">
+            <input required type={showPassword ? "text" : "password"} value={form.password} onChange={set("password")} placeholder="Пароль (мин. 6 символов)" className="w-full h-11 rounded-md border border-input bg-background px-3 pr-10 text-sm focus:outline-none focus:border-brand" />
+            <button type="button" onClick={() => setShowPassword((s) => !s)} className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
+              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
+          </div>
           <Button type="submit" disabled={loading} className="w-full bg-brand text-brand-foreground hover:bg-brand/90">
             {loading ? "Создаём аккаунт…" : "Зарегистрироваться"}
           </Button>
