@@ -267,9 +267,9 @@ function CartPage() {
                 {submitting ? (
                   <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Отправляем…</>
                 ) : user ? (
-                  "Купить"
+                  hasBackorder ? "Заказать" : "Купить"
                 ) : (
-                  "Войти и оформить"
+                  hasBackorder ? "Войти и заказать" : "Войти и оформить"
                 )}
               </Button>
               <p className="mt-2 text-center text-[11px] text-muted-foreground">
