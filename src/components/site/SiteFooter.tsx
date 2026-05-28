@@ -54,7 +54,7 @@ export function SiteFooter() {
           </ul>
           <div className="flex items-center gap-3 pt-1">
             
-            <a href="https://wa.me/79372194926" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp" className="text-muted-foreground hover:text-brand transition-colors"><MessageCircle className="h-4 w-4" /></a>
+            <a href="tel:+79372194926" aria-label="Позвонить менеджеру" className="text-muted-foreground hover:text-brand transition-colors"><MessageCircle className="h-4 w-4" /></a>
           </div>
         </div>
       </div>
