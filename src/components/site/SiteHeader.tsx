@@ -16,15 +16,8 @@ const nav = [
 
 export function SiteHeader() {
   const [open, setOpen] = useState(false);
-  const [query, setQuery] = useState("");
-  const navigate = useNavigate();
   const { user } = useAuth();
   const { count } = useCart();
-
-  const handleSearch = (e: FormEvent) => {
-    e.preventDefault();
-    navigate({ to: "/catalog", search: { q: query.trim() || undefined } });
-  };
 
   return (
     <header className="sticky top-0 z-40 border-b border-border/60 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
