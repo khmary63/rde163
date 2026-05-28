@@ -247,56 +247,6 @@ function HomePage() {
         </div>
       </section>
 
-      {/* ============== SITRAK SPOTLIGHT — яркий оранжевый блок ============== */}
-      <section className="relative border-y-2 border-foreground bg-foreground text-background overflow-hidden">
-        <div className="absolute inset-0">
-          <img src={sitrakTruck2} alt="" aria-hidden loading="lazy" className="h-full w-full object-cover opacity-40" />
-          <div className="absolute inset-0 bg-[linear-gradient(90deg,oklch(0.20_0.013_250/0.95)_0%,oklch(0.20_0.013_250/0.7)_50%,oklch(0.20_0.013_250/0.4)_100%)]" />
-          <div className="absolute -top-32 -left-32 h-[500px] w-[500px] rounded-full bg-accent-orange/40 blur-3xl" />
-        </div>
-
-        <div className="relative mx-auto max-w-[1480px] px-6 py-24 lg:py-32 grid lg:grid-cols-[1.1fr_1fr] gap-14 items-center">
-          <div className="space-y-7">
-            <div className="inline-flex items-center gap-3 border border-accent-orange bg-accent-orange/10 px-3 py-1.5 font-mono text-[11px] tracking-[0.3em] uppercase text-accent-orange">
-              <span className="h-2 w-2 rounded-full bg-accent-orange animate-pulse" />
-              / FEATURED
-            </div>
-            <h2 className="font-display font-bold leading-[0.85]">
-              <span className="block text-[clamp(3rem,8vw,8rem)] text-accent-orange">SITRAK</span>
-              <span className="block text-[clamp(1.5rem,3.5vw,3.5rem)] text-background mt-1">флагман нашего каталога</span>
-            </h2>
-            <p className="text-lg text-background/80 max-w-xl leading-relaxed">
-              Важно! Если Вы ищете оригинальные запчасти на SITRAK и HOWO, обратите внимание на бренд CNHTC. В ООО "Русский дом экспорта" оригинальные запчасти идут именно под этим брендом.
-            </p>
-
-            <div className="grid grid-cols-3 gap-4 pt-2">
-              {[
-                { v: "2,5K+", l: "SKU" },
-                { v: "98%", l: "со склада" },
-                { v: "1–7", l: "дня доставка" },
-              ].map((s) => (
-                <div key={s.l} className="border-l-2 border-accent-orange pl-4">
-                  <div className="font-display text-3xl lg:text-4xl font-bold text-accent-orange tabular-nums">{s.v}</div>
-                  <div className="text-xs text-background/70 mt-1">{s.l}</div>
-                </div>
-              ))}
-            </div>
-
-            <div className="flex flex-wrap gap-3 pt-2">
-              <Button asChild size="lg" className="rounded-none bg-accent-orange text-accent-orange-foreground hover:bg-background hover:text-foreground font-display tracking-wide px-7 text-base shadow-[0_15px_40px_-10px_oklch(0.72_0.19_45/0.6)]">
-                <Link to="/catalog">Каталог <ArrowUpRight className="ml-2 h-5 w-5" /></Link>
-              </Button>
-            </div>
-          </div>
-
-          <div className="relative">
-            <div className="absolute -top-3 -left-3 right-3 bottom-3 border-2 border-accent-orange" />
-            <div className="relative overflow-hidden">
-              <img src={sitrakFleet} alt="Линейка SITRAK" loading="lazy" className="w-full h-auto object-cover" />
-            </div>
-          </div>
-        </div>
-      </section>
 
       {/* ============== БЛОК 04 · Гарантии и сервис + галерея складов ============== */}
       <section className="mx-auto max-w-[1480px] px-6 py-24 lg:py-32">
