@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "@tanstack/react-router";
+import { Link } from "@tanstack/react-router";
 import { Phone, MessageCircle, User, ShoppingCart, Menu, X } from "lucide-react";
 import { useState } from "react";
 import { adminContact } from "@/data/mock";
