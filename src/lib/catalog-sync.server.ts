@@ -226,7 +226,13 @@ export async function runCatalogSync(trigger: "manual" | "cron" = "manual"): Pro
         const [brandId, sku, whId] = k.split("::");
         const pid = prodIdMap.get(`${brandId}::${sku}`);
         if (!pid) continue;
-        stockRows.push({ product_id: pid, warehouse_id: whId, qty, status: qty > 0 ? "in_stock" : "out" });
+        const isChina = chinaWhId && whId === chinaWhId;
+        stockRows.push({
+          product_id: pid,
+          warehouse_id: whId,
+          qty,
+          status: isChina ? "expected" : qty > 0 ? "in_stock" : "out",
+        });
       }
       for (let i = 0; i < stockRows.length; i += CHUNK) {
         const slice = stockRows.slice(i, i + CHUNK);
