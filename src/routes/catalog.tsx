@@ -209,12 +209,12 @@ function CatalogPage() {
     setSearch("");
     setBrandIds([]);
     setWarehouseIds([]);
-    setOriginality("original");
-    setInStockOnly(true);
+    setOriginality("all");
+    setInStockOnly(false);
     setPage(0);
   };
 
-  const activeCount = (search ? 1 : 0) + brandIds.length + warehouseIds.length + (originality !== "original" ? 1 : 0) + (!inStockOnly ? 1 : 0);
+  const activeCount = (search ? 1 : 0) + brandIds.length + warehouseIds.length + (originality !== "all" ? 1 : 0) + (inStockOnly ? 1 : 0);
 
   return (
     <div className="mx-auto max-w-[1400px] px-4 py-8">
