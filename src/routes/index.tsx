@@ -258,7 +258,7 @@ function HomePage() {
             </h2>
           </div>
           <Button asChild variant="outline" className="rounded-none border-foreground hover:bg-foreground hover:text-background h-12 px-6">
-            <a href="https://wa.me/79372194926" target="_blank" rel="noopener noreferrer">Связаться <ArrowUpRight className="ml-2 h-4 w-4" /></a>
+            <Link to="/contacts">Связаться <ArrowUpRight className="ml-2 h-4 w-4" /></Link>
           </Button>
         </div>
 
