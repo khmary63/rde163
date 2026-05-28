@@ -54,7 +54,7 @@ export function SiteFooter() {
           </ul>
           <div className="flex items-center gap-3 pt-1">
             
-            <a href="tel:+79372194926" aria-label="Позвонить менеджеру" className="text-muted-foreground hover:text-brand transition-colors"><MessageCircle className="h-4 w-4" /></a>
+            <a href="https://max.ru/u/f9LHodD0cOLtOegQuRGbTfeI0oQqDRMHqPnuwG3FVK8EO9mm8Mgn5nncB-k" target="_blank" rel="noopener noreferrer" aria-label="Написать менеджеру в Max" className="text-muted-foreground hover:text-brand transition-colors"><MessageCircle className="h-4 w-4" /></a>
           </div>
         </div>
       </div>
