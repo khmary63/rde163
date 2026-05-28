@@ -340,7 +340,7 @@ function HomePage() {
       </section>
 
       {/* ============== РЕГИОНАЛЬНЫЙ МЕНЕДЖЕР ============== */}
-      <section className="mx-auto max-w-[1480px] px-6 py-20 lg:py-28">
+      <section className="mx-auto max-w-[1480px] px-6 pt-10 pb-20 lg:pt-12 lg:pb-28">
         <div className="grid lg:grid-cols-12 gap-8 lg:gap-12 items-center">
           <div className="lg:col-span-4 relative">
             <div className="absolute -top-3 -left-3 right-3 bottom-3 border-2 border-accent-orange pointer-events-none" />
