@@ -186,8 +186,8 @@ function CatalogPage() {
 
   const [brandIds, setBrandIds] = useState<string[]>([]);
   const [warehouseIds, setWarehouseIds] = useState<string[]>([]);
-  const [originality, setOriginality] = useState<Filters["originality"]>("original");
-  const [inStockOnly, setInStockOnly] = useState(true);
+  const [originality, setOriginality] = useState<Filters["originality"]>("all");
+  const [inStockOnly, setInStockOnly] = useState(false);
   const [page, setPage] = useState(0);
   const cart = useCart();
 
@@ -209,12 +209,12 @@ function CatalogPage() {
     setSearch("");
     setBrandIds([]);
     setWarehouseIds([]);
-    setOriginality("original");
-    setInStockOnly(true);
+    setOriginality("all");
+    setInStockOnly(false);
     setPage(0);
   };
 
-  const activeCount = (search ? 1 : 0) + brandIds.length + warehouseIds.length + (originality !== "original" ? 1 : 0) + (!inStockOnly ? 1 : 0);
+  const activeCount = (search ? 1 : 0) + brandIds.length + warehouseIds.length + (originality !== "all" ? 1 : 0) + (inStockOnly ? 1 : 0);
 
   return (
     <div className="mx-auto max-w-[1400px] px-4 py-8">
