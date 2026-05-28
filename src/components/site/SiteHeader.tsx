@@ -1,6 +1,6 @@
-import { Link, useNavigate } from "@tanstack/react-router";
-import { Phone, MessageCircle, User, ShoppingCart, Search, Menu, X } from "lucide-react";
-import { useState, type FormEvent } from "react";
+import { Link } from "@tanstack/react-router";
+import { Phone, MessageCircle, User, ShoppingCart, Menu, X } from "lucide-react";
+import { useState } from "react";
 import { adminContact } from "@/data/mock";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
@@ -16,15 +16,8 @@ const nav = [
 
 export function SiteHeader() {
   const [open, setOpen] = useState(false);
-  const [query, setQuery] = useState("");
-  const navigate = useNavigate();
   const { user } = useAuth();
   const { count } = useCart();
-
-  const handleSearch = (e: FormEvent) => {
-    e.preventDefault();
-    navigate({ to: "/catalog", search: { q: query.trim() || undefined } });
-  };
 
   return (
     <header className="sticky top-0 z-40 border-b border-border/60 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
@@ -72,22 +65,7 @@ export function SiteHeader() {
           ))}
         </nav>
 
-        <form onSubmit={handleSearch} className="hidden md:flex flex-1 mx-4 relative">
-          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <input
-            type="search"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Поиск по артикулу, OEM, названию…"
-            className="w-full h-10 pl-9 pr-20 rounded-md border border-border bg-surface/60 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-brand/40 focus:border-brand transition-colors"
-          />
-          <button
-            type="submit"
-            className="absolute right-1 top-1/2 -translate-y-1/2 h-8 px-3 rounded text-xs font-semibold bg-brand text-brand-foreground hover:bg-brand/90 transition-colors"
-          >
-            Найти
-          </button>
-        </form>
+        <div className="flex-1" />
 
         <Link to="/cart" className="relative inline-flex h-9 w-9 items-center justify-center rounded-md hover:bg-surface transition-colors">
           <ShoppingCart className="h-5 w-5" />
