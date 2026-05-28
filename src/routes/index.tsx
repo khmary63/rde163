@@ -110,11 +110,9 @@ function HomePage() {
                 </Link>
               </Button>
             </div>
-            <div className="mt-4 flex flex-wrap gap-x-6 gap-y-2 text-xs font-mono text-muted-foreground uppercase tracking-wider">
-              <span><span className="text-accent-orange font-bold">⌘K</span> быстрый поиск</span>
-              <span><span className="text-accent-orange font-bold">↵</span> отправить</span>
-              <span><span className="text-brand font-bold">●</span> 6700 SKU ИНДЕКСИРОВАНО</span>
-            </div>
+            <p className="mt-4 text-sm lg:text-base text-foreground/85 leading-relaxed border-l-2 border-accent-orange pl-4">
+              <span className="font-bold text-accent-orange">Важно!</span> Если Вы ищете оригинальные запчасти на SITRAK и HOWO, обратите внимание на бренд <span className="font-bold">CNHTC</span>. В ООО «Русский дом экспорта» оригинальные запчасти идут именно под этим брендом.
+            </p>
           </div>
 
           {/* Гигантский заголовок */}
