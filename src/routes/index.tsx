@@ -154,7 +154,7 @@ function HomePage() {
       </section>
 
       {/* ============== BENTO: «Нашёл за 30 секунд» + сценарии ============== */}
-      <section className="relative mx-auto max-w-[1480px] px-6 py-24 lg:py-32">
+      <section className="relative mx-auto max-w-[1480px] px-6 pt-24 pb-10 lg:pt-32 lg:pb-12">
         <div className="grid lg:grid-cols-12 gap-8">
           {/* Заголовок секции */}
           <div className="lg:col-span-12 mb-2 flex items-end justify-between gap-6 flex-wrap">
@@ -249,7 +249,7 @@ function HomePage() {
 
 
       {/* ============== БЛОК 04 · Гарантии и сервис + галерея складов ============== */}
-      <section className="mx-auto max-w-[1480px] px-6 pt-24 pb-10 lg:pt-32 lg:pb-12">
+      <section className="mx-auto max-w-[1480px] px-6 pt-10 pb-10 lg:pt-12 lg:pb-12">
         <div className="flex items-end justify-between mb-12 gap-6 flex-wrap">
           <div>
             <div className="font-mono text-[11px] text-accent-blue uppercase tracking-[0.3em] mb-3">/ 04 · гарантии и сервис</div>
