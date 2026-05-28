@@ -36,7 +36,7 @@ export function SiteHeader() {
           </div>
           <div className="flex items-center gap-3">
             
-            <a href="https://wa.me/79372194926" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp" className="hover:text-brand transition-colors"><MessageCircle className="h-3.5 w-3.5" /></a>
+            <a href="tel:+79372194926" aria-label="Позвонить менеджеру" className="hover:text-brand transition-colors"><MessageCircle className="h-3.5 w-3.5" /></a>
             <span className="hidden md:inline">Пн–Пт 8:00–19:00 МСК</span>
           </div>
         </div>
