@@ -43,16 +43,15 @@ export function FeedbackWidget() {
 
   return (
     <>
-      <a
-        href="https://wa.me/79372194926"
-        target="_blank"
-        rel="noopener noreferrer"
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
         className="fixed bottom-6 right-6 z-40 flex items-center gap-2 rounded-full bg-brand px-5 py-3 text-sm font-semibold text-brand-foreground shadow-lg shadow-brand/30 hover:bg-brand/90 transition-all"
         aria-label="Связаться с менеджером"
       >
         <MessageSquare className="h-4 w-4" />
         <span className="hidden sm:inline">Связаться</span>
-      </a>
+      </button>
 
       {open && (
         <div className="fixed inset-0 z-50 flex items-end sm:items-center sm:justify-end bg-background/60 backdrop-blur-sm p-0 sm:p-6">
