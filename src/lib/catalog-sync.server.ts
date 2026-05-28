@@ -260,8 +260,12 @@ export async function runCatalogSync(trigger: "manual" | "cron" = "manual"): Pro
           finished_at: new Date().toISOString(),
           rows_processed: rows.length,
           rows_failed: skipped,
-          message: `OK (${trigger}): ${inserted} новых, ${updated} обновлено, ${stockReplaced} остатков`,
-          details: { ...summary },
+          message:
+            `OK (${trigger}): ${inserted} новых, ${updated} обновлено, ${stockReplaced} остатков` +
+            (unknownWh.size
+              ? `. Пропущены неизвестные склады: ${[...unknownWh].join(", ")} (добавьте вручную в админке)`
+              : ""),
+          details: { ...summary, unknown_warehouses: [...unknownWh] },
         })
         .eq("id", logId);
     }
