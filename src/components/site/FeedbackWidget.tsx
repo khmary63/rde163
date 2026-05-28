@@ -43,15 +43,16 @@ export function FeedbackWidget() {
 
   return (
     <>
-      <button
-        type="button"
-        onClick={() => setOpen(true)}
+      <a
+        href="https://max.ru/u/f9LHodD0cOLtOegQuRGbTfeI0oQqDRMHqPnuwG3FVK8EO9mm8Mgn5nncB-k"
+        target="_blank"
+        rel="noopener noreferrer"
         className="fixed bottom-6 right-6 z-40 flex items-center gap-2 rounded-full bg-brand px-5 py-3 text-sm font-semibold text-brand-foreground shadow-lg shadow-brand/30 hover:bg-brand/90 transition-all"
-        aria-label="Связаться с менеджером"
+        aria-label="Связаться с менеджером в Max"
       >
         <MessageSquare className="h-4 w-4" />
         <span className="hidden sm:inline">Связаться</span>
-      </button>
+      </a>
 
       {open && (
         <div className="fixed inset-0 z-50 flex items-end sm:items-center sm:justify-end bg-background/60 backdrop-blur-sm p-0 sm:p-6">
