@@ -61,6 +61,9 @@ function LoginPage() {
         <div className="text-sm text-center text-muted-foreground">
           Нет аккаунта? <Link to="/register" className="text-brand hover:underline">Зарегистрироваться</Link>
         </div>
+        <div className="text-sm text-center">
+          <Link to="/forgot-password" className="text-muted-foreground hover:text-brand hover:underline">Забыли пароль?</Link>
+        </div>
         <Link to="/" className="block text-xs text-center text-muted-foreground hover:text-foreground">← На главную</Link>
       </div>
     </div>
