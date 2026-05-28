@@ -124,7 +124,17 @@ function HomePage() {
 
 
           {/* Боковая статистика — позиционирована над задним колесом грузовика */}
-          <div className="hidden lg:flex absolute right-[6%] bottom-[14%] flex-col gap-1 font-mono text-right bg-background/85 backdrop-blur-md border border-border px-6 py-5 shadow-[0_20px_60px_-20px_oklch(0.20_0.013_250/0.35)]">
+          <div className="hidden lg:flex absolute right-[6%] bottom-[14%] flex-col gap-3 font-mono text-right">
+            <div className="self-end inline-flex items-center gap-3 rounded-full border-2 border-accent-orange bg-background/90 backdrop-blur px-4 py-1.5 text-xs tracking-widest uppercase shadow-[0_8px_30px_-10px_oklch(0.72_0.19_45/0.6)]">
+              <span className="relative flex h-2 w-2">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent-orange opacity-75" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-accent-orange" />
+              </span>
+              <span className="text-foreground">live</span>
+              <span className="h-3 w-px bg-border" />
+              <span className="text-accent-orange font-bold">8 СКЛАДОВ ОНЛАЙН</span>
+            </div>
+            <div className="flex flex-col gap-1 bg-background/85 backdrop-blur-md border border-border px-6 py-5 shadow-[0_20px_60px_-20px_oklch(0.20_0.013_250/0.35)]">
             <div className="text-[10px] uppercase tracking-[0.3em] text-foreground/70">в реальном времени</div>
             <div className="font-display text-6xl font-bold tabular-nums text-accent-orange leading-none flex items-baseline justify-end gap-2">
               <LiveStockCounter fallback={5663} />
