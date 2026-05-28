@@ -147,6 +147,7 @@ function HomePage() {
             <div className="mt-3 h-px w-full bg-border" />
             <div className="font-display text-3xl font-bold tabular-nums leading-none mt-3 text-accent-teal">~ 30 сек</div>
             <div className="text-xs text-foreground/75">на оформление заказа</div>
+            </div>
           </div>
         </div>
 
