@@ -26,7 +26,7 @@ const organizationJsonLd = {
   name: "Русский Дом Экспорта",
   alternateName: "РДЭ Запчасти",
   url: "https://rde163.ru",
-  description: "B2B каталог запчастей для китайской спецтехники и грузовиков. 5 000+ позиций, 8 складов по РФ.",
+  description: "B2B каталог запчастей для китайской спецтехники и грузовиков. 6 000+ позиций, 8 складов по РФ.",
   areaServed: "RU",
   sameAs: [],
 };
@@ -35,9 +35,9 @@ export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "РДЭ — B2B каталог запчастей для китайской техники" },
-      { name: "description", content: "5 000+ наименований в наличии на 8 складах по РФ. Персональные цены для юрлиц, заявка менеджеру за 30 секунд." },
+      { name: "description", content: "6 000+ наименований в наличии на 8 складах по РФ. Персональные цены для юрлиц, заявка менеджеру за 30 секунд." },
       { property: "og:title", content: "РДЭ — B2B каталог запчастей для китайской техники" },
-      { property: "og:description", content: "5 000+ позиций, 8 складов по РФ, персональные цены для юрлиц." },
+      { property: "og:description", content: "6 000+ позиций, 8 складов по РФ, персональные цены для юрлиц." },
       { property: "og:url", content: "https://rde163.ru/" },
     ],
     links: [{ rel: "canonical", href: "https://rde163.ru/" }],
@@ -135,7 +135,7 @@ function HomePage() {
             <div className="flex flex-col gap-1 bg-background/85 backdrop-blur-md border border-border px-6 py-5 shadow-[0_20px_60px_-20px_oklch(0.20_0.013_250/0.35)]">
             <div className="text-[10px] uppercase tracking-[0.3em] text-foreground/70">в реальном времени</div>
             <div className="font-display text-6xl font-bold tabular-nums text-accent-orange leading-none flex items-baseline justify-end gap-2">
-              <LiveStockCounter fallback={5663} />
+              <LiveStockCounter fallback={6142} />
               <span className="relative flex h-2 w-2 self-center" aria-hidden>
                 <span className="absolute inset-0 rounded-full bg-accent-orange animate-ping opacity-75" />
                 <span className="relative inline-flex h-2 w-2 rounded-full bg-accent-orange" />
@@ -223,7 +223,7 @@ function HomePage() {
               Комплексный подход к товарам и услугам
             </h3>
             <p className="text-base text-foreground/85 leading-relaxed max-w-4xl">
-              На складах компании представлены <span className="font-semibold text-foreground">более 5 000 наименований</span> оригинальных запасных частей — от расходных материалов до крупных узлов и агрегатов.
+              На складах компании представлены <span className="font-semibold text-foreground">более 6 000 наименований</span> оригинальных запасных частей — от расходных материалов до крупных узлов и агрегатов.
             </p>
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
               {[
