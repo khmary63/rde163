@@ -85,9 +85,10 @@ function HomePage() {
           {/* Поисковая строка — наверху, сразу под чипом */}
           <div className="w-full md:w-2/3 mx-auto">
             <div className="flex flex-col sm:flex-row gap-2">
-              <div className="flex-1 flex items-center gap-3 rounded-none border-b-2 border-foreground bg-background/80 backdrop-blur px-4 h-16 focus-within:border-accent-orange transition-colors">
-                <span className="font-mono text-xs text-accent-orange tracking-widest font-bold">01</span>
-                <span className="h-6 w-px bg-border" />
+              <div className="flex-1 flex items-center gap-3 rounded-none border-b-2 border-foreground bg-background/80 backdrop-blur px-4 h-16 focus-within:border-accent-orange transition-colors min-w-0">
+                <span className="hidden sm:inline font-mono text-xs text-accent-orange tracking-widest font-bold">01</span>
+                <span className="hidden sm:inline h-6 w-px bg-border" />
+
                 <Search className="h-5 w-5 text-foreground shrink-0" />
                 <input
                   type="text"
