@@ -195,7 +195,7 @@ function useProducts(filters: Filters, isAuthed: boolean) {
       q = q.order("name").range(from, to);
       const { data, error, count } = await q;
       if (error) throw error;
-      return { rows: (data ?? []) as Product[], total: count ?? 0 };
+      return { rows: (data ?? []) as unknown as Product[], total: count ?? 0 };
     },
     placeholderData: (prev) => prev,
   });
