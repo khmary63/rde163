@@ -413,7 +413,7 @@ function CatalogPage() {
                               <span className="font-medium">
                                 {status === "in" && `${totalQty} шт.`}
                                 {status === "low" && `${totalQty} шт. · мало`}
-                                {status === "out" && "Под заказ"}
+                                {status === "out" && (isOnOrder ? "Под заказ" : "Нет в наличии")}
                               </span>
                             </div>
                             <div className="mt-1 flex flex-wrap gap-1">
