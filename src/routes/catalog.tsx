@@ -437,9 +437,20 @@ function CatalogPage() {
                           </td>
                           <td className="px-4 py-3 text-right align-top">
                             <div className="font-display text-base font-semibold">
-                              {Number(p.base_price).toLocaleString("ru-RU", { maximumFractionDigits: 0 })} ₽
+                              {userPrice.toLocaleString("ru-RU", { maximumFractionDigits: 0 })} ₽
                             </div>
-                            <div className="text-[11px] text-muted-foreground">с учётом скидки</div>
+                            {hasDiscount ? (
+                              <div className="text-[11px] text-muted-foreground">
+                                с учётом скидки {discount}%
+                                <span className="ml-1 line-through opacity-70">
+                                  {retail.toLocaleString("ru-RU", { maximumFractionDigits: 0 })} ₽
+                                </span>
+                              </div>
+                            ) : (
+                              <div className="text-[11px] text-muted-foreground">
+                                {user ? "РРЦ" : "РРЦ · войдите, чтобы увидеть вашу цену"}
+                              </div>
+                            )}
                           </td>
                           <td className="px-4 py-3 text-right align-top">
                             {status === "out" ? (
