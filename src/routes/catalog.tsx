@@ -369,7 +369,7 @@ function CatalogPage() {
             </Card>
           ) : (
             <>
-              <div className="overflow-hidden rounded-lg border border-border bg-card">
+              <div className="hidden md:block overflow-hidden rounded-lg border border-border bg-card">
                 <table className="w-full text-sm">
                   <thead className="bg-surface text-xs uppercase tracking-wider text-muted-foreground">
                     <tr>
@@ -509,6 +509,116 @@ function CatalogPage() {
                   </tbody>
                 </table>
               </div>
+
+              {/* Мобильные карточки */}
+              <div className="md:hidden flex flex-col gap-3">
+                {productsQ.data?.rows.map((p) => {
+                  const totalQty = p.stock.reduce((s, r) => s + (r.qty || 0), 0);
+                  const isOnOrder = p.source === "on_order" || totalQty === 0;
+                  const status: "in" | "low" | "out" = totalQty === 0 ? "out" : totalQty < 5 ? "low" : "in";
+                  const retail = Number(p.price_retail || p.base_price || 0);
+                  const userPrice = pickPriceForDiscount(retail, p.price_tiers, discount);
+                  const hasDiscount = discount > 0 && userPrice < retail;
+                  return (
+                    <Card key={p.id} className="p-4 flex flex-col gap-3">
+                      <div>
+                        <div className="font-medium leading-tight">{p.name}</div>
+                        <div className="mt-1 font-mono text-xs text-muted-foreground">{p.sku}</div>
+                      </div>
+                      <div className="flex flex-wrap items-center gap-1.5">
+                        <Badge variant="secondary" className="font-normal">{p.brand?.name ?? "—"}</Badge>
+                        {p.brand?.name && p.brand.name.toUpperCase() !== "CNHTC" && (
+                          <Badge variant="outline" className="font-normal">аналог</Badge>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-2 text-sm">
+                        <span
+                          className={cn(
+                            "inline-flex h-2 w-2 rounded-full",
+                            status === "in" && "bg-[oklch(0.70_0.18_145)]",
+                            status === "low" && "bg-[oklch(0.78_0.16_75)]",
+                            status === "out" && "bg-[oklch(0.62_0.20_25)]",
+                          )}
+                        />
+                        <span className="font-medium">
+                          {status === "in" && `${totalQty} шт.`}
+                          {status === "low" && `${totalQty} шт. · мало`}
+                          {status === "out" && (isOnOrder ? "Под заказ" : "Нет в наличии")}
+                        </span>
+                      </div>
+                      {p.stock.filter((s) => s.qty > 0).length > 0 && (
+                        <div className="flex flex-wrap gap-1">
+                          {p.stock.filter((s) => s.qty > 0).map((s) => {
+                            const w = wareById.get(s.warehouse_id);
+                            return (
+                              <span key={s.warehouse_id} className="rounded bg-surface px-1.5 py-0.5 text-[11px] text-muted-foreground">
+                                {w?.city ?? w?.name ?? "—"}: {s.qty}
+                              </span>
+                            );
+                          })}
+                        </div>
+                      )}
+                      <div className="flex items-end justify-between gap-3 pt-1 border-t border-border">
+                        <div>
+                          <div className="font-display text-lg font-semibold whitespace-nowrap">
+                            {userPrice.toLocaleString("ru-RU", { maximumFractionDigits: 0 })}&nbsp;₽
+                          </div>
+                          {hasDiscount && (
+                            <div className="text-[11px] text-muted-foreground whitespace-nowrap">
+                              скидка {discount}%
+                              <span className="ml-1 line-through opacity-70">
+                                {retail.toLocaleString("ru-RU", { maximumFractionDigits: 0 })}&nbsp;₽
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                        {status === "out" ? (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="gap-1.5"
+                            onClick={() => {
+                              const fallbackWh = whQ.data?.[0];
+                              if (!fallbackWh) { toast.error("Не удалось добавить под заказ"); return; }
+                              cart.add({
+                                productId: p.id, sku: p.sku, name: p.name,
+                                brand: p.brand?.name ?? "", price: userPrice,
+                                warehouseId: fallbackWh.id, warehouseName: "Под заказ",
+                                maxQty: Number.MAX_SAFE_INTEGER, backorder: true,
+                              });
+                              toast.success("Добавлено в корзину", { description: `${p.name} — менеджер свяжется при поступлении` });
+                            }}
+                          >
+                            <Send className="h-3.5 w-3.5" /> Заказать
+                          </Button>
+                        ) : (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="gap-1.5"
+                            onClick={() => {
+                              const best = [...p.stock].filter((s) => s.qty > 0).sort((a, b) => b.qty - a.qty)[0];
+                              if (!best) return;
+                              const w = wareById.get(best.warehouse_id);
+                              cart.add({
+                                productId: p.id, sku: p.sku, name: p.name,
+                                brand: p.brand?.name ?? "", price: userPrice,
+                                warehouseId: best.warehouse_id,
+                                warehouseName: w?.city ?? w?.name ?? "—",
+                                maxQty: best.qty,
+                              });
+                              toast.success("Добавлено в корзину", { description: p.name });
+                            }}
+                          >
+                            <ShoppingCart className="h-3.5 w-3.5" /> В корзину
+                          </Button>
+                        )}
+                      </div>
+                    </Card>
+                  );
+                })}
+              </div>
+
 
               {/* Pagination */}
               <div className="flex items-center justify-between text-sm text-muted-foreground">

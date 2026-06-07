@@ -64,7 +64,9 @@ function HomePage() {
             className="h-full w-full object-cover object-[20%_center]"
           />
           {/* Светлый градиент-вуаль слева, чтобы текст читался */}
-          <div className="absolute inset-0 bg-[linear-gradient(95deg,oklch(0.99_0.002_240/0.96)_0%,oklch(0.99_0.002_240/0.85)_38%,oklch(0.99_0.002_240/0.4)_62%,oklch(0.42_0.18_258/0.2)_100%)]" />
+          {/* На мобильных — почти сплошной светлый слой, на десктопе — мягкий градиент к грузовику */}
+          <div className="absolute inset-0 bg-[linear-gradient(180deg,oklch(0.99_0.002_240/0.96)_0%,oklch(0.99_0.002_240/0.9)_60%,oklch(0.99_0.002_240/0.78)_100%)] lg:bg-[linear-gradient(95deg,oklch(0.99_0.002_240/0.96)_0%,oklch(0.99_0.002_240/0.85)_38%,oklch(0.99_0.002_240/0.4)_62%,oklch(0.42_0.18_258/0.2)_100%)]" />
+
           <div className="absolute inset-0 grid-bg opacity-25" />
           {/* Цветные блики */}
           <div className="absolute -bottom-32 -left-32 h-[420px] w-[420px] rounded-full bg-accent-orange/25 blur-3xl" />
@@ -83,15 +85,17 @@ function HomePage() {
           {/* Поисковая строка — наверху, сразу под чипом */}
           <div className="w-full md:w-2/3 mx-auto">
             <div className="flex flex-col sm:flex-row gap-2">
-              <div className="flex-1 flex items-center gap-3 rounded-none border-b-2 border-foreground bg-background/80 backdrop-blur px-4 h-16 focus-within:border-accent-orange transition-colors">
-                <span className="font-mono text-xs text-accent-orange tracking-widest font-bold">01</span>
-                <span className="h-6 w-px bg-border" />
+              <div className="flex-1 flex items-center gap-3 rounded-none border-b-2 border-foreground bg-background/80 backdrop-blur px-4 h-16 focus-within:border-accent-orange transition-colors min-w-0">
+                <span className="hidden sm:inline font-mono text-xs text-accent-orange tracking-widest font-bold">01</span>
+                <span className="hidden sm:inline h-6 w-px bg-border" />
+
                 <Search className="h-5 w-5 text-foreground shrink-0" />
                 <input
                   type="text"
-                  placeholder="Артикул, OEM-номер или название"
-                  className="flex-1 bg-transparent outline-none text-base placeholder:text-muted-foreground/60"
+                  placeholder="Артикул, OEM или название"
+                  className="flex-1 min-w-0 bg-transparent outline-none text-base placeholder:text-muted-foreground/60"
                 />
+
               </div>
               <Button asChild size="lg" className="h-16 px-8 rounded-none bg-accent-orange text-accent-orange-foreground hover:bg-foreground hover:text-background font-display tracking-wide text-base group shadow-[0_15px_40px_-10px_oklch(0.72_0.19_45/0.6)]">
                 <Link to="/catalog">
