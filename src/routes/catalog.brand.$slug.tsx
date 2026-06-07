@@ -137,7 +137,7 @@ function BrandPage() {
           </Button>
         </Card>
       ) : (
-        <>
+        <div>
         <div className="hidden md:block overflow-hidden rounded-lg border border-border bg-card">
 
           <table className="w-full text-sm">
