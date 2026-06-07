@@ -11,6 +11,8 @@ import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { useCart } from "@/hooks/use-cart";
+import { useAuth } from "@/hooks/use-auth";
+import { pickPriceForDiscount, type PriceTiers } from "@/lib/pricing";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/catalog")({
