@@ -369,7 +369,7 @@ function CatalogPage() {
             </Card>
           ) : (
             <>
-              <div className="overflow-hidden rounded-lg border border-border bg-card">
+              <div className="hidden md:block overflow-hidden rounded-lg border border-border bg-card">
                 <table className="w-full text-sm">
                   <thead className="bg-surface text-xs uppercase tracking-wider text-muted-foreground">
                     <tr>
