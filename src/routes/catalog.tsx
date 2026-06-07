@@ -379,8 +379,13 @@ function CatalogPage() {
                   </thead>
                   <tbody className="divide-y divide-border">
                     {productsQ.data?.rows.map((p) => {
+                      // OFFER warehouse stock rows are kept at qty=0; real warehouses drive availability.
                       const totalQty = p.stock.reduce((s, r) => s + (r.qty || 0), 0);
+                      const isOnOrder = p.source === "on_order" || totalQty === 0;
                       const status: "in" | "low" | "out" = totalQty === 0 ? "out" : totalQty < 5 ? "low" : "in";
+                      const retail = Number(p.price_retail || p.base_price || 0);
+                      const userPrice = pickPriceForDiscount(retail, p.price_tiers, discount);
+                      const hasDiscount = discount > 0 && userPrice < retail;
                       return (
                         <tr key={p.id} className="hover:bg-surface/50">
                           <td className="px-4 py-3 align-top">
