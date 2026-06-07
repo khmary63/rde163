@@ -161,7 +161,7 @@ function BrandPage() {
                       {totalQty > 0 ? <span className="text-foreground">{totalQty} шт.</span> : <span className="text-muted-foreground">Под заказ</span>}
                     </td>
                     <td className="px-4 py-3 text-right align-top font-display font-semibold">
-                      {Number(p.base_price).toLocaleString("ru-RU", { maximumFractionDigits: 0 })} ₽
+                      {Number(p.price_retail).toLocaleString("ru-RU", { maximumFractionDigits: 0 })} ₽
                     </td>
                     <td className="px-4 py-3 text-right align-top">
                       <Button
@@ -177,7 +177,7 @@ function BrandPage() {
                             sku: p.sku,
                             name: p.name,
                             brand: brand.name,
-                            price: Number(p.base_price),
+                            price: Number(p.price_retail),
                             warehouseId: best.warehouse_id,
                             warehouseName: "—",
                             maxQty: best.qty,
