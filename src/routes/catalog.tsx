@@ -422,7 +422,6 @@ function CatalogPage() {
                             <div className="mt-1 flex flex-wrap gap-1">
                               {p.stock
                                 .filter((s) => s.qty > 0)
-                                .slice(0, 4)
                                 .map((s) => {
                                   const w = wareById.get(s.warehouse_id);
                                   return (
@@ -431,11 +430,6 @@ function CatalogPage() {
                                     </span>
                                   );
                                 })}
-                              {p.stock.filter((s) => s.qty > 0).length > 4 && (
-                                <span className="text-[11px] text-muted-foreground">
-                                  +{p.stock.filter((s) => s.qty > 0).length - 4}
-                                </span>
-                              )}
                             </div>
                           </td>
                           <td className="px-4 py-3 text-right align-top">
