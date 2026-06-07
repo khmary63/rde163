@@ -218,6 +218,9 @@ function CatalogPage() {
   const brandsQ = useBrands();
   const whQ = useWarehouses();
   const productsQ = useProducts(filters);
+  const discountQ = useUserDiscount();
+  const { user } = useAuth();
+  const discount = discountQ.data ?? 0;
 
   const totalPages = Math.max(1, Math.ceil((productsQ.data?.total ?? 0) / PAGE_SIZE));
   const wareById = useMemo(() => new Map((whQ.data ?? []).map((w) => [w.id, w])), [whQ.data]);
