@@ -239,7 +239,7 @@ function BrandPage() {
             );
           })}
         </div>
-        </>
+        </div>
       )}
 
 
