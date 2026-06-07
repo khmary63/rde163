@@ -132,20 +132,23 @@ type Filters = {
   page: number;
 };
 
-function useProducts(filters: Filters) {
+function useProducts(filters: Filters, isAuthed: boolean) {
   return useQuery({
-    queryKey: ["products", filters],
+    queryKey: ["products", filters, isAuthed],
     queryFn: async () => {
       const from = filters.page * PAGE_SIZE;
       const to = from + PAGE_SIZE - 1;
 
       const stockJoin = filters.warehouseIds.length > 0 || filters.inStockOnly ? "stock!inner" : "stock";
+      // Wholesale columns (base_price, price_tiers) are only readable by authenticated users.
+      const priceCols = isAuthed ? "base_price, price_retail, price_tiers" : "price_retail";
       let q = supabase
         .from("products")
         .select(
-          `id, sku, name, base_price, price_retail, price_tiers, source, is_original, brand:brands(id, slug, name), stock:${stockJoin}(warehouse_id, qty)`,
+          `id, sku, name, ${priceCols}, source, is_original, brand:brands(id, slug, name), stock:${stockJoin}(warehouse_id, qty)`,
           { count: "exact" }
         );
+
 
       if (filters.search.trim()) {
         const s = filters.search.trim().replace(/[%_]/g, " ");
