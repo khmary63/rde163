@@ -143,7 +143,7 @@ function useProducts(filters: Filters) {
       let q = supabase
         .from("products")
         .select(
-          `id, sku, name, base_price, is_original, brand:brands(id, slug, name), stock:${stockJoin}(warehouse_id, qty)`,
+          `id, sku, name, base_price, price_retail, price_tiers, source, is_original, brand:brands(id, slug, name), stock:${stockJoin}(warehouse_id, qty)`,
           { count: "exact" }
         );
 
