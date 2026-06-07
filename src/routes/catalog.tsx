@@ -66,10 +66,30 @@ type Product = {
   sku: string;
   name: string;
   base_price: number;
+  price_retail: number;
+  price_tiers: PriceTiers | null;
+  source: "price_list" | "on_order";
   is_original: boolean;
   brand: Brand | null;
   stock: StockRow[];
 };
+
+function useUserDiscount() {
+  const { user } = useAuth();
+  return useQuery({
+    queryKey: ["user-discount", user?.id ?? "guest"],
+    queryFn: async (): Promise<number> => {
+      if (!user) return 0;
+      const { data } = await supabase
+        .from("profiles")
+        .select("discount_percent")
+        .eq("id", user.id)
+        .maybeSingle();
+      return Number(data?.discount_percent ?? 0);
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+}
 
 function useBrands() {
   return useQuery({
