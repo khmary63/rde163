@@ -64,7 +64,9 @@ function HomePage() {
             className="h-full w-full object-cover object-[20%_center]"
           />
           {/* Светлый градиент-вуаль слева, чтобы текст читался */}
-          <div className="absolute inset-0 bg-[linear-gradient(95deg,oklch(0.99_0.002_240/0.96)_0%,oklch(0.99_0.002_240/0.85)_38%,oklch(0.99_0.002_240/0.4)_62%,oklch(0.42_0.18_258/0.2)_100%)]" />
+          {/* На мобильных — почти сплошной светлый слой, на десктопе — мягкий градиент к грузовику */}
+          <div className="absolute inset-0 bg-[linear-gradient(180deg,oklch(0.99_0.002_240/0.96)_0%,oklch(0.99_0.002_240/0.9)_60%,oklch(0.99_0.002_240/0.78)_100%)] lg:bg-[linear-gradient(95deg,oklch(0.99_0.002_240/0.96)_0%,oklch(0.99_0.002_240/0.85)_38%,oklch(0.99_0.002_240/0.4)_62%,oklch(0.42_0.18_258/0.2)_100%)]" />
+
           <div className="absolute inset-0 grid-bg opacity-25" />
           {/* Цветные блики */}
           <div className="absolute -bottom-32 -left-32 h-[420px] w-[420px] rounded-full bg-accent-orange/25 blur-3xl" />
