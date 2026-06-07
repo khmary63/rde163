@@ -92,9 +92,10 @@ function HomePage() {
                 <Search className="h-5 w-5 text-foreground shrink-0" />
                 <input
                   type="text"
-                  placeholder="Артикул, OEM-номер или название"
-                  className="flex-1 bg-transparent outline-none text-base placeholder:text-muted-foreground/60"
+                  placeholder="Артикул, OEM или название"
+                  className="flex-1 min-w-0 bg-transparent outline-none text-base placeholder:text-muted-foreground/60"
                 />
+
               </div>
               <Button asChild size="lg" className="h-16 px-8 rounded-none bg-accent-orange text-accent-orange-foreground hover:bg-foreground hover:text-background font-display tracking-wide text-base group shadow-[0_15px_40px_-10px_oklch(0.72_0.19_45/0.6)]">
                 <Link to="/catalog">
