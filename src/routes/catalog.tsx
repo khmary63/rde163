@@ -132,20 +132,23 @@ type Filters = {
   page: number;
 };
 
-function useProducts(filters: Filters) {
+function useProducts(filters: Filters, isAuthed: boolean) {
   return useQuery({
-    queryKey: ["products", filters],
+    queryKey: ["products", filters, isAuthed],
     queryFn: async () => {
       const from = filters.page * PAGE_SIZE;
       const to = from + PAGE_SIZE - 1;
 
       const stockJoin = filters.warehouseIds.length > 0 || filters.inStockOnly ? "stock!inner" : "stock";
+      // Wholesale columns (base_price, price_tiers) are only readable by authenticated users.
+      const priceCols = isAuthed ? "base_price, price_retail, price_tiers" : "price_retail";
       let q = supabase
         .from("products")
         .select(
-          `id, sku, name, base_price, price_retail, price_tiers, source, is_original, brand:brands(id, slug, name), stock:${stockJoin}(warehouse_id, qty)`,
+          `id, sku, name, ${priceCols}, source, is_original, brand:brands(id, slug, name), stock:${stockJoin}(warehouse_id, qty)`,
           { count: "exact" }
         );
+
 
       if (filters.search.trim()) {
         const s = filters.search.trim().replace(/[%_]/g, " ");
@@ -192,7 +195,7 @@ function useProducts(filters: Filters) {
       q = q.order("name").range(from, to);
       const { data, error, count } = await q;
       if (error) throw error;
-      return { rows: (data ?? []) as Product[], total: count ?? 0 };
+      return { rows: (data ?? []) as unknown as Product[], total: count ?? 0 };
     },
     placeholderData: (prev) => prev,
   });
@@ -215,11 +218,11 @@ function CatalogPage() {
 
   const filters: Filters = { search, brandIds, warehouseIds, originality, inStockOnly, page };
 
+  const { user } = useAuth();
   const brandsQ = useBrands();
   const whQ = useWarehouses();
-  const productsQ = useProducts(filters);
+  const productsQ = useProducts(filters, !!user);
   const discountQ = useUserDiscount();
-  const { user } = useAuth();
   const discount = discountQ.data ?? 0;
 
   const totalPages = Math.max(1, Math.ceil((productsQ.data?.total ?? 0) / PAGE_SIZE));
