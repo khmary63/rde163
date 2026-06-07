@@ -11,6 +11,8 @@ import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { useCart } from "@/hooks/use-cart";
+import { useAuth } from "@/hooks/use-auth";
+import { pickPriceForDiscount, type PriceTiers } from "@/lib/pricing";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/catalog")({
@@ -64,10 +66,30 @@ type Product = {
   sku: string;
   name: string;
   base_price: number;
+  price_retail: number;
+  price_tiers: PriceTiers | null;
+  source: "price_list" | "on_order";
   is_original: boolean;
   brand: Brand | null;
   stock: StockRow[];
 };
+
+function useUserDiscount() {
+  const { user } = useAuth();
+  return useQuery({
+    queryKey: ["user-discount", user?.id ?? "guest"],
+    queryFn: async (): Promise<number> => {
+      if (!user) return 0;
+      const { data } = await supabase
+        .from("profiles")
+        .select("discount_percent")
+        .eq("id", user.id)
+        .maybeSingle();
+      return Number(data?.discount_percent ?? 0);
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+}
 
 function useBrands() {
   return useQuery({
@@ -121,7 +143,7 @@ function useProducts(filters: Filters) {
       let q = supabase
         .from("products")
         .select(
-          `id, sku, name, base_price, is_original, brand:brands(id, slug, name), stock:${stockJoin}(warehouse_id, qty)`,
+          `id, sku, name, base_price, price_retail, price_tiers, source, is_original, brand:brands(id, slug, name), stock:${stockJoin}(warehouse_id, qty)`,
           { count: "exact" }
         );
 
@@ -196,6 +218,9 @@ function CatalogPage() {
   const brandsQ = useBrands();
   const whQ = useWarehouses();
   const productsQ = useProducts(filters);
+  const discountQ = useUserDiscount();
+  const { user } = useAuth();
+  const discount = discountQ.data ?? 0;
 
   const totalPages = Math.max(1, Math.ceil((productsQ.data?.total ?? 0) / PAGE_SIZE));
   const wareById = useMemo(() => new Map((whQ.data ?? []).map((w) => [w.id, w])), [whQ.data]);
@@ -354,8 +379,13 @@ function CatalogPage() {
                   </thead>
                   <tbody className="divide-y divide-border">
                     {productsQ.data?.rows.map((p) => {
+                      // OFFER warehouse stock rows are kept at qty=0; real warehouses drive availability.
                       const totalQty = p.stock.reduce((s, r) => s + (r.qty || 0), 0);
+                      const isOnOrder = p.source === "on_order" || totalQty === 0;
                       const status: "in" | "low" | "out" = totalQty === 0 ? "out" : totalQty < 5 ? "low" : "in";
+                      const retail = Number(p.price_retail || p.base_price || 0);
+                      const userPrice = pickPriceForDiscount(retail, p.price_tiers, discount);
+                      const hasDiscount = discount > 0 && userPrice < retail;
                       return (
                         <tr key={p.id} className="hover:bg-surface/50">
                           <td className="px-4 py-3 align-top">
@@ -383,7 +413,7 @@ function CatalogPage() {
                               <span className="font-medium">
                                 {status === "in" && `${totalQty} шт.`}
                                 {status === "low" && `${totalQty} шт. · мало`}
-                                {status === "out" && "Под заказ"}
+                                {status === "out" && (isOnOrder ? "Под заказ" : "Нет в наличии")}
                               </span>
                             </div>
                             <div className="mt-1 flex flex-wrap gap-1">
@@ -407,9 +437,20 @@ function CatalogPage() {
                           </td>
                           <td className="px-4 py-3 text-right align-top">
                             <div className="font-display text-base font-semibold">
-                              {Number(p.base_price).toLocaleString("ru-RU", { maximumFractionDigits: 0 })} ₽
+                              {userPrice.toLocaleString("ru-RU", { maximumFractionDigits: 0 })} ₽
                             </div>
-                            <div className="text-[11px] text-muted-foreground">с учётом скидки</div>
+                            {hasDiscount ? (
+                              <div className="text-[11px] text-muted-foreground">
+                                с учётом скидки {discount}%
+                                <span className="ml-1 line-through opacity-70">
+                                  {retail.toLocaleString("ru-RU", { maximumFractionDigits: 0 })} ₽
+                                </span>
+                              </div>
+                            ) : (
+                              <div className="text-[11px] text-muted-foreground">
+                                {user ? "РРЦ" : "РРЦ · войдите, чтобы увидеть вашу цену"}
+                              </div>
+                            )}
                           </td>
                           <td className="px-4 py-3 text-right align-top">
                             {status === "out" ? (
@@ -428,7 +469,7 @@ function CatalogPage() {
                                     sku: p.sku,
                                     name: p.name,
                                     brand: p.brand?.name ?? "",
-                                    price: Number(p.base_price),
+                                    price: userPrice,
                                     warehouseId: fallbackWh.id,
                                     warehouseName: "Под заказ",
                                     maxQty: Number.MAX_SAFE_INTEGER,
@@ -457,7 +498,7 @@ function CatalogPage() {
                                     sku: p.sku,
                                     name: p.name,
                                     brand: p.brand?.name ?? "",
-                                    price: Number(p.base_price),
+                                    price: userPrice,
                                     warehouseId: best.warehouse_id,
                                     warehouseName: w?.city ?? w?.name ?? "—",
                                     maxQty: best.qty,

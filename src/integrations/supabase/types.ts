@@ -495,7 +495,10 @@ export type Database = {
           is_original: boolean
           name: string
           oem: string | null
+          price_retail: number
+          price_tiers: Json
           sku: string
+          source: string
           specs: Json
           updated_at: string
         }
@@ -510,7 +513,10 @@ export type Database = {
           is_original?: boolean
           name: string
           oem?: string | null
+          price_retail?: number
+          price_tiers?: Json
           sku: string
+          source?: string
           specs?: Json
           updated_at?: string
         }
@@ -525,7 +531,10 @@ export type Database = {
           is_original?: boolean
           name?: string
           oem?: string | null
+          price_retail?: number
+          price_tiers?: Json
           sku?: string
+          source?: string
           specs?: Json
           updated_at?: string
         }

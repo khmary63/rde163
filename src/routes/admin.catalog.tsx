@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Upload, FileSpreadsheet, CheckCircle2, AlertTriangle, Loader2, Download, RefreshCw } from "lucide-react";
+import { Upload, FileSpreadsheet, CheckCircle2, AlertTriangle, Loader2, RefreshCw } from "lucide-react";
 import * as XLSX from "xlsx";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -10,54 +10,96 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { syncCatalogFromSheet } from "@/lib/catalog-sync.functions";
-
+import { DISCOUNT_TIERS, type PriceTiers } from "@/lib/pricing";
 
 export const Route = createFileRoute("/admin/catalog")({
   head: () => ({ meta: [{ title: "Прайс — Админка" }, { name: "robots", content: "noindex" }] }),
   component: CatalogUploadPage,
 });
 
+// Fixed Excel price-list layout (1-based column indices):
+//  1  Бренд
+//  4  Артикул
+//  9  Номенклатура
+// 15  РРЦ со скидкой 5%
+// 16  РРЦ со скидкой 10%
+// 17  РРЦ со скидкой 15%
+// 18  РРЦ РДЭ (retail)
+// 19  РРЦ со скидкой 20%
+// 20  РРЦ со скидкой 21%
+// 21  РРЦ со скидкой 18%
+// 22..29  Остатки на 8 складах (см. WAREHOUSE_COL_TO_CODE)
+const COL = {
+  brand: 0,
+  sku: 3,
+  name: 8,
+  tier5: 14,
+  tier10: 15,
+  tier15: 16,
+  retail: 17,
+  tier20: 18,
+  tier21: 19,
+  tier18: 20,
+  whStart: 21, // 22..29
+  whEnd: 28,
+} as const;
+
+const TIER_COLS: Array<{ tier: number; col: number }> = [
+  { tier: 5, col: COL.tier5 },
+  { tier: 10, col: COL.tier10 },
+  { tier: 15, col: COL.tier15 },
+  { tier: 18, col: COL.tier18 },
+  { tier: 20, col: COL.tier20 },
+  { tier: 21, col: COL.tier21 },
+];
+
+// Map exact header text → warehouse code in DB.
+const WH_HEADER_TO_CODE: Record<string, string> = {
+  "агропарк рдэ(самара)": "AGROPARK",
+  "агропарк рдэ (самара)": "AGROPARK",
+  "рдэ самара (адресное хранение)": "SAMARA_ADDR",
+  "склад рдэ екатеринбург": "EKB",
+  "склад рдэ краснодар": "KRD",
+  "склад рдэ москва": "MSK",
+  "склад рдэ новосибирск": "NSK",
+  "склад рдэ санкт-петербург": "SPB",
+  "склад рдэ челябинск": "CHEL",
+};
+
+const HEADER_ROW = 3; // 1-based
+const DATA_START_ROW = 8; // 1-based
+
 type ParsedRow = {
   line: number;
   sku: string;
   name: string;
   brand: string;
-  is_original: boolean;
-  base_price: number;
-  oem: string | null;
-  category: string | null;
-  description: string | null;
+  retail: number;
+  price_tiers: PriceTiers;
   stocks: Record<string, number>; // warehouse code -> qty
 };
 
-function splitLine(line: string, delim: string): string[] {
-  const out: string[] = [];
-  let cur = "";
-  let inQ = false;
-  for (let i = 0; i < line.length; i++) {
-    const ch = line[i];
-    if (ch === '"') {
-      if (inQ && line[i + 1] === '"') { cur += '"'; i++; }
-      else inQ = !inQ;
-    } else if (ch === delim && !inQ) {
-      out.push(cur);
-      cur = "";
-    } else cur += ch;
-  }
-  out.push(cur);
-  return out.map((c) => c.trim());
+function normNum(v: unknown): number {
+  if (v == null || v === "") return 0;
+  const s = String(v).replace(/\s|\u00A0/g, "").replace(",", ".");
+  const n = Number(s);
+  return Number.isFinite(n) ? n : 0;
 }
 
-function normNum(v: string): number {
-  if (!v) return 0;
-  const n = Number(v.replace(/\s/g, "").replace(",", "."));
-  return isFinite(n) ? n : 0;
+function normInt(v: unknown): number {
+  const n = Math.floor(normNum(v));
+  return n > 0 ? n : 0;
 }
 
 function CatalogUploadPage() {
   const qc = useQueryClient();
   const fileRef = useRef<HTMLInputElement>(null);
-  const [parsed, setParsed] = useState<{ rows: ParsedRow[]; errors: string[]; whCodes: string[] } | null>(null);
+  const [parsed, setParsed] = useState<{
+    rows: ParsedRow[];
+    errors: string[];
+    whCodesFound: string[];
+    unknownWh: string[];
+  } | null>(null);
   const [busy, setBusy] = useState(false);
   const [progress, setProgress] = useState<{ done: number; total: number } | null>(null);
 
@@ -76,127 +118,98 @@ function CatalogUploadPage() {
       const [{ count: products }, { count: stockRows }, lastLogRes] = await Promise.all([
         supabase.from("products").select("*", { count: "exact", head: true }),
         supabase.from("stock").select("*", { count: "exact", head: true }),
-        supabase.from("sync_logs").select("*").eq("source", "catalog_csv").order("started_at", { ascending: false }).limit(1).maybeSingle(),
+        supabase.from("sync_logs").select("*").eq("source", "catalog_xlsx").order("started_at", { ascending: false }).limit(1).maybeSingle(),
       ]);
       return { products: products ?? 0, stockRows: stockRows ?? 0, lastLog: lastLogRes.data };
     },
   });
 
-  const warehouseCodes = useMemo(() => (warehousesQ.data ?? []).map((w) => w.code), [warehousesQ.data]);
+  const whByCode = useMemo(
+    () => new Map((warehousesQ.data ?? []).map((w) => [w.code, w.id])),
+    [warehousesQ.data],
+  );
 
-  const parseRows = (header: string[], dataRows: string[][]) => {
+  const parseWorkbook = (aoa: unknown[][]) => {
     const errors: string[] = [];
-    const idx = (names: string[]) =>
-      header.findIndex((h) => names.includes(h.toLowerCase().replace(/^\ufeff/, "").trim()));
-
-    const skuI = idx(["sku", "артикул"]);
-    const nameI = idx(["name", "наименование", "название"]);
-    const brandI = idx(["brand", "бренд", "производитель"]);
-    const priceI = idx(["price", "base_price", "цена"]);
-    const origI = idx(["is_original", "original", "оригинал", "тип"]);
-    const oemI = idx(["oem", "oem_number"]);
-    const catI = idx(["category", "категория"]);
-    const descI = idx(["description", "описание"]);
-
-    const lowerHeader = header.map((h) => h.toLowerCase().replace(/^\ufeff/, "").trim());
-    const whIndexMap = new Map<string, number>();
-    for (const code of warehouseCodes) {
-      const i = lowerHeader.findIndex((h) => h === `qty_${code}` || h === code);
-      if (i >= 0) whIndexMap.set(code, i);
+    const headerRow = (aoa[HEADER_ROW - 1] ?? []) as unknown[];
+    // Build warehouse column index map (22..29) by header name
+    const whColToCode = new Map<number, string>();
+    const unknownWh: string[] = [];
+    for (let c = COL.whStart; c <= COL.whEnd; c++) {
+      const h = String(headerRow[c] ?? "").trim().toLowerCase();
+      if (!h) continue;
+      const code = WH_HEADER_TO_CODE[h];
+      if (code) whColToCode.set(c, code);
+      else unknownWh.push(String(headerRow[c] ?? ""));
     }
-
-    if (skuI === -1 || nameI === -1 || brandI === -1 || priceI === -1) {
-      toast.error("Не найдены обязательные колонки", { description: "Нужны: sku, name, brand, price" });
-      return null;
-    }
+    const whCodesFound = [...new Set(whColToCode.values())];
 
     const rows: ParsedRow[] = [];
-    for (let li = 0; li < dataRows.length; li++) {
-      const cols = dataRows[li];
-      const sku = (cols[skuI] ?? "").toString().trim();
-      const name = (cols[nameI] ?? "").toString().trim();
-      const brand = (cols[brandI] ?? "").toString().trim();
-      const price = normNum((cols[priceI] ?? "0").toString());
-      if (!sku || !name || !brand) {
-        errors.push(`Строка ${li + 2}: пустой sku / name / brand`);
+    for (let r = DATA_START_ROW - 1; r < aoa.length; r++) {
+      const row = aoa[r] as unknown[];
+      if (!row) continue;
+      const brand = String(row[COL.brand] ?? "").trim();
+      const sku = String(row[COL.sku] ?? "").trim();
+      const name = String(row[COL.name] ?? "").trim();
+      if (!brand && !sku && !name) continue; // blank row
+      if (!brand || !sku || !name) {
+        errors.push(`Строка ${r + 1}: пустой бренд / артикул / наименование`);
         continue;
       }
-      const origRaw = origI >= 0 ? (cols[origI] ?? "").toString().trim().toLowerCase() : "original";
-      const isOriginal = !["analog", "аналог", "false", "0", "no", "нет"].includes(origRaw);
+      const retail = normNum(row[COL.retail]);
+      const price_tiers: PriceTiers = {};
+      for (const { tier, col } of TIER_COLS) {
+        const v = normNum(row[col]);
+        if (v > 0) price_tiers[String(tier) as `${(typeof DISCOUNT_TIERS)[number]}`] = v;
+      }
       const stocks: Record<string, number> = {};
-      whIndexMap.forEach((colIdx, code) => {
-        const q = normNum((cols[colIdx] ?? "0").toString());
-        if (q > 0) stocks[code] = Math.floor(q);
+      whColToCode.forEach((code, col) => {
+        const q = normInt(row[col]);
+        if (q > 0) stocks[code] = q;
       });
-      rows.push({
-        line: li + 2,
-        sku,
-        name,
-        brand,
-        is_original: isOriginal,
-        base_price: price,
-        oem: oemI >= 0 ? (cols[oemI] ?? "").toString().trim() || null : null,
-        category: catI >= 0 ? (cols[catI] ?? "").toString().trim() || null : null,
-        description: descI >= 0 ? (cols[descI] ?? "").toString().trim() || null : null,
-        stocks,
-      });
+      rows.push({ line: r + 1, sku, name, brand, retail, price_tiers, stocks });
     }
-
-    return { rows, errors, whCodes: Array.from(whIndexMap.keys()) };
+    return { rows, errors, whCodesFound, unknownWh: [...new Set(unknownWh)] };
   };
 
   const handleFile = async (file: File) => {
     const lower = file.name.toLowerCase();
-    const isExcel = lower.endsWith(".xlsx") || lower.endsWith(".xls");
-
-    let header: string[] = [];
-    let dataRows: string[][] = [];
-
-    if (isExcel) {
-      const buf = await file.arrayBuffer();
-      const wb = XLSX.read(buf, { type: "array" });
-      const ws = wb.Sheets[wb.SheetNames[0]];
-      if (!ws) {
-        toast.error("Не удалось прочитать первый лист Excel");
-        return;
-      }
-      const aoa = XLSX.utils.sheet_to_json<unknown[]>(ws, { header: 1, blankrows: false, defval: "" });
-      if (aoa.length < 2) {
-        toast.error("Файл пустой или только заголовок");
-        return;
-      }
-      header = (aoa[0] as unknown[]).map((c) => (c ?? "").toString());
-      dataRows = aoa.slice(1).map((row) => (row as unknown[]).map((c) => (c ?? "").toString()));
-    } else {
-      const text = await file.text();
-      const firstLine = text.split(/\r?\n/, 1)[0] ?? "";
-      const delim = firstLine.includes(";") && !firstLine.includes(",") ? ";" : ",";
-      const lines = text.split(/\r?\n/).filter((l) => l.trim().length > 0);
-      if (lines.length < 2) {
-        toast.error("Файл пустой или только заголовок");
-        return;
-      }
-      header = splitLine(lines[0], delim);
-      dataRows = lines.slice(1).map((l) => splitLine(l, delim));
+    if (!lower.endsWith(".xlsx") && !lower.endsWith(".xls")) {
+      toast.error("Принимаются только .xlsx / .xls");
+      return;
     }
-
-    const result = parseRows(header, dataRows);
-    if (result) setParsed(result);
+    const buf = await file.arrayBuffer();
+    const wb = XLSX.read(buf, { type: "array" });
+    const ws = wb.Sheets[wb.SheetNames[0]];
+    if (!ws) {
+      toast.error("Не удалось прочитать первый лист Excel");
+      return;
+    }
+    const aoa = XLSX.utils.sheet_to_json<unknown[]>(ws, { header: 1, blankrows: false, defval: "" });
+    if (aoa.length < DATA_START_ROW) {
+      toast.error("Файл слишком короткий — нет строк данных");
+      return;
+    }
+    const result = parseWorkbook(aoa);
+    if (result.rows.length === 0) {
+      toast.error("Не найдено ни одной валидной строки данных");
+    }
+    setParsed(result);
   };
 
   const handleImport = async () => {
-    if (!parsed || parsed.rows.length === 0 || !warehousesQ.data) return;
+    if (!parsed || parsed.rows.length === 0) return;
     setBusy(true);
     setProgress({ done: 0, total: parsed.rows.length });
     const logStart = await supabase.from("sync_logs").insert({
-      source: "catalog_csv",
+      source: "catalog_xlsx",
       status: "running",
-      message: `Импорт ${parsed.rows.length} строк`,
+      message: `Импорт ${parsed.rows.length} строк из Excel-прайса`,
     }).select("id").single();
     const logId = logStart.data?.id;
 
     try {
-      // 1. Upsert brands (unique by slug)
+      // 1. Upsert brands
       const brandNames = Array.from(new Set(parsed.rows.map((r) => r.brand)));
       const brandRows = brandNames.map((n) => ({
         name: n,
@@ -209,23 +222,28 @@ function CatalogUploadPage() {
       const { data: brandsAll } = await supabase.from("brands").select("id, name").in("name", brandNames);
       const brandMap = new Map((brandsAll ?? []).map((b) => [b.name, b.id]));
 
-      // 2. Upsert products by sku
-      const productRows = parsed.rows.map((r) => ({
-        sku: r.sku,
-        name: r.name,
-        brand_id: brandMap.get(r.brand) ?? null,
-        is_original: r.is_original,
-        base_price: r.base_price,
-        oem: r.oem,
-        category: r.category,
-        description: r.description,
-      }));
+      // 2. Upsert products by (brand_id, sku)
+      const productRows = parsed.rows
+        .filter((r) => brandMap.get(r.brand))
+        .map((r) => ({
+          sku: r.sku,
+          name: r.name,
+          brand_id: brandMap.get(r.brand)!,
+          is_original: (r.brand || "").toUpperCase() === "CNHTC",
+          base_price: r.retail,
+          price_retail: r.retail,
+          price_tiers: r.price_tiers,
+          oem: r.sku,
+          source: "price_list",
+        }));
 
       let processed = 0;
       let failed = 0;
-      for (let i = 0; i < productRows.length; i += 500) {
-        const chunk = productRows.slice(i, i + 500);
-        const { error } = await supabase.from("products").upsert(chunk, { onConflict: "sku" });
+      for (let i = 0; i < productRows.length; i += 300) {
+        const chunk = productRows.slice(i, i + 300);
+        const { error } = await supabase
+          .from("products")
+          .upsert(chunk, { onConflict: "brand_id,sku" });
         if (error) {
           failed += chunk.length;
         } else {
@@ -234,19 +252,46 @@ function CatalogUploadPage() {
         setProgress({ done: i + chunk.length, total: productRows.length });
       }
 
-      // 3. Get product ids
-      const allSkus = parsed.rows.map((r) => r.sku);
-      const productMap = new Map<string, string>();
-      for (let i = 0; i < allSkus.length; i += 500) {
-        const { data } = await supabase.from("products").select("id, sku").in("sku", allSkus.slice(i, i + 500));
-        (data ?? []).forEach((p) => productMap.set(p.sku, p.id));
+      // 3. Fetch product ids
+      const productMap = new Map<string, string>(); // `${brandId}::${sku}` -> id
+      const skuList = parsed.rows.map((r) => r.sku);
+      for (let i = 0; i < skuList.length; i += 300) {
+        const slice = skuList.slice(i, i + 300);
+        const { data } = await supabase
+          .from("products")
+          .select("id, sku, brand_id")
+          .in("sku", slice);
+        for (const p of data ?? []) productMap.set(`${p.brand_id}::${p.sku}`, p.id);
       }
 
-      // 4. Upsert stock
-      const whByCode = new Map(warehousesQ.data.map((w) => [w.code, w.id]));
-      const stockRows: Array<{ product_id: string; warehouse_id: string; qty: number; status: "in_stock" | "out" }> = [];
+      // 4. Full replace of stock for the 8 real warehouses only
+      //    (OFFER warehouse left untouched — that's the Google Sheets domain).
+      const realWhIds = parsed.whCodesFound
+        .map((c) => whByCode.get(c))
+        .filter((v): v is string => Boolean(v));
+
+      const allPids = parsed.rows
+        .map((r) => productMap.get(`${brandMap.get(r.brand)}::${r.sku}`))
+        .filter((v): v is string => Boolean(v));
+
+      if (realWhIds.length && allPids.length) {
+        for (let i = 0; i < allPids.length; i += 300) {
+          const slice = allPids.slice(i, i + 300);
+          await supabase
+            .from("stock")
+            .delete()
+            .in("warehouse_id", realWhIds)
+            .in("product_id", slice);
+        }
+      }
+
+      const stockRows: Array<{
+        product_id: string; warehouse_id: string; qty: number; status: "in_stock" | "out";
+      }> = [];
       for (const r of parsed.rows) {
-        const pid = productMap.get(r.sku);
+        const bid = brandMap.get(r.brand);
+        if (!bid) continue;
+        const pid = productMap.get(`${bid}::${r.sku}`);
         if (!pid) continue;
         for (const [code, qty] of Object.entries(r.stocks)) {
           const wid = whByCode.get(code);
@@ -256,7 +301,10 @@ function CatalogUploadPage() {
       }
       for (let i = 0; i < stockRows.length; i += 500) {
         const chunk = stockRows.slice(i, i + 500);
-        await supabase.from("stock").upsert(chunk, { onConflict: "product_id,warehouse_id" });
+        const { error } = await supabase
+          .from("stock")
+          .upsert(chunk, { onConflict: "product_id,warehouse_id" });
+        if (error) throw new Error(`Остатки: ${error.message}`);
       }
 
       await supabase.from("sync_logs").update({
@@ -264,13 +312,16 @@ function CatalogUploadPage() {
         rows_processed: processed,
         rows_failed: failed,
         finished_at: new Date().toISOString(),
-        message: `Товаров: ${processed}, строк остатков: ${stockRows.length}`,
+        message: `Прайс: товаров ${processed}, остатков ${stockRows.length}, складов в файле ${parsed.whCodesFound.length}`,
       }).eq("id", logId!);
 
-      toast.success(`Импорт завершён`, { description: `Товаров: ${processed}, остатков: ${stockRows.length}` });
+      toast.success("Импорт завершён", {
+        description: `Товаров: ${processed}, остатков: ${stockRows.length}`,
+      });
       setParsed(null);
       if (fileRef.current) fileRef.current.value = "";
       qc.invalidateQueries({ queryKey: ["catalog-stats"] });
+      qc.invalidateQueries({ queryKey: ["products"] });
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : String(e);
       toast.error("Ошибка импорта", { description: msg });
@@ -287,37 +338,6 @@ function CatalogUploadPage() {
     }
   };
 
-  const buildTemplateRows = () => {
-    const header = ["sku", "name", "brand", "is_original", "price", "oem", "category", "description", ...warehouseCodes.map((c) => `qty_${c}`)];
-    const samples = [
-      ["VG1540080110", "Фильтр топливный WD615", "CNHTC", "original", "1850", "VG1540080110", "Фильтры", "Оригинал. фильтр для двигателя WD615", ...warehouseCodes.map((c) => (c === "msk" ? "12" : c === "samara_addr" ? "8" : "0"))],
-      ["WG9112550110", "Фильтр воздушный HOWO", "HOWO", "original", "2400", "WG9112550110", "Фильтры", "", ...warehouseCodes.map(() => "5")],
-      ["MANN-WK9165", "Фильтр аналог Mann WK9165", "Mann", "analog", "1200", "", "Фильтры", "Аналог", ...warehouseCodes.map((_c, i) => (i < 2 ? "3" : "0"))],
-    ];
-    return { header, samples };
-  };
-
-  const downloadTemplateCsv = () => {
-    const { header, samples } = buildTemplateRows();
-    const csv = [header.join(","), ...samples.map((r) => r.join(","))].join("\n") + "\n";
-    const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "price-template.csv";
-    a.click();
-    URL.revokeObjectURL(url);
-  };
-
-  const downloadTemplateXlsx = () => {
-    const { header, samples } = buildTemplateRows();
-    const aoa = [header, ...samples];
-    const ws = XLSX.utils.aoa_to_sheet(aoa);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Прайс");
-    XLSX.writeFile(wb, "price-template.xlsx");
-  };
-
   return (
     <div className="mx-auto max-w-[1200px] px-6 py-8 space-y-6">
       <div className="flex items-end justify-between gap-4">
@@ -326,79 +346,79 @@ function CatalogUploadPage() {
           <p className="mt-1 text-sm text-muted-foreground">
             В базе: <strong>{statsQ.data?.products ?? 0}</strong> товаров, <strong>{statsQ.data?.stockRows ?? 0}</strong> остатков по складам.{" "}
             {statsQ.data?.lastLog && (
-              <>Последняя загрузка: {new Date(statsQ.data.lastLog.started_at).toLocaleString("ru-RU")} — {statsQ.data.lastLog.status}.</>
+              <>Последняя загрузка прайса: {new Date(statsQ.data.lastLog.started_at).toLocaleString("ru-RU")} — {statsQ.data.lastLog.status}.</>
             )}
           </p>
-        </div>
-        <div className="flex gap-2">
-          <Button variant="outline" size="sm" onClick={downloadTemplateXlsx} className="gap-1.5" disabled={!warehousesQ.data}>
-            <Download className="h-3.5 w-3.5" /> Шаблон .xlsx
-          </Button>
-          <Button variant="outline" size="sm" onClick={downloadTemplateCsv} className="gap-1.5" disabled={!warehousesQ.data}>
-            <Download className="h-3.5 w-3.5" /> Шаблон .csv
-          </Button>
         </div>
       </div>
 
       <GoogleSheetsSyncCard onDone={() => { qc.invalidateQueries({ queryKey: ["catalog-stats"] }); qc.invalidateQueries({ queryKey: ["warehouses-admin"] }); }} />
 
       {/* Spec */}
-
       <Card className="p-5">
-        <h2 className="font-display text-sm uppercase tracking-wider text-muted-foreground">Формат файла</h2>
-        <p className="mt-2 text-sm">Принимаются файлы <strong>Excel (.xlsx, .xls)</strong> и <strong>CSV</strong> (UTF-8, разделитель — запятая или точка с запятой). Первая строка — заголовки.</p>
+        <h2 className="font-display text-sm uppercase tracking-wider text-muted-foreground">Формат файла прайса</h2>
+        <p className="mt-2 text-sm">
+          Принимается стандартный Excel-прайс «по всем складам» (<strong>.xlsx</strong>, .xls). Заголовки — строка 3, данные — с строки 8.
+          Структура файла фиксированная; колонки определяются по позиции.
+        </p>
 
         <div className="mt-3 overflow-hidden rounded border border-border">
           <table className="w-full text-sm">
             <thead className="bg-surface text-xs uppercase tracking-wider text-muted-foreground">
               <tr>
-                <th className="px-3 py-2 text-left">Колонка</th>
-                <th className="px-3 py-2 text-left">Обяз.</th>
-                <th className="px-3 py-2 text-left">Описание</th>
-                <th className="px-3 py-2 text-left">Пример</th>
+                <th className="px-3 py-2 text-left">№ колонки</th>
+                <th className="px-3 py-2 text-left">Заголовок</th>
+                <th className="px-3 py-2 text-left">Назначение</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border text-sm">
-              <Row col="sku" required label="да" desc="Артикул товара. Уникален. По нему обновляются существующие позиции." ex="VG1540080110" />
-              <Row col="name" required label="да" desc="Название товара." ex="Фильтр топливный WD615" />
-              <Row col="brand" required label="да" desc="Бренд. Новые бренды создаются автоматически." ex="CNHTC" />
-              <Row col="price" required label="да" desc="Базовая цена в рублях. Допускается «1 850,00» или «1850.00»." ex="1850" />
-              <Row col="is_original" required={false} label="нет" desc='"original" / "analog" (по умолчанию — original). Также: "аналог", "true/false".' ex="original" />
-              <Row col="oem" required={false} label="нет" desc="OEM-номер производителя техники." ex="VG1540080110" />
-              <Row col="category" required={false} label="нет" desc="Категория." ex="Фильтры" />
-              <Row col="description" required={false} label="нет" desc="Краткое описание." ex="Оригинал для WD615" />
+              <SpecRow n="1" h="Ценовая группа / Бренд" d="Бренд товара" />
+              <SpecRow n="4" h="Артикул" d="Артикул" />
+              <SpecRow n="9" h="Номенклатура" d="Наименование" />
+              <SpecRow n="15" h="РРЦ со скидкой 5%" d="Цена для покупателей со скидкой 5%" />
+              <SpecRow n="16" h="РРЦ со скидкой 10%" d="Скидка 10%" />
+              <SpecRow n="17" h="РРЦ со скидкой 15%" d="Скидка 15%" />
+              <SpecRow n="18" h="РРЦ РДЭ" d="Базовая розничная цена (без скидки)" highlight />
+              <SpecRow n="19" h="РРЦ со скидкой 20%" d="Скидка 20%" />
+              <SpecRow n="20" h="РРЦ со скидкой 21%" d="Скидка 21%" />
+              <SpecRow n="21" h="РРЦ со скидкой 18%" d="Скидка 18%" />
+              <SpecRow n="22–29" h="Остатки по 8 складам" d="Маппинг — по точному названию заголовка склада" />
             </tbody>
           </table>
         </div>
 
-        <h3 className="mt-5 font-display text-sm uppercase tracking-wider text-muted-foreground">Колонки остатков по складам</h3>
-        <p className="mt-1 text-sm text-muted-foreground">
-          По одной колонке на склад: <code>qty_&lt;код_склада&gt;</code> (или просто <code>&lt;код&gt;</code>). Количество — целое число, 0 или пусто = «не на складе».
-        </p>
+        <h3 className="mt-5 font-display text-sm uppercase tracking-wider text-muted-foreground">Склады</h3>
         <div className="mt-2 overflow-hidden rounded border border-border">
           <table className="w-full text-sm">
             <thead className="bg-surface text-xs uppercase tracking-wider text-muted-foreground">
               <tr>
-                <th className="px-3 py-2 text-left">Код склада</th>
-                <th className="px-3 py-2 text-left">Колонка в CSV</th>
+                <th className="px-3 py-2 text-left">Заголовок в Excel</th>
+                <th className="px-3 py-2 text-left">Код в БД</th>
                 <th className="px-3 py-2 text-left">Склад</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
-              {warehousesQ.data?.map((w) => (
-                <tr key={w.id}>
-                  <td className="px-3 py-2 font-mono">{w.code}</td>
-                  <td className="px-3 py-2 font-mono">qty_{w.code}</td>
-                  <td className="px-3 py-2">{w.name}</td>
-                </tr>
-              ))}
+              {Object.entries(WH_HEADER_TO_CODE)
+                // dedupe duplicate "агропарк" header variants
+                .filter(([, c], i, arr) => arr.findIndex(([, c2]) => c2 === c) === i)
+                .map(([header, code]) => {
+                  const wh = warehousesQ.data?.find((w) => w.code === code);
+                  return (
+                    <tr key={header}>
+                      <td className="px-3 py-2">{header}</td>
+                      <td className="px-3 py-2 font-mono">{code}</td>
+                      <td className="px-3 py-2">{wh?.name ?? "—"}</td>
+                    </tr>
+                  );
+                })}
             </tbody>
           </table>
         </div>
 
         <div className="mt-4 rounded border border-brand/30 bg-brand/5 p-3 text-xs text-muted-foreground">
-          <strong className="text-foreground">Поведение импорта:</strong> существующие товары обновляются по <code>sku</code> (цена, наличие, описание). Новые — создаются.
-          Остатки полностью перезаписываются для складов, указанных в файле; для не указанных в файле — остаются без изменений.
+          <strong className="text-foreground">Поведение импорта:</strong> товары upsert‑ятся по паре (бренд, артикул).
+          Базовая цена и все тиеры скидок (5/10/15/18/20/21%) обновляются из файла.
+          Остатки по 8 реальным складам полностью перезаписываются. Позиции «Под заказ» из Google Sheets не затрагиваются.
         </div>
       </Card>
 
@@ -408,13 +428,13 @@ function CatalogUploadPage() {
         <label className="mt-3 flex cursor-pointer items-center justify-center gap-3 rounded-lg border-2 border-dashed border-border bg-surface/50 px-6 py-10 hover:border-brand">
           <Upload className="h-5 w-5 text-muted-foreground" />
           <div className="text-sm">
-            <div className="font-medium">Выберите файл прайса (.xlsx, .xls или .csv)</div>
-            <div className="text-xs text-muted-foreground">Рекомендуется до 50 000 строк за раз.</div>
+            <div className="font-medium">Выберите Excel-прайс (.xlsx, .xls)</div>
+            <div className="text-xs text-muted-foreground">Структура файла фиксирована — см. описание выше.</div>
           </div>
           <input
             ref={fileRef}
             type="file"
-            accept=".csv,text/csv,.xlsx,.xls,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel"
+            accept=".xlsx,.xls,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel"
             className="hidden"
             onChange={(e) => {
               const f = e.target.files?.[0];
@@ -430,13 +450,21 @@ function CatalogUploadPage() {
               <span>Строк: <strong>{parsed.rows.length}</strong></span>
               <span className="text-muted-foreground">·</span>
               <span className="inline-flex items-center gap-1 text-emerald-600">
-                <CheckCircle2 className="h-3.5 w-3.5" /> Колонки складов: {parsed.whCodes.length > 0 ? parsed.whCodes.join(", ") : "не найдены"}
+                <CheckCircle2 className="h-3.5 w-3.5" /> Складов: {parsed.whCodesFound.length > 0 ? parsed.whCodesFound.join(", ") : "не найдены"}
               </span>
+              {parsed.unknownWh.length > 0 && (
+                <>
+                  <span className="text-muted-foreground">·</span>
+                  <span className="inline-flex items-center gap-1 text-amber-600">
+                    <AlertTriangle className="h-3.5 w-3.5" /> Неопознанные склады: {parsed.unknownWh.join(", ")}
+                  </span>
+                </>
+              )}
               {parsed.errors.length > 0 && (
                 <>
                   <span className="text-muted-foreground">·</span>
                   <span className="inline-flex items-center gap-1 text-amber-600">
-                    <AlertTriangle className="h-3.5 w-3.5" /> Предупреждений: <strong>{parsed.errors.length}</strong>
+                    <AlertTriangle className="h-3.5 w-3.5" /> Пропущено строк: <strong>{parsed.errors.length}</strong>
                   </span>
                 </>
               )}
@@ -454,11 +482,11 @@ function CatalogUploadPage() {
               <table className="w-full text-sm">
                 <thead className="bg-surface text-xs uppercase tracking-wider text-muted-foreground">
                   <tr>
-                    <th className="px-3 py-2 text-left">SKU</th>
-                    <th className="px-3 py-2 text-left">Название</th>
+                    <th className="px-3 py-2 text-left">Артикул</th>
                     <th className="px-3 py-2 text-left">Бренд</th>
-                    <th className="px-3 py-2 text-right">Цена</th>
-                    <th className="px-3 py-2 text-left">Тип</th>
+                    <th className="px-3 py-2 text-left">Наименование</th>
+                    <th className="px-3 py-2 text-right">РРЦ</th>
+                    <th className="px-3 py-2 text-right">Тиеры</th>
                     <th className="px-3 py-2 text-right">Всего шт</th>
                   </tr>
                 </thead>
@@ -466,10 +494,12 @@ function CatalogUploadPage() {
                   {parsed.rows.slice(0, 10).map((r) => (
                     <tr key={r.line}>
                       <td className="px-3 py-2 font-mono text-xs">{r.sku}</td>
-                      <td className="px-3 py-2">{r.name}</td>
                       <td className="px-3 py-2">{r.brand}</td>
-                      <td className="px-3 py-2 text-right">{r.base_price.toLocaleString("ru-RU")}</td>
-                      <td className="px-3 py-2">{r.is_original ? <Badge variant="default">ориг.</Badge> : <Badge variant="outline">аналог</Badge>}</td>
+                      <td className="px-3 py-2">{r.name}</td>
+                      <td className="px-3 py-2 text-right">{r.retail.toLocaleString("ru-RU")}</td>
+                      <td className="px-3 py-2 text-right text-xs text-muted-foreground">
+                        {Object.keys(r.price_tiers).length} / 6
+                      </td>
                       <td className="px-3 py-2 text-right">{Object.values(r.stocks).reduce((s, n) => s + n, 0)}</td>
                     </tr>
                   ))}
@@ -515,8 +545,8 @@ function GoogleSheetsSyncCard({ onDone }: { onDone: () => void }) {
     try {
       const r = await sync();
       setResult(r as unknown as Record<string, number>);
-      toast.success("Синхронизация выполнена", {
-        description: `Товаров: +${r.products_inserted}, обновлено: ${r.products_updated}, остатков: ${r.stock_rows}`,
+      toast.success("Синхронизация «под заказ» выполнена", {
+        description: `Новых: ${r.products_inserted}, обновлено: ${r.products_updated}, позиций: ${r.stock_rows}`,
       });
       onDone();
     } catch (e) {
@@ -530,24 +560,26 @@ function GoogleSheetsSyncCard({ onDone }: { onDone: () => void }) {
     <Card className="p-5 border-primary/40">
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div>
-          <h2 className="font-display text-sm uppercase tracking-wider text-muted-foreground">Синхронизация с Google Sheets</h2>
+          <h2 className="font-display text-sm uppercase tracking-wider text-muted-foreground">Позиции «Под заказ» (Google Sheets)</h2>
           <p className="mt-2 text-sm">
-            Каталог и остатки подтягиваются из таблицы{" "}
+            Из таблицы{" "}
             <a
               href="https://docs.google.com/spreadsheets/d/1wqUakDJVX2-dP0gF0VuZhUC61DP5r2mJa38CKFzua6E/edit?gid=1212612956"
               target="_blank" rel="noreferrer"
               className="underline"
-            >«Ожидаемые поступления Контейнеры»</a>, лист «Запчасти».
+            >«Ожидаемые поступления»</a>, лист «Запчасти», подгружаются позиции, которых нет на складах.
+            Их розничная цена — колонка J («Цена, РРЦ»), скидки считаются автоматически по формуле от РРЦ.
+            Статус — всегда «Под заказ».
           </p>
           <p className="mt-1 text-xs text-muted-foreground">
-            Колонки: B — Производитель, C — артикул, D — наименование, F — локация (склад), G — статус, J — цена, K — свободно. Существующие товары обновляются, остатки полностью пересчитываются.
+            Не затрагивает товары, загруженные через Excel-прайс (их цены и остатки остаются неизменными).
           </p>
           {result && (
             <div className="mt-3 text-xs text-muted-foreground space-y-0.5">
               <div>Строк прочитано: <strong>{result.rows_total}</strong>, пропущено: {result.rows_skipped}</div>
-              <div>Новых брендов: {result.brands_added}, новых складов: {result.warehouses_added}</div>
+              <div>Новых брендов: {result.brands_added}</div>
               <div>Товаров добавлено: <strong>{result.products_inserted}</strong>, обновлено: {result.products_updated}</div>
-              <div>Записей об остатках: <strong>{result.stock_rows}</strong></div>
+              <div>Позиций «под заказ»: <strong>{result.stock_rows}</strong></div>
             </div>
           )}
         </div>
@@ -560,14 +592,12 @@ function GoogleSheetsSyncCard({ onDone }: { onDone: () => void }) {
   );
 }
 
-
-function Row({ col, required, label, desc, ex }: { col: string; required: boolean; label: string; desc: string; ex: string }) {
+function SpecRow({ n, h, d, highlight }: { n: string; h: string; d: string; highlight?: boolean }) {
   return (
-    <tr>
-      <td className="px-3 py-2 font-mono">{col}</td>
-      <td className="px-3 py-2">{required ? <Badge variant="default">{label}</Badge> : <Badge variant="secondary">{label}</Badge>}</td>
-      <td className="px-3 py-2">{desc}</td>
-      <td className="px-3 py-2 font-mono text-xs text-muted-foreground">{ex}</td>
+    <tr className={highlight ? "bg-brand/5" : undefined}>
+      <td className="px-3 py-2 font-mono">{n}</td>
+      <td className="px-3 py-2">{highlight ? <Badge>{h}</Badge> : h}</td>
+      <td className="px-3 py-2 text-muted-foreground">{d}</td>
     </tr>
   );
 }
