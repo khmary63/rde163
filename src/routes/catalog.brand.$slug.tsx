@@ -77,7 +77,7 @@ type Product = {
   id: string;
   sku: string;
   name: string;
-  base_price: number;
+  price_retail: number;
   is_original: boolean;
   stock: { warehouse_id: string; qty: number }[];
 };
@@ -91,12 +91,12 @@ function BrandPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("products")
-        .select("id, sku, name, base_price, is_original, stock(warehouse_id, qty)")
+        .select("id, sku, name, price_retail, is_original, stock(warehouse_id, qty)")
         .eq("brand_id", brand.id)
         .order("name")
         .limit(100);
       if (error) throw error;
-      return (data ?? []) as Product[];
+      return (data ?? []) as unknown as Product[];
     },
   });
 
