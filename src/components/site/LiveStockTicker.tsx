@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { Radio } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/integrations/supabase/proxy-client";
 
 type BrandCount = { name: string; qty: number };
 

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/integrations/supabase/proxy-client";
 
 async function fetchInStockCount(): Promise<number> {
   // Считаем уникальные товары со статусом "в наличии" и положительным остатком.

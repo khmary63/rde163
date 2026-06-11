@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { MessageSquare, X, Send, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/integrations/supabase/proxy-client";
 import { useServerFn } from "@tanstack/react-start";
 import { notifyNewFeedback } from "@/lib/notify.functions";
 import { toast } from "sonner";
