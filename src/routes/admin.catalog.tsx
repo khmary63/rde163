@@ -490,6 +490,24 @@ function GoogleSheetsSyncCard({ onDone }: { onDone: () => void }) {
       stock_rows: 0,
       offer_qty_sum: 0,
     };
+    const CHUNK_TIMEOUT_MS = 60_000;
+    const MAX_ATTEMPTS = 3;
+    const runChunk = async (chunkLogId: string, slice: Awaited<ReturnType<typeof start>>["rows"]) => {
+      let lastError: unknown = null;
+      for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), CHUNK_TIMEOUT_MS);
+        try {
+          return await processChunk({ data: { logId: chunkLogId, rows: slice }, signal: controller.signal });
+        } catch (e) {
+          lastError = e;
+          if (attempt < MAX_ATTEMPTS) await new Promise((r) => setTimeout(r, 1500 * attempt));
+        } finally {
+          clearTimeout(timer);
+        }
+      }
+      throw lastError instanceof Error ? lastError : new Error("Чанк не обработан после повторных попыток");
+    };
     try {
       const started = await start();
       logId = started.logId;
@@ -497,7 +515,7 @@ function GoogleSheetsSyncCard({ onDone }: { onDone: () => void }) {
       const BATCH = 150;
       for (let i = 0; i < rows.length; i += BATCH) {
         setPhase(`Обработка: ${Math.min(i + BATCH, rows.length)} из ${rows.length} строк…`);
-        const res = await processChunk({ data: { logId, rows: rows.slice(i, i + BATCH) } });
+        const res = await runChunk(logId, rows.slice(i, i + BATCH));
         summary.rows_processed += res.rows_processed;
         summary.rows_skipped += res.rows_skipped;
         summary.brands_added += res.brands_added;
