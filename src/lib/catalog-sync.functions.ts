@@ -3,6 +3,7 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 const SPREADSHEET_ID = "1wqUakDJVX2-dP0gF0VuZhUC61DP5r2mJa38CKFzua6E";
 const SHEET_NAME = "Запчасти";
+const SHEET_GID = "1212612956";
 const GATEWAY = "https://connector-gateway.lovable.dev/google_sheets/v4";
 const OFFER_WAREHOUSE_CODE = "OFFER";
 const DISCOUNT_TIERS = [5, 10, 15, 18, 20, 21] as const;
@@ -46,6 +47,57 @@ function buildTiers(retail: number): Record<string, number> {
   return out;
 }
 
+function parseCsv(text: string): string[][] {
+  const rows: string[][] = [];
+  let row: string[] = [];
+  let cell = "";
+  let inQuotes = false;
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i];
+    if (inQuotes) {
+      if (ch === '"' && text[i + 1] === '"') { cell += '"'; i++; }
+      else if (ch === '"') inQuotes = false;
+      else cell += ch;
+    } else if (ch === '"') inQuotes = true;
+    else if (ch === ",") { row.push(cell); cell = ""; }
+    else if (ch === "\n") { row.push(cell); rows.push(row); row = []; cell = ""; }
+    else if (ch !== "\r") cell += ch;
+  }
+  if (cell || row.length) { row.push(cell); rows.push(row); }
+  return rows;
+}
+
+async function fetchSheetRows(): Promise<SheetRow[]> {
+  const LOVABLE_API_KEY = process.env.LOVABLE_API_KEY;
+  const GOOGLE_SHEETS_API_KEY = process.env.GOOGLE_SHEETS_API_KEY;
+  if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY не настроен");
+  if (!GOOGLE_SHEETS_API_KEY) throw new Error("GOOGLE_SHEETS_API_KEY не настроен (подключите Google Sheets)");
+
+  const encodedRange = `${encodeURIComponent(SHEET_NAME)}!A2:K`;
+  const url = `${GATEWAY}/spreadsheets/${SPREADSHEET_ID}/values/${encodedRange}?valueRenderOption=UNFORMATTED_VALUE`;
+  const resp = await fetch(url, {
+    headers: {
+      Authorization: `Bearer ${LOVABLE_API_KEY}`,
+      "X-Connection-Api-Key": GOOGLE_SHEETS_API_KEY,
+    },
+  });
+  if (resp.ok) {
+    const json = (await resp.json()) as { values?: SheetRow[] };
+    return json.values ?? [];
+  }
+
+  const errorText = await resp.text();
+  if (resp.status !== 403) throw new Error(`Google Sheets API ${resp.status}: ${errorText.slice(0, 300)}`);
+
+  const csvUrl = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/export?format=csv&gid=${SHEET_GID}&range=A2:K`;
+  const csvResp = await fetch(csvUrl, { headers: { "user-agent": "Mozilla/5.0" } });
+  if (!csvResp.ok) {
+    const csvText = await csvResp.text();
+    throw new Error(`Google Sheets API 403; CSV fallback ${csvResp.status}: ${csvText.slice(0, 300)}`);
+  }
+  return parseCsv(await csvResp.text());
+}
+
 async function assertStaff(userId: string) {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const { data: roles } = await supabaseAdmin
@@ -73,25 +125,8 @@ export const startCatalogSync = createServerFn({ method: "POST" })
     if (error || !log?.id) throw new Error(`sync_logs insert: ${error?.message ?? "no id"}`);
 
     try {
-      const LOVABLE_API_KEY = process.env.LOVABLE_API_KEY;
-      const GOOGLE_SHEETS_API_KEY = process.env.GOOGLE_SHEETS_API_KEY;
-      if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY не настроен");
-      if (!GOOGLE_SHEETS_API_KEY) throw new Error("GOOGLE_SHEETS_API_KEY не настроен (подключите Google Sheets)");
-
-      const encodedRange = `${encodeURIComponent(SHEET_NAME)}!A2:K`;
-      const url = `${GATEWAY}/spreadsheets/${SPREADSHEET_ID}/values/${encodedRange}?valueRenderOption=UNFORMATTED_VALUE`;
-      const resp = await fetch(url, {
-        headers: {
-          Authorization: `Bearer ${LOVABLE_API_KEY}`,
-          "X-Connection-Api-Key": GOOGLE_SHEETS_API_KEY,
-        },
-      });
-      if (!resp.ok) {
-        const t = await resp.text();
-        throw new Error(`Google Sheets API ${resp.status}: ${t.slice(0, 300)}`);
-      }
-      const json = (await resp.json()) as { values?: SheetRow[] };
-      const rows = (json.values ?? []).map((r, index) => ({
+      const sheetRows = await fetchSheetRows();
+      const rows = sheetRows.map((r, index) => ({
         line: index + 2,
         brand: String(r[1] ?? "").trim(),
         sku: String(r[2] ?? "").trim(),
