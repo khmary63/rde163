@@ -12,7 +12,7 @@ import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { useCart } from "@/hooks/use-cart";
 import { useAuth } from "@/hooks/use-auth";
-import { pickPriceForDiscount, type PriceTiers } from "@/lib/pricing";
+import { pickPriceForDiscount } from "@/lib/pricing";
 import {
   getCatalogBrands,
   getCatalogProducts,
