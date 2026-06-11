@@ -2,13 +2,14 @@ import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
 const SPREADSHEET_ID = "1wqUakDJVX2-dP0gF0VuZhUC61DP5r2mJa38CKFzua6E";
 const SHEET_NAME = "Запчасти";
+const SHEET_GID = "1212612956";
 const RANGE = `${SHEET_NAME}!A2:K`;
 const GATEWAY = "https://connector-gateway.lovable.dev/google_sheets/v4";
 
 const OFFER_WAREHOUSE_CODE = "OFFER";
 const DISCOUNT_TIERS = [5, 10, 15, 18, 20, 21] as const;
 
-type Row = (string | undefined)[];
+type Row = (string | number | undefined)[];
 
 function slugify(s: string): string {
   return s
@@ -37,6 +38,57 @@ function buildTiers(retail: number): Record<string, number> {
     out[String(t)] = Math.round(retail * (1 - t / 100) * 100) / 100;
   }
   return out;
+}
+
+function parseCsv(text: string): string[][] {
+  const rows: string[][] = [];
+  let row: string[] = [];
+  let cell = "";
+  let inQuotes = false;
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i];
+    if (inQuotes) {
+      if (ch === '"' && text[i + 1] === '"') { cell += '"'; i++; }
+      else if (ch === '"') inQuotes = false;
+      else cell += ch;
+    } else if (ch === '"') inQuotes = true;
+    else if (ch === ",") { row.push(cell); cell = ""; }
+    else if (ch === "\n") { row.push(cell); rows.push(row); row = []; cell = ""; }
+    else if (ch !== "\r") cell += ch;
+  }
+  if (cell || row.length) { row.push(cell); rows.push(row); }
+  return rows;
+}
+
+async function fetchSheetRows(): Promise<Row[]> {
+  const LOVABLE_API_KEY = process.env.LOVABLE_API_KEY;
+  const GOOGLE_SHEETS_API_KEY = process.env.GOOGLE_SHEETS_API_KEY;
+  if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY не настроен");
+  if (!GOOGLE_SHEETS_API_KEY) throw new Error("GOOGLE_SHEETS_API_KEY не настроен (подключите Google Sheets)");
+
+  const encodedRange = `${encodeURIComponent(SHEET_NAME)}!A2:K`;
+  const url = `${GATEWAY}/spreadsheets/${SPREADSHEET_ID}/values/${encodedRange}?valueRenderOption=UNFORMATTED_VALUE`;
+  const resp = await fetch(url, {
+    headers: {
+      Authorization: `Bearer ${LOVABLE_API_KEY}`,
+      "X-Connection-Api-Key": GOOGLE_SHEETS_API_KEY,
+    },
+  });
+  if (resp.ok) {
+    const json = (await resp.json()) as { values?: Row[] };
+    return json.values ?? [];
+  }
+
+  const errorText = await resp.text();
+  if (resp.status !== 403) throw new Error(`Google Sheets API ${resp.status}: ${errorText.slice(0, 300)}`);
+
+  const csvUrl = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/export?format=csv&gid=${SHEET_GID}&range=A2:K`;
+  const csvResp = await fetch(csvUrl, { headers: { "user-agent": "Mozilla/5.0" } });
+  if (!csvResp.ok) {
+    const csvText = await csvResp.text();
+    throw new Error(`Google Sheets API 403; CSV fallback ${csvResp.status}: ${csvText.slice(0, 300)}`);
+  }
+  return parseCsv(await csvResp.text());
 }
 
 export interface CatalogSyncSummary {
@@ -78,21 +130,7 @@ export async function runCatalogSync(
 
 
   try {
-    // Encode the sheet name (Cyrillic) but keep `!` and `:` unescaped — Google rejects %3A in range.
-    const encodedRange = `${encodeURIComponent(SHEET_NAME)}!A2:K`;
-    const url = `${GATEWAY}/spreadsheets/${SPREADSHEET_ID}/values/${encodedRange}?valueRenderOption=UNFORMATTED_VALUE`;
-    const resp = await fetch(url, {
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "X-Connection-Api-Key": GOOGLE_SHEETS_API_KEY,
-      },
-    });
-    if (!resp.ok) {
-      const t = await resp.text();
-      throw new Error(`Google Sheets API ${resp.status}: ${t.slice(0, 300)}`);
-    }
-    const json = (await resp.json()) as { values?: Row[] };
-    const rows = json.values ?? [];
+    const rows = await fetchSheetRows();
 
     // ---- 1. OFFER warehouse (target for all rows) --------------------
     const { data: offerWh } = await supabaseAdmin
