@@ -202,22 +202,48 @@ function CatalogUploadPage() {
     if (!parsed || parsed.rows.length === 0) return;
     setBusy(true);
     setProgress({ done: 0, total: parsed.rows.length });
+    const BATCH = 250;
+    const allRows = parsed.rows.map((r) => ({
+      sku: r.sku,
+      name: r.name,
+      brand: r.brand,
+      retail: r.retail,
+      price_tiers: r.price_tiers,
+      stocks: r.stocks,
+    }));
+    let logId: string | null = null;
+    let totalProcessed = 0;
+    let totalFailed = 0;
+    let totalStockRows = 0;
     try {
-      const result = await importCatalogXlsx({
+      const started = await importStart({
+        data: { totalRows: allRows.length, whCodesFound: parsed.whCodesFound },
+      });
+      logId = started.logId;
+
+      for (let i = 0; i < allRows.length; i += BATCH) {
+        const slice = allRows.slice(i, i + BATCH);
+        const res = await importChunk({
+          data: { logId, rows: slice, whCodesFound: parsed.whCodesFound },
+        });
+        totalProcessed += res.processed;
+        totalFailed += res.failed;
+        totalStockRows += res.stockRows;
+        setProgress({ done: Math.min(i + BATCH, allRows.length), total: allRows.length });
+      }
+
+      await importFinish({
         data: {
-          rows: parsed.rows.map((r) => ({
-            sku: r.sku,
-            name: r.name,
-            brand: r.brand,
-            retail: r.retail,
-            price_tiers: r.price_tiers,
-            stocks: r.stocks,
-          })),
+          logId,
+          processed: totalProcessed,
+          failed: totalFailed,
+          stockRows: totalStockRows,
           whCodesFound: parsed.whCodesFound,
         },
       });
+
       toast.success("Импорт завершён", {
-        description: `Товаров: ${result.processed}, остатков: ${result.stockRows}`,
+        description: `Товаров: ${totalProcessed}, остатков: ${totalStockRows}`,
       });
       setParsed(null);
       if (fileRef.current) fileRef.current.value = "";
@@ -225,6 +251,20 @@ function CatalogUploadPage() {
       qc.invalidateQueries({ queryKey: ["products"] });
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : String(e);
+      if (logId) {
+        try {
+          await importFinish({
+            data: {
+              logId,
+              processed: totalProcessed,
+              failed: totalFailed,
+              stockRows: totalStockRows,
+              whCodesFound: parsed.whCodesFound,
+              error: msg,
+            },
+          });
+        } catch {}
+      }
       toast.error("Ошибка импорта", { description: msg });
     } finally {
       setBusy(false);
