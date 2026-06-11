@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { startCatalogSync, getCatalogSyncStatus } from "@/lib/catalog-sync.functions";
+import { startCatalogSync, processCatalogSyncChunk, finishCatalogSync } from "@/lib/catalog-sync.functions";
 import { importStart, importChunk, importFinish } from "@/lib/catalog-import.functions";
 import { DISCOUNT_TIERS, type PriceTiers } from "@/lib/pricing";
 
@@ -470,7 +470,8 @@ function CatalogUploadPage() {
 
 function GoogleSheetsSyncCard({ onDone }: { onDone: () => void }) {
   const start = useServerFn(startCatalogSync);
-  const status = useServerFn(getCatalogSyncStatus);
+  const processChunk = useServerFn(processCatalogSyncChunk);
+  const finish = useServerFn(finishCatalogSync);
   const [busy, setBusy] = useState(false);
   const [phase, setPhase] = useState<string>("");
   const [result, setResult] = useState<null | Record<string, number>>(null);
@@ -479,33 +480,45 @@ function GoogleSheetsSyncCard({ onDone }: { onDone: () => void }) {
     setBusy(true);
     setResult(null);
     setPhase("Запуск синхронизации…");
+    let logId: string | null = null;
+    const summary = {
+      rows_processed: 0,
+      rows_skipped: 0,
+      brands_added: 0,
+      products_inserted: 0,
+      products_updated: 0,
+      stock_rows: 0,
+      offer_qty_sum: 0,
+    };
     try {
-      const { logId } = await start();
-      setPhase("Загрузка данных из Google Sheets…");
-      // Poll sync_logs until status leaves "running" (max ~5 minutes).
-      const deadline = Date.now() + 5 * 60 * 1000;
-      let row: Awaited<ReturnType<typeof status>> = null;
-      while (Date.now() < deadline) {
-        await new Promise((r) => setTimeout(r, 2000));
-        row = await status({ data: { logId } });
-        if (!row) continue;
-        if (row.status !== "running") break;
-        if (row.rows_processed) setPhase(`Обработка: ${row.rows_processed} строк…`);
+      const started = await start();
+      logId = started.logId;
+      const rows = started.rows;
+      const BATCH = 150;
+      for (let i = 0; i < rows.length; i += BATCH) {
+        setPhase(`Обработка: ${Math.min(i + BATCH, rows.length)} из ${rows.length} строк…`);
+        const res = await processChunk({ data: { logId, rows: rows.slice(i, i + BATCH) } });
+        summary.rows_processed += res.rows_processed;
+        summary.rows_skipped += res.rows_skipped;
+        summary.brands_added += res.brands_added;
+        summary.products_inserted += res.products_inserted;
+        summary.products_updated += res.products_updated;
+        summary.stock_rows += res.stock_rows;
+        summary.offer_qty_sum += res.offer_qty_sum;
       }
-      if (!row || row.status === "running") {
-        throw new Error("Синхронизация выполняется слишком долго. Проверьте логи позже.");
-      }
-      if (row.status === "error") {
-        throw new Error(row.message || "Неизвестная ошибка");
-      }
-      const details = (row.details ?? {}) as Record<string, number>;
+      await finish({ data: { logId, summary } });
+      const details = summary as Record<string, number>;
       setResult(details);
       toast.success("Синхронизация «под заказ» выполнена", {
         description: `Новых: ${details.products_inserted ?? 0}, обновлено: ${details.products_updated ?? 0}, позиций: ${details.stock_rows ?? 0}`,
       });
       onDone();
     } catch (e) {
-      toast.error("Ошибка синхронизации", { description: e instanceof Error ? e.message : String(e) });
+      const msg = e instanceof Error ? e.message : String(e);
+      if (logId) {
+        try { await finish({ data: { logId, summary, error: msg } }); } catch {}
+      }
+      toast.error("Ошибка синхронизации", { description: msg });
     } finally {
       setBusy(false);
       setPhase("");
