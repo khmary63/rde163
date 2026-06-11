@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { syncCatalogFromSheet } from "@/lib/catalog-sync.functions";
+import { startCatalogSync, getCatalogSyncStatus } from "@/lib/catalog-sync.functions";
 import { importStart, importChunk, importFinish } from "@/lib/catalog-import.functions";
 import { DISCOUNT_TIERS, type PriceTiers } from "@/lib/pricing";
 
