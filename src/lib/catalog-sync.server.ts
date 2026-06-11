@@ -3,7 +3,6 @@ import { supabaseAdmin } from "@/integrations/supabase/client.server";
 const SPREADSHEET_ID = "1wqUakDJVX2-dP0gF0VuZhUC61DP5r2mJa38CKFzua6E";
 const SHEET_NAME = "Запчасти";
 const SHEET_GID = "1212612956";
-const RANGE = `${SHEET_NAME}!A2:K`;
 const GATEWAY = "https://connector-gateway.lovable.dev/google_sheets/v4";
 
 const OFFER_WAREHOUSE_CODE = "OFFER";
@@ -136,11 +135,6 @@ export async function runCatalogSync(
   trigger: "manual" | "cron" = "manual",
   existingLogId?: string,
 ): Promise<CatalogSyncSummary> {
-  const LOVABLE_API_KEY = process.env.LOVABLE_API_KEY;
-  const GOOGLE_SHEETS_API_KEY = process.env.GOOGLE_SHEETS_API_KEY;
-  if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY не настроен");
-  if (!GOOGLE_SHEETS_API_KEY) throw new Error("GOOGLE_SHEETS_API_KEY не настроен (подключите Google Sheets)");
-
   const logId = existingLogId ?? (await createCatalogSyncLog(trigger));
 
 
