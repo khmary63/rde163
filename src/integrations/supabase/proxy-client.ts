@@ -6,7 +6,7 @@
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from './types';
 
-const PROXY_URL = 'https://api-rde163.neyromarket.com';
+const PROXY_URL = 'https://rde163.ru/api';
 const SUPABASE_PUBLISHABLE_KEY =
   import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY ||
   process.env.SUPABASE_PUBLISHABLE_KEY;
