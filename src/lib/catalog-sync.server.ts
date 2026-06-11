@@ -49,14 +49,9 @@ export interface CatalogSyncSummary {
   stock_rows: number;
 }
 
-/** Sync Google Sheets «Запчасти» → товары «под заказ» (source='on_order'). */
-export async function runCatalogSync(trigger: "manual" | "cron" = "manual"): Promise<CatalogSyncSummary> {
-  const LOVABLE_API_KEY = process.env.LOVABLE_API_KEY;
-  const GOOGLE_SHEETS_API_KEY = process.env.GOOGLE_SHEETS_API_KEY;
-  if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY не настроен");
-  if (!GOOGLE_SHEETS_API_KEY) throw new Error("GOOGLE_SHEETS_API_KEY не настроен (подключите Google Sheets)");
-
-  const { data: logIns } = await supabaseAdmin
+/** Insert a `running` sync_logs row and return its id. */
+export async function createCatalogSyncLog(trigger: "manual" | "cron" = "manual"): Promise<string> {
+  const { data, error } = await supabaseAdmin
     .from("sync_logs")
     .insert({
       source: "google_sheets_catalog",
@@ -65,7 +60,22 @@ export async function runCatalogSync(trigger: "manual" | "cron" = "manual"): Pro
     })
     .select("id")
     .single();
-  const logId = logIns?.id;
+  if (error || !data?.id) throw new Error(`sync_logs insert: ${error?.message ?? "no id"}`);
+  return data.id;
+}
+
+/** Sync Google Sheets «Запчасти» → товары «под заказ» (source='on_order'). */
+export async function runCatalogSync(
+  trigger: "manual" | "cron" = "manual",
+  existingLogId?: string,
+): Promise<CatalogSyncSummary> {
+  const LOVABLE_API_KEY = process.env.LOVABLE_API_KEY;
+  const GOOGLE_SHEETS_API_KEY = process.env.GOOGLE_SHEETS_API_KEY;
+  if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY не настроен");
+  if (!GOOGLE_SHEETS_API_KEY) throw new Error("GOOGLE_SHEETS_API_KEY не настроен (подключите Google Sheets)");
+
+  const logId = existingLogId ?? (await createCatalogSyncLog(trigger));
+
 
   try {
     // Encode the sheet name (Cyrillic) but keep `!` and `:` unescaped — Google rejects %3A in range.
