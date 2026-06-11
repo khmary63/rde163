@@ -1,6 +1,50 @@
 import { createServerFn } from "@tanstack/react-start";
-import { getRequest } from "@tanstack/react-start/server";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+
+const SPREADSHEET_ID = "1wqUakDJVX2-dP0gF0VuZhUC61DP5r2mJa38CKFzua6E";
+const SHEET_NAME = "Запчасти";
+const GATEWAY = "https://connector-gateway.lovable.dev/google_sheets/v4";
+const OFFER_WAREHOUSE_CODE = "OFFER";
+const DISCOUNT_TIERS = [5, 10, 15, 18, 20, 21] as const;
+
+type SheetRow = (string | number | undefined)[];
+type CatalogSyncRow = { line: number; brand: string; sku: string; name: string; retail: number; free: number };
+type CatalogSyncChunkResult = {
+  rows_processed: number;
+  rows_skipped: number;
+  brands_added: number;
+  products_inserted: number;
+  products_updated: number;
+  stock_rows: number;
+  offer_qty_sum: number;
+};
+
+function slugify(s: string): string {
+  return s
+    .toLowerCase()
+    .replace(/[^a-z0-9а-я]+/gi, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 60) || "x";
+}
+
+function parseNumber(v: unknown): number {
+  if (v == null) return 0;
+  const s = String(v).replace(/\s|\u00A0/g, "").replace(",", ".");
+  const n = Number(s);
+  return Number.isFinite(n) ? n : 0;
+}
+
+function parseInt0(v: unknown): number {
+  const n = Math.floor(parseNumber(v));
+  return n > 0 ? n : 0;
+}
+
+function buildTiers(retail: number): Record<string, number> {
+  if (!retail || retail <= 0) return {};
+  const out: Record<string, number> = {};
+  for (const t of DISCOUNT_TIERS) out[String(t)] = Math.round(retail * (1 - t / 100) * 100) / 100;
+  return out;
+}
 
 async function assertStaff(userId: string) {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -12,27 +56,191 @@ async function assertStaff(userId: string) {
   if (!isStaff) throw new Error("Доступ только для администраторов");
 }
 
-/**
- * Kick off catalog sync and return immediately with the sync_logs id.
- * The actual work runs in the background via `waitUntil` so the browser
- * does not need to keep the HTTP connection open for ~30s (Kaspersky/
- * corporate proxies routinely kill long-running responses).
- */
 export const startCatalogSync = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     await assertStaff(context.userId);
-    const { createCatalogSyncLog, runCatalogSync } = await import("./catalog-sync.server");
-    const logId = await createCatalogSyncLog("manual");
-    // Run in the background; errors are persisted to sync_logs by runCatalogSync.
-    const work = runCatalogSync("manual", logId).catch(() => undefined);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: log, error } = await supabaseAdmin
+      .from("sync_logs")
+      .insert({
+        source: "google_sheets_catalog",
+        status: "running",
+        message: "Старт синхронизации «под заказ» (manual, по частям)",
+      })
+      .select("id")
+      .single();
+    if (error || !log?.id) throw new Error(`sync_logs insert: ${error?.message ?? "no id"}`);
+
     try {
-      // Cloudflare Workers: keep the worker alive until the promise settles.
-      (getRequest() as unknown as { waitUntil?: (p: Promise<unknown>) => void }).waitUntil?.(work);
-    } catch {
-      // ignore — fall back to fire-and-forget
+      const LOVABLE_API_KEY = process.env.LOVABLE_API_KEY;
+      const GOOGLE_SHEETS_API_KEY = process.env.GOOGLE_SHEETS_API_KEY;
+      if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY не настроен");
+      if (!GOOGLE_SHEETS_API_KEY) throw new Error("GOOGLE_SHEETS_API_KEY не настроен (подключите Google Sheets)");
+
+      const encodedRange = `${encodeURIComponent(SHEET_NAME)}!A2:K`;
+      const url = `${GATEWAY}/spreadsheets/${SPREADSHEET_ID}/values/${encodedRange}?valueRenderOption=UNFORMATTED_VALUE`;
+      const resp = await fetch(url, {
+        headers: {
+          Authorization: `Bearer ${LOVABLE_API_KEY}`,
+          "X-Connection-Api-Key": GOOGLE_SHEETS_API_KEY,
+        },
+      });
+      if (!resp.ok) {
+        const t = await resp.text();
+        throw new Error(`Google Sheets API ${resp.status}: ${t.slice(0, 300)}`);
+      }
+      const json = (await resp.json()) as { values?: SheetRow[] };
+      const rows = (json.values ?? []).map((r, index) => ({
+        line: index + 2,
+        brand: String(r[1] ?? "").trim(),
+        sku: String(r[2] ?? "").trim(),
+        name: String(r[3] ?? "").trim(),
+        retail: parseNumber(r[9]),
+        free: parseInt0(r[10]),
+      }));
+      return { logId: log.id as string, rows };
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      await supabaseAdmin
+        .from("sync_logs")
+        .update({ status: "error", finished_at: new Date().toISOString(), message: msg })
+        .eq("id", log.id);
+      throw e;
     }
-    return { logId };
+  });
+
+export const processCatalogSyncChunk = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: { logId: string; rows: CatalogSyncRow[] }) => d)
+  .handler(async ({ data, context }) => {
+    await assertStaff(context.userId);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const result: CatalogSyncChunkResult = {
+      rows_processed: data.rows.length,
+      rows_skipped: 0,
+      brands_added: 0,
+      products_inserted: 0,
+      products_updated: 0,
+      stock_rows: 0,
+      offer_qty_sum: 0,
+    };
+    const validRows = data.rows.filter((r) => r.brand && r.sku && r.name);
+    result.rows_skipped = data.rows.length - validRows.length;
+    if (!validRows.length) return result;
+
+    const { data: offerWh } = await supabaseAdmin
+      .from("warehouses")
+      .select("id")
+      .eq("code", OFFER_WAREHOUSE_CODE)
+      .maybeSingle();
+    if (!offerWh?.id) throw new Error(`Виртуальный склад «${OFFER_WAREHOUSE_CODE}» не найден — добавьте его в админке`);
+
+    const brandNames = [...new Set(validRows.map((r) => r.brand))];
+    const { data: existingBrands } = await supabaseAdmin.from("brands").select("id, name");
+    const brandMap = new Map<string, string>((existingBrands ?? []).map((b: { id: string; name: string }) => [b.name.toLowerCase(), b.id]));
+    const newBrands = brandNames
+      .filter((n) => !brandMap.has(n.toLowerCase()))
+      .map((n) => ({ name: n, slug: slugify(n) }));
+    if (newBrands.length) {
+      const { data: ins, error } = await supabaseAdmin.from("brands").insert(newBrands).select("id, name");
+      if (error) throw new Error(`brands insert: ${error.message}`);
+      result.brands_added = ins?.length ?? 0;
+      for (const b of ins ?? []) brandMap.set(b.name.toLowerCase(), b.id);
+    }
+
+    const products = new Map<string, { brand_id: string; sku: string; name: string; retail: number; free: number }>();
+    for (const r of validRows) {
+      const brandId = brandMap.get(r.brand.toLowerCase());
+      if (!brandId) { result.rows_skipped++; continue; }
+      const key = `${brandId}::${r.sku}`;
+      const prev = products.get(key);
+      if (!prev) products.set(key, { brand_id: brandId, sku: r.sku, name: r.name, retail: r.retail, free: r.free });
+      else {
+        if (!prev.retail && r.retail) prev.retail = r.retail;
+        prev.free += r.free;
+      }
+    }
+
+    const skuList = [...new Set([...products.values()].map((p) => p.sku))];
+    const existingMap = new Map<string, { id: string; source: string; base_price: number; price_retail: number; price_tiers: Record<string, number> | null }>();
+    for (let i = 0; i < skuList.length; i += 300) {
+      const { data: found, error } = await supabaseAdmin
+        .from("products")
+        .select("id, sku, brand_id, source, base_price, price_retail, price_tiers")
+        .in("sku", skuList.slice(i, i + 300));
+      if (error) throw new Error(`products fetch: ${error.message}`);
+      for (const p of found ?? []) existingMap.set(`${p.brand_id}::${p.sku}`, p);
+    }
+
+    const productRows = [...products.entries()].map(([key, p]) => {
+      const ex = existingMap.get(key);
+      const keepPriceListPrice = ex?.source === "price_list";
+      if (ex) result.products_updated++;
+      else result.products_inserted++;
+      return {
+        brand_id: p.brand_id,
+        sku: p.sku,
+        name: p.name,
+        oem: p.sku,
+        base_price: keepPriceListPrice ? ex.base_price : p.retail,
+        price_retail: keepPriceListPrice ? ex.price_retail : p.retail,
+        price_tiers: keepPriceListPrice ? (ex.price_tiers ?? {}) : buildTiers(p.retail),
+        source: ex?.source ?? "on_order",
+        category: null,
+        is_original: true,
+      };
+    });
+
+    for (let i = 0; i < productRows.length; i += 150) {
+      const { error } = await supabaseAdmin
+        .from("products")
+        .upsert(productRows.slice(i, i + 150), { onConflict: "brand_id,sku", ignoreDuplicates: false });
+      if (error) throw new Error(`products upsert: ${error.message}`);
+    }
+
+    const productIdMap = new Map<string, string>();
+    for (let i = 0; i < skuList.length; i += 300) {
+      const { data: found, error } = await supabaseAdmin
+        .from("products")
+        .select("id, sku, brand_id")
+        .in("sku", skuList.slice(i, i + 300));
+      if (error) throw new Error(`products ids fetch: ${error.message}`);
+      for (const p of found ?? []) productIdMap.set(`${p.brand_id}::${p.sku}`, p.id);
+    }
+
+    const productIds = [...new Set([...products.keys()].map((k) => productIdMap.get(k)).filter((v): v is string => Boolean(v)))];
+    for (let i = 0; i < productIds.length; i += 300) {
+      await supabaseAdmin.from("stock").delete().eq("warehouse_id", offerWh.id).in("product_id", productIds.slice(i, i + 300));
+    }
+    const stockRows = productIds.map((product_id) => ({ product_id, warehouse_id: offerWh.id, qty: 0, status: "expected" as const }));
+    for (let i = 0; i < stockRows.length; i += 300) {
+      const { error } = await supabaseAdmin.from("stock").upsert(stockRows.slice(i, i + 300), { onConflict: "product_id,warehouse_id" });
+      if (error) throw new Error(`stock upsert: ${error.message}`);
+    }
+    result.stock_rows = stockRows.length;
+    result.offer_qty_sum = [...products.values()].reduce((sum, p) => sum + p.free, 0);
+    return result;
+  });
+
+export const finishCatalogSync = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: { logId: string; summary: CatalogSyncChunkResult; error?: string }) => d)
+  .handler(async ({ data, context }) => {
+    await assertStaff(context.userId);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    await supabaseAdmin
+      .from("sync_logs")
+      .update({
+        status: data.error ? "error" : "ok",
+        finished_at: new Date().toISOString(),
+        rows_processed: data.summary.rows_processed,
+        rows_failed: data.summary.rows_skipped,
+        message: data.error ?? `OK (manual): «под заказ» — ${data.summary.products_inserted} новых, ${data.summary.products_updated} обновлено, ${data.summary.stock_rows} позиций`,
+        details: { ...data.summary, rows_total: data.summary.rows_processed, warehouses_added: 0 },
+      })
+      .eq("id", data.logId);
+    return { ok: true };
   });
 
 export const getCatalogSyncStatus = createServerFn({ method: "POST" })
