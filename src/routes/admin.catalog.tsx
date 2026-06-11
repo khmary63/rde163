@@ -10,6 +10,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { syncCatalogFromSheet } from "@/lib/catalog-sync.functions";
+import { importCatalogXlsx } from "@/lib/catalog-import.functions";
 import { DISCOUNT_TIERS, type PriceTiers } from "@/lib/pricing";
 
 export const Route = createFileRoute("/admin/catalog")({
