@@ -2,7 +2,7 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { Loader2, ShoppingCart, ChevronRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/proxy-client";
-import { supabaseAdmin } from "@/integrations/supabase/client.server";
+
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { Badge } from "@/components/ui/badge";
@@ -14,6 +14,7 @@ import { toast } from "sonner";
 const getBrandBySlug = createServerFn({ method: "GET" })
   .inputValidator((d: unknown) => z.object({ slug: z.string().min(1).max(100) }).parse(d))
   .handler(async ({ data }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: brand } = await supabaseAdmin
       .from("brands")
       .select("id, slug, name, description, logo_url")

@@ -1,7 +1,11 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { supabaseAdmin } from "@/integrations/supabase/client.server";
+type SupabaseAdmin = Awaited<ReturnType<typeof getAdmin>>;
+async function getAdmin() {
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  return supabaseAdmin;
+}
 
 const Input = z.object({
   from: z.string().optional(), // ISO date YYYY-MM-DD
@@ -44,7 +48,7 @@ export interface AnalyticsResult {
   top_products: ProductRow[];
 }
 
-async function ensureStaff(userId: string) {
+async function ensureStaff(userId: string, supabaseAdmin: SupabaseAdmin) {
   const { data } = await supabaseAdmin
     .from("user_roles")
     .select("role")
@@ -57,7 +61,8 @@ export const getSalesAnalytics = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((i: unknown) => Input.parse(i))
   .handler(async ({ data, context }): Promise<AnalyticsResult> => {
-    await ensureStaff(context.userId);
+    const supabaseAdmin = await getAdmin();
+    await ensureStaff(context.userId, supabaseAdmin);
 
     // ---- Fetch orders in range ---------------------------------------
     let q = supabaseAdmin
@@ -221,7 +226,8 @@ export const getCustomerDetail = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((i: unknown) => DetailInput.parse(i))
   .handler(async ({ data, context }): Promise<CustomerDetail> => {
-    await ensureStaff(context.userId);
+    const supabaseAdmin = await getAdmin();
+    await ensureStaff(context.userId, supabaseAdmin);
 
     let q = supabaseAdmin
       .from("orders")
