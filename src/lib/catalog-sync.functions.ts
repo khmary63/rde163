@@ -163,7 +163,7 @@ export const processCatalogSyncChunk = createServerFn({ method: "POST" })
     }
 
     const skuList = [...new Set([...products.values()].map((p) => p.sku))];
-    const existingMap = new Map<string, { id: string; source: string; base_price: number; price_retail: number; price_tiers: Record<string, number> | null }>();
+    const existingMap = new Map<string, { id: string; source: string; base_price: number; price_retail: number; price_tiers: unknown }>();
     for (let i = 0; i < skuList.length; i += 300) {
       const { data: found, error } = await supabaseAdmin
         .from("products")
