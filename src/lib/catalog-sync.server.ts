@@ -68,7 +68,9 @@ export async function runCatalogSync(trigger: "manual" | "cron" = "manual"): Pro
   const logId = logIns?.id;
 
   try {
-    const url = `${GATEWAY}/spreadsheets/${SPREADSHEET_ID}/values/${RANGE}?valueRenderOption=UNFORMATTED_VALUE`;
+    // Encode the sheet name (Cyrillic) but keep `!` and `:` unescaped — Google rejects %3A in range.
+    const encodedRange = `${encodeURIComponent(SHEET_NAME)}!A2:K`;
+    const url = `${GATEWAY}/spreadsheets/${SPREADSHEET_ID}/values/${encodedRange}?valueRenderOption=UNFORMATTED_VALUE`;
     const resp = await fetch(url, {
       headers: {
         Authorization: `Bearer ${LOVABLE_API_KEY}`,
