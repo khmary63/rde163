@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/integrations/supabase/proxy-client";
 
 export const Route = createFileRoute("/forgot-password")({
   head: () => ({ meta: [{ title: "Восстановление пароля — РДЭ Запчасти" }] }),

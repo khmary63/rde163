@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/integrations/supabase/proxy-client";
 
 export const Route = createFileRoute("/reset-password")({
   head: () => ({ meta: [{ title: "Новый пароль — РДЭ Запчасти" }] }),

@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { Package, Inbox, Clock, CheckCircle2, TrendingUp } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/integrations/supabase/proxy-client";
 
 export const Route = createFileRoute("/admin/")({
   component: AdminDashboard,
