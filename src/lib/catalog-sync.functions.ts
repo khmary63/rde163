@@ -173,24 +173,41 @@ export const processCatalogSyncChunk = createServerFn({ method: "POST" })
       for (const p of found ?? []) existingMap.set(`${p.brand_id}::${p.sku}`, p);
     }
 
-    const productRows = [...products.entries()].map(([key, p]) => {
+    const priceListNameRows: Array<{ brand_id: string; sku: string; name: string }> = [];
+    const productRows: Array<{
+      brand_id: string; sku: string; name: string; oem: string;
+      base_price: number; price_retail: number; price_tiers: unknown;
+      source: string; category: null; is_original: boolean;
+    }> = [];
+    for (const [key, p] of products.entries()) {
       const ex = existingMap.get(key);
       const keepPriceListPrice = ex?.source === "price_list";
       if (ex) result.products_updated++;
       else result.products_inserted++;
-      return {
+      if (keepPriceListPrice) {
+        priceListNameRows.push({ brand_id: p.brand_id, sku: p.sku, name: p.name });
+        continue;
+      }
+      productRows.push({
         brand_id: p.brand_id,
         sku: p.sku,
         name: p.name,
         oem: p.sku,
-        base_price: keepPriceListPrice ? ex.base_price : p.retail,
-        price_retail: keepPriceListPrice ? ex.price_retail : p.retail,
-        price_tiers: keepPriceListPrice ? (ex.price_tiers ?? {}) : buildTiers(p.retail),
+        base_price: p.retail,
+        price_retail: p.retail,
+        price_tiers: buildTiers(p.retail),
         source: ex?.source ?? "on_order",
         category: null,
         is_original: true,
-      };
-    });
+      });
+    }
+
+    for (let i = 0; i < priceListNameRows.length; i += 150) {
+      const { error } = await supabaseAdmin
+        .from("products")
+        .upsert(priceListNameRows.slice(i, i + 150) as any, { onConflict: "brand_id,sku", ignoreDuplicates: false });
+      if (error) throw new Error(`products name upsert: ${error.message}`);
+    }
 
     for (let i = 0; i < productRows.length; i += 150) {
       const { error } = await supabaseAdmin
