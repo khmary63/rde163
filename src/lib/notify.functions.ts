@@ -2,7 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { sendMaxMessage } from "./max.server";
 import { sendInternalTransactionalEmail } from "./email/send.server";
-import { supabaseAdmin } from "@/integrations/supabase/client.server";
+
 
 const FeedbackInput = z.object({
   feedback_id: z.string().uuid(),
@@ -11,6 +11,7 @@ const FeedbackInput = z.object({
 export const notifyNewFeedback = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => FeedbackInput.parse(input))
   .handler(async ({ data }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     // Look up the feedback row to ensure it exists in the DB.
     // This ties every notification to a real, RLS-validated row and prevents
     // attackers from spamming managers by hitting this endpoint directly.
