@@ -10,6 +10,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { syncCatalogFromSheet } from "@/lib/catalog-sync.functions";
+import { importCatalogXlsx } from "@/lib/catalog-import.functions";
 import { DISCOUNT_TIERS, type PriceTiers } from "@/lib/pricing";
 
 export const Route = createFileRoute("/admin/catalog")({
@@ -201,122 +202,22 @@ function CatalogUploadPage() {
     if (!parsed || parsed.rows.length === 0) return;
     setBusy(true);
     setProgress({ done: 0, total: parsed.rows.length });
-    const logStart = await supabase.from("sync_logs").insert({
-      source: "catalog_xlsx",
-      status: "running",
-      message: `Импорт ${parsed.rows.length} строк из Excel-прайса`,
-    }).select("id").single();
-    const logId = logStart.data?.id;
-
     try {
-      // 1. Upsert brands
-      const brandNames = Array.from(new Set(parsed.rows.map((r) => r.brand)));
-      const brandRows = brandNames.map((n) => ({
-        name: n,
-        slug: n.toLowerCase().replace(/[^a-z0-9а-я]+/gi, "-").replace(/^-+|-+$/g, "").slice(0, 60) || "brand",
-      }));
-      const { error: brandErr } = await supabase
-        .from("brands")
-        .upsert(brandRows, { onConflict: "slug", ignoreDuplicates: true });
-      if (brandErr) throw new Error(`Бренды: ${brandErr.message}`);
-      const { data: brandsAll } = await supabase.from("brands").select("id, name").in("name", brandNames);
-      const brandMap = new Map((brandsAll ?? []).map((b) => [b.name, b.id]));
-
-      // 2. Upsert products by (brand_id, sku)
-      const productRows = parsed.rows
-        .filter((r) => brandMap.get(r.brand))
-        .map((r) => ({
-          sku: r.sku,
-          name: r.name,
-          brand_id: brandMap.get(r.brand)!,
-          is_original: (r.brand || "").toUpperCase() === "CNHTC",
-          base_price: r.retail,
-          price_retail: r.retail,
-          price_tiers: r.price_tiers,
-          oem: r.sku,
-          source: "price_list",
-        }));
-
-      let processed = 0;
-      let failed = 0;
-      for (let i = 0; i < productRows.length; i += 300) {
-        const chunk = productRows.slice(i, i + 300);
-        const { error } = await supabase
-          .from("products")
-          .upsert(chunk, { onConflict: "brand_id,sku" });
-        if (error) {
-          failed += chunk.length;
-        } else {
-          processed += chunk.length;
-        }
-        setProgress({ done: i + chunk.length, total: productRows.length });
-      }
-
-      // 3. Fetch product ids
-      const productMap = new Map<string, string>(); // `${brandId}::${sku}` -> id
-      const skuList = parsed.rows.map((r) => r.sku);
-      for (let i = 0; i < skuList.length; i += 300) {
-        const slice = skuList.slice(i, i + 300);
-        const { data } = await supabase
-          .from("products")
-          .select("id, sku, brand_id")
-          .in("sku", slice);
-        for (const p of data ?? []) productMap.set(`${p.brand_id}::${p.sku}`, p.id);
-      }
-
-      // 4. Full replace of stock for the 8 real warehouses only
-      //    (OFFER warehouse left untouched — that's the Google Sheets domain).
-      const realWhIds = parsed.whCodesFound
-        .map((c) => whByCode.get(c))
-        .filter((v): v is string => Boolean(v));
-
-      const allPids = parsed.rows
-        .map((r) => productMap.get(`${brandMap.get(r.brand)}::${r.sku}`))
-        .filter((v): v is string => Boolean(v));
-
-      if (realWhIds.length && allPids.length) {
-        for (let i = 0; i < allPids.length; i += 300) {
-          const slice = allPids.slice(i, i + 300);
-          await supabase
-            .from("stock")
-            .delete()
-            .in("warehouse_id", realWhIds)
-            .in("product_id", slice);
-        }
-      }
-
-      const stockRows: Array<{
-        product_id: string; warehouse_id: string; qty: number; status: "in_stock" | "out";
-      }> = [];
-      for (const r of parsed.rows) {
-        const bid = brandMap.get(r.brand);
-        if (!bid) continue;
-        const pid = productMap.get(`${bid}::${r.sku}`);
-        if (!pid) continue;
-        for (const [code, qty] of Object.entries(r.stocks)) {
-          const wid = whByCode.get(code);
-          if (!wid) continue;
-          stockRows.push({ product_id: pid, warehouse_id: wid, qty, status: qty > 0 ? "in_stock" : "out" });
-        }
-      }
-      for (let i = 0; i < stockRows.length; i += 500) {
-        const chunk = stockRows.slice(i, i + 500);
-        const { error } = await supabase
-          .from("stock")
-          .upsert(chunk, { onConflict: "product_id,warehouse_id" });
-        if (error) throw new Error(`Остатки: ${error.message}`);
-      }
-
-      await supabase.from("sync_logs").update({
-        status: failed > 0 ? "partial" : "success",
-        rows_processed: processed,
-        rows_failed: failed,
-        finished_at: new Date().toISOString(),
-        message: `Прайс: товаров ${processed}, остатков ${stockRows.length}, складов в файле ${parsed.whCodesFound.length}`,
-      }).eq("id", logId!);
-
+      const result = await importCatalogXlsx({
+        data: {
+          rows: parsed.rows.map((r) => ({
+            sku: r.sku,
+            name: r.name,
+            brand: r.brand,
+            retail: r.retail,
+            price_tiers: r.price_tiers,
+            stocks: r.stocks,
+          })),
+          whCodesFound: parsed.whCodesFound,
+        },
+      });
       toast.success("Импорт завершён", {
-        description: `Товаров: ${processed}, остатков: ${stockRows.length}`,
+        description: `Товаров: ${result.processed}, остатков: ${result.stockRows}`,
       });
       setParsed(null);
       if (fileRef.current) fileRef.current.value = "";
@@ -325,13 +226,6 @@ function CatalogUploadPage() {
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : String(e);
       toast.error("Ошибка импорта", { description: msg });
-      if (logId) {
-        await supabase.from("sync_logs").update({
-          status: "error",
-          finished_at: new Date().toISOString(),
-          message: msg,
-        }).eq("id", logId);
-      }
     } finally {
       setBusy(false);
       setProgress(null);
