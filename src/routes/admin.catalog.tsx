@@ -546,7 +546,7 @@ function GoogleSheetsSyncCard({ onDone }: { onDone: () => void }) {
           </p>
           {result && (
             <div className="mt-3 text-xs text-muted-foreground space-y-0.5">
-              <div>Строк прочитано: <strong>{result.rows_total}</strong>, пропущено: {result.rows_skipped}</div>
+              <div>Строк прочитано: <strong>{result.rows_total ?? result.rows_processed}</strong>, пропущено: {result.rows_skipped}</div>
               <div>Новых брендов: {result.brands_added}</div>
               <div>Товаров добавлено: <strong>{result.products_inserted}</strong>, обновлено: {result.products_updated}</div>
               <div>Позиций «под заказ»: <strong>{result.stock_rows}</strong></div>
