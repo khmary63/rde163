@@ -492,7 +492,7 @@ function GoogleSheetsSyncCard({ onDone }: { onDone: () => void }) {
     };
     const CHUNK_TIMEOUT_MS = 60_000;
     const MAX_ATTEMPTS = 3;
-    const runChunk = async (chunkLogId: string, slice: typeof summary extends never ? never : Parameters<typeof processChunk>[0]["data"]["rows"]) => {
+    const runChunk = async (chunkLogId: string, slice: Awaited<ReturnType<typeof start>>["rows"]) => {
       let lastError: unknown = null;
       for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
         const controller = new AbortController();
