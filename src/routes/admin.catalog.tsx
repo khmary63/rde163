@@ -542,8 +542,9 @@ function GoogleSheetsSyncCard({ onDone }: { onDone: () => void }) {
         </div>
         <Button onClick={run} disabled={busy} className="gap-1.5">
           {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
-          {busy ? "Синхронизация…" : "Синхронизировать сейчас"}
+          {busy ? (phase || "Синхронизация…") : "Синхронизировать сейчас"}
         </Button>
+
       </div>
     </Card>
   );
