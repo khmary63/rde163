@@ -195,7 +195,7 @@ export const processCatalogSyncChunk = createServerFn({ method: "POST" })
     for (let i = 0; i < productRows.length; i += 150) {
       const { error } = await supabaseAdmin
         .from("products")
-        .upsert(productRows.slice(i, i + 150), { onConflict: "brand_id,sku", ignoreDuplicates: false });
+        .upsert(productRows.slice(i, i + 150) as any, { onConflict: "brand_id,sku", ignoreDuplicates: false });
       if (error) throw new Error(`products upsert: ${error.message}`);
     }
 
