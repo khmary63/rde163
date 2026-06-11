@@ -469,26 +469,49 @@ function CatalogUploadPage() {
 }
 
 function GoogleSheetsSyncCard({ onDone }: { onDone: () => void }) {
-  const sync = useServerFn(syncCatalogFromSheet);
+  const start = useServerFn(startCatalogSync);
+  const status = useServerFn(getCatalogSyncStatus);
   const [busy, setBusy] = useState(false);
+  const [phase, setPhase] = useState<string>("");
   const [result, setResult] = useState<null | Record<string, number>>(null);
 
   const run = async () => {
     setBusy(true);
     setResult(null);
+    setPhase("Запуск синхронизации…");
     try {
-      const r = await sync();
-      setResult(r as unknown as Record<string, number>);
+      const { logId } = await start();
+      setPhase("Загрузка данных из Google Sheets…");
+      // Poll sync_logs until status leaves "running" (max ~5 minutes).
+      const deadline = Date.now() + 5 * 60 * 1000;
+      let row: Awaited<ReturnType<typeof status>> = null;
+      while (Date.now() < deadline) {
+        await new Promise((r) => setTimeout(r, 2000));
+        row = await status({ data: { logId } });
+        if (!row) continue;
+        if (row.status !== "running") break;
+        if (row.rows_processed) setPhase(`Обработка: ${row.rows_processed} строк…`);
+      }
+      if (!row || row.status === "running") {
+        throw new Error("Синхронизация выполняется слишком долго. Проверьте логи позже.");
+      }
+      if (row.status === "error") {
+        throw new Error(row.message || "Неизвестная ошибка");
+      }
+      const details = (row.details ?? {}) as Record<string, number>;
+      setResult(details);
       toast.success("Синхронизация «под заказ» выполнена", {
-        description: `Новых: ${r.products_inserted}, обновлено: ${r.products_updated}, позиций: ${r.stock_rows}`,
+        description: `Новых: ${details.products_inserted ?? 0}, обновлено: ${details.products_updated ?? 0}, позиций: ${details.stock_rows ?? 0}`,
       });
       onDone();
     } catch (e) {
       toast.error("Ошибка синхронизации", { description: e instanceof Error ? e.message : String(e) });
     } finally {
       setBusy(false);
+      setPhase("");
     }
   };
+
 
   return (
     <Card className="p-5 border-primary/40">
