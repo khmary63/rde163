@@ -97,7 +97,7 @@ async function fetchCatalogProducts(
       is_original: Boolean(p.is_original),
       brand,
       stock: Array.isArray(p.stock)
-        ? p.stock.map((s) => ({ warehouse_id: s.warehouse_id, qty: Number(s.qty ?? 0) }))
+        ? p.stock.map((s: { warehouse_id: string; qty: number | null }) => ({ warehouse_id: s.warehouse_id, qty: Number(s.qty ?? 0) }))
         : [],
     };
   });
