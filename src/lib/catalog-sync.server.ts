@@ -66,6 +66,21 @@ async function fetchSheetRows(): Promise<Row[]> {
   if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY не настроен");
   if (!GOOGLE_SHEETS_API_KEY) throw new Error("GOOGLE_SHEETS_API_KEY не настроен (подключите Google Sheets)");
 
+  const batchUrl = new URL(`${GATEWAY}/spreadsheets/${SPREADSHEET_ID}/values:batchGet`);
+  batchUrl.searchParams.set("ranges", `${SHEET_NAME}!A2:K`);
+  batchUrl.searchParams.set("valueRenderOption", "UNFORMATTED_VALUE");
+  const batchResp = await fetch(batchUrl.toString(), {
+    headers: {
+      Authorization: `Bearer ${LOVABLE_API_KEY}`,
+      "X-Connection-Api-Key": GOOGLE_SHEETS_API_KEY,
+    },
+  });
+  if (batchResp.ok) {
+    const json = (await batchResp.json()) as { valueRanges?: Array<{ values?: Row[] }> };
+    return json.valueRanges?.[0]?.values ?? [];
+  }
+  const batchErrorText = await batchResp.text();
+
   const encodedRange = `${encodeURIComponent(SHEET_NAME)}!A2:K`;
   const url = `${GATEWAY}/spreadsheets/${SPREADSHEET_ID}/values/${encodedRange}?valueRenderOption=UNFORMATTED_VALUE`;
   const resp = await fetch(url, {
@@ -80,7 +95,7 @@ async function fetchSheetRows(): Promise<Row[]> {
   }
 
   const errorText = await resp.text();
-  if (resp.status !== 403) throw new Error(`Google Sheets API ${resp.status}: ${errorText.slice(0, 300)}`);
+  if (resp.status !== 403) throw new Error(`Google Sheets API ${resp.status}: ${errorText.slice(0, 300)}; batchGet ${batchResp.status}: ${batchErrorText.slice(0, 160)}`);
 
   const csvUrl = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/export?format=csv&gid=${SHEET_GID}&range=A2:K`;
   const csvResp = await fetch(csvUrl, { headers: { "user-agent": "Mozilla/5.0" } });
