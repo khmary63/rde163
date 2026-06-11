@@ -1,8 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { useMemo, useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Search, Loader2, ShoppingCart, ChevronLeft, ChevronRight, X, Send } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -12,7 +12,17 @@ import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { useCart } from "@/hooks/use-cart";
 import { useAuth } from "@/hooks/use-auth";
-import { pickPriceForDiscount, type PriceTiers } from "@/lib/pricing";
+import { pickPriceForDiscount } from "@/lib/pricing";
+import {
+  getCatalogBrands,
+  getCatalogProducts,
+  getCatalogProductsForUser,
+  getCatalogWarehouses,
+  getUserDiscount,
+  type CatalogBrand as Brand,
+  type CatalogProduct as Product,
+  type CatalogWarehouse as Warehouse,
+} from "@/lib/catalog.functions";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/catalog")({
@@ -58,67 +68,34 @@ export const Route = createFileRoute("/catalog")({
 
 const PAGE_SIZE = 50;
 
-type Brand = { id: string; slug: string; name: string };
-type Warehouse = { id: string; code: string; name: string; city: string | null; sort_order: number };
-type StockRow = { warehouse_id: string; qty: number };
-type Product = {
-  id: string;
-  sku: string;
-  name: string;
-  base_price: number;
-  price_retail: number;
-  price_tiers: PriceTiers | null;
-  source: "price_list" | "on_order";
-  is_original: boolean;
-  brand: Brand | null;
-  stock: StockRow[];
-};
-
 function useUserDiscount() {
   const { user } = useAuth();
+  const fetchDiscount = useServerFn(getUserDiscount);
   return useQuery({
     queryKey: ["user-discount", user?.id ?? "guest"],
     queryFn: async (): Promise<number> => {
       if (!user) return 0;
-      const { data } = await supabase
-        .from("profiles")
-        .select("discount_percent")
-        .eq("id", user.id)
-        .maybeSingle();
-      return Number(data?.discount_percent ?? 0);
+      return fetchDiscount();
     },
+    enabled: !!user,
     staleTime: 5 * 60 * 1000,
   });
 }
 
 function useBrands() {
+  const fetchBrands = useServerFn(getCatalogBrands);
   return useQuery({
     queryKey: ["brands"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("brands")
-        .select("id, slug, name")
-        .order("sort_order");
-      if (error) throw error;
-      return data as Brand[];
-    },
+    queryFn: () => fetchBrands(),
     staleTime: 5 * 60 * 1000,
   });
 }
 
 function useWarehouses() {
+  const fetchWarehouses = useServerFn(getCatalogWarehouses);
   return useQuery({
     queryKey: ["warehouses"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("warehouses")
-        .select("id, code, name, city, sort_order")
-        .eq("is_active", true)
-        .eq("is_public", true)
-        .order("sort_order");
-      if (error) throw error;
-      return data as Warehouse[];
-    },
+    queryFn: () => fetchWarehouses(),
     staleTime: 5 * 60 * 1000,
   });
 }
@@ -133,70 +110,11 @@ type Filters = {
 };
 
 function useProducts(filters: Filters, isAuthed: boolean) {
+  const fetchPublicProducts = useServerFn(getCatalogProducts);
+  const fetchUserProducts = useServerFn(getCatalogProductsForUser);
   return useQuery({
     queryKey: ["products", filters, isAuthed],
-    queryFn: async () => {
-      const from = filters.page * PAGE_SIZE;
-      const to = from + PAGE_SIZE - 1;
-
-      const stockJoin = filters.warehouseIds.length > 0 || filters.inStockOnly ? "stock!inner" : "stock";
-      // Wholesale columns (base_price, price_tiers) are only readable by authenticated users.
-      const priceCols = isAuthed ? "base_price, price_retail, price_tiers" : "price_retail";
-      let q = supabase
-        .from("products")
-        .select(
-          `id, sku, name, ${priceCols}, source, is_original, brand:brands(id, slug, name), stock:${stockJoin}(warehouse_id, qty)`,
-          { count: "exact" }
-        );
-
-
-      if (filters.search.trim()) {
-        const s = filters.search.trim().replace(/[%_]/g, " ");
-        // Параллельно ищем совпадения в кросс-номерах
-        const { data: crossMatches } = await supabase
-          .from("product_crosses")
-          .select("product_id")
-          .ilike("cross_number", `%${s}%`)
-          .limit(500);
-        const crossIds = (crossMatches ?? []).map((r) => r.product_id).filter(Boolean);
-        const orParts = [
-          `name.ilike.%${s}%`,
-          `sku.ilike.%${s}%`,
-          `oem.ilike.%${s}%`,
-        ];
-        if (crossIds.length > 0) {
-          orParts.push(`id.in.(${crossIds.join(",")})`);
-        }
-        q = q.or(orParts.join(","));
-      }
-      if (filters.brandIds.length > 0) {
-        q = q.in("brand_id", filters.brandIds);
-      }
-      // "Оригинал" = бренд CNHTC, всё остальное — аналоги
-      if (filters.originality === "original" || filters.originality === "analog") {
-        const { data: cnhtc } = await supabase
-          .from("brands")
-          .select("id")
-          .ilike("name", "CNHTC")
-          .maybeSingle();
-        if (cnhtc?.id) {
-          if (filters.originality === "original") q = q.eq("brand_id", cnhtc.id);
-          else q = q.neq("brand_id", cnhtc.id);
-        }
-      }
-
-      if (filters.warehouseIds.length > 0) {
-        q = q.in("stock.warehouse_id", filters.warehouseIds);
-      }
-      if (filters.inStockOnly) {
-        q = q.gt("stock.qty", 0);
-      }
-
-      q = q.order("name").range(from, to);
-      const { data, error, count } = await q;
-      if (error) throw error;
-      return { rows: (data ?? []) as unknown as Product[], total: count ?? 0 };
-    },
+    queryFn: () => (isAuthed ? fetchUserProducts({ data: filters }) : fetchPublicProducts({ data: filters })),
     placeholderData: (prev) => prev,
   });
 }
