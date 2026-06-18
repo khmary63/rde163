@@ -140,18 +140,20 @@ function RootComponent() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const isAdmin = pathname.startsWith("/admin");
   const isAuth = pathname === "/login" || pathname === "/register";
+  const isDemo = pathname.startsWith("/demo") || pathname.startsWith("/portfolio");
+  const hideChrome = isAdmin || isAuth || isDemo;
 
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <CartProvider>
           <div className="flex min-h-screen flex-col bg-background">
-            {!isAdmin && !isAuth && <SiteHeader />}
+            {!hideChrome && <SiteHeader />}
             <main className="flex-1">
               <Outlet />
             </main>
-            {!isAdmin && !isAuth && <SiteFooter />}
-            {!isAdmin && <FeedbackWidget />}
+            {!hideChrome && <SiteFooter />}
+            {!isAdmin && !isDemo && <FeedbackWidget />}
             <Toaster />
           </div>
         </CartProvider>
