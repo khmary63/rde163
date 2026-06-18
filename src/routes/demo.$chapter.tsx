@@ -27,7 +27,7 @@ function ChapterView() {
           <p className="text-sm text-white/60">{ch.subtitle}</p>
         </div>
         <ul className="mt-2 flex flex-wrap gap-x-5 gap-y-1 text-[13px] text-white/75">
-          {ch.highlights.map((h) => (
+          {ch.highlights.map((h: string) => (
             <li key={h} className="flex items-center gap-2">
               <span className="h-1 w-1 rounded-full bg-accent-orange" />
               {h}

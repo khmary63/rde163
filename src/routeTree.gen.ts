@@ -20,6 +20,7 @@ import { Route as PersonalDataRouteImport } from './routes/personal-data'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as FaqRouteImport } from './routes/faq'
+import { Route as DemoRouteImport } from './routes/demo'
 import { Route as ContactsRouteImport } from './routes/contacts'
 import { Route as CertificatesRouteImport } from './routes/certificates'
 import { Route as CatalogRouteImport } from './routes/catalog'
@@ -27,9 +28,13 @@ import { Route as CartRouteImport } from './routes/cart'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AccountRouteImport } from './routes/account'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as DemoIndexRouteImport } from './routes/demo.index'
 import { Route as BlogIndexRouteImport } from './routes/blog.index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as PortfolioRde163RouteImport } from './routes/portfolio.rde163'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
+import { Route as DemoPrintRouteImport } from './routes/demo.print'
+import { Route as DemoChapterRouteImport } from './routes/demo.$chapter'
 import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
 import { Route as AdminReviewsRouteImport } from './routes/admin.reviews'
 import { Route as AdminRefsRouteImport } from './routes/admin.refs'
@@ -106,6 +111,11 @@ const FaqRoute = FaqRouteImport.update({
   path: '/faq',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DemoRoute = DemoRouteImport.update({
+  id: '/demo',
+  path: '/demo',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ContactsRoute = ContactsRouteImport.update({
   id: '/contacts',
   path: '/contacts',
@@ -141,6 +151,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DemoIndexRoute = DemoIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => DemoRoute,
+} as any)
 const BlogIndexRoute = BlogIndexRouteImport.update({
   id: '/blog/',
   path: '/blog/',
@@ -151,10 +166,25 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AdminRoute,
 } as any)
+const PortfolioRde163Route = PortfolioRde163RouteImport.update({
+  id: '/portfolio/rde163',
+  path: '/portfolio/rde163',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const EmailUnsubscribeRoute = EmailUnsubscribeRouteImport.update({
   id: '/email/unsubscribe',
   path: '/email/unsubscribe',
   getParentRoute: () => rootRouteImport,
+} as any)
+const DemoPrintRoute = DemoPrintRouteImport.update({
+  id: '/print',
+  path: '/print',
+  getParentRoute: () => DemoRoute,
+} as any)
+const DemoChapterRoute = DemoChapterRouteImport.update({
+  id: '/$chapter',
+  path: '/$chapter',
+  getParentRoute: () => DemoRoute,
 } as any)
 const BlogSlugRoute = BlogSlugRouteImport.update({
   id: '/blog/$slug',
@@ -269,6 +299,7 @@ export interface FileRoutesByFullPath {
   '/catalog': typeof CatalogRouteWithChildren
   '/certificates': typeof CertificatesRoute
   '/contacts': typeof ContactsRoute
+  '/demo': typeof DemoRouteWithChildren
   '/faq': typeof FaqRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
@@ -291,9 +322,13 @@ export interface FileRoutesByFullPath {
   '/admin/refs': typeof AdminRefsRoute
   '/admin/reviews': typeof AdminReviewsRoute
   '/blog/$slug': typeof BlogSlugRoute
+  '/demo/$chapter': typeof DemoChapterRoute
+  '/demo/print': typeof DemoPrintRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
+  '/portfolio/rde163': typeof PortfolioRde163Route
   '/admin/': typeof AdminIndexRoute
   '/blog/': typeof BlogIndexRoute
+  '/demo/': typeof DemoIndexRoute
   '/admin/orders/$id': typeof AdminOrdersIdRoute
   '/catalog/brand/$slug': typeof CatalogBrandSlugRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
@@ -333,9 +368,13 @@ export interface FileRoutesByTo {
   '/admin/refs': typeof AdminRefsRoute
   '/admin/reviews': typeof AdminReviewsRoute
   '/blog/$slug': typeof BlogSlugRoute
+  '/demo/$chapter': typeof DemoChapterRoute
+  '/demo/print': typeof DemoPrintRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
+  '/portfolio/rde163': typeof PortfolioRde163Route
   '/admin': typeof AdminIndexRoute
   '/blog': typeof BlogIndexRoute
+  '/demo': typeof DemoIndexRoute
   '/admin/orders/$id': typeof AdminOrdersIdRoute
   '/catalog/brand/$slug': typeof CatalogBrandSlugRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
@@ -355,6 +394,7 @@ export interface FileRoutesById {
   '/catalog': typeof CatalogRouteWithChildren
   '/certificates': typeof CertificatesRoute
   '/contacts': typeof ContactsRoute
+  '/demo': typeof DemoRouteWithChildren
   '/faq': typeof FaqRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
@@ -377,9 +417,13 @@ export interface FileRoutesById {
   '/admin/refs': typeof AdminRefsRoute
   '/admin/reviews': typeof AdminReviewsRoute
   '/blog/$slug': typeof BlogSlugRoute
+  '/demo/$chapter': typeof DemoChapterRoute
+  '/demo/print': typeof DemoPrintRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
+  '/portfolio/rde163': typeof PortfolioRde163Route
   '/admin/': typeof AdminIndexRoute
   '/blog/': typeof BlogIndexRoute
+  '/demo/': typeof DemoIndexRoute
   '/admin/orders/$id': typeof AdminOrdersIdRoute
   '/catalog/brand/$slug': typeof CatalogBrandSlugRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
@@ -400,6 +444,7 @@ export interface FileRouteTypes {
     | '/catalog'
     | '/certificates'
     | '/contacts'
+    | '/demo'
     | '/faq'
     | '/forgot-password'
     | '/login'
@@ -422,9 +467,13 @@ export interface FileRouteTypes {
     | '/admin/refs'
     | '/admin/reviews'
     | '/blog/$slug'
+    | '/demo/$chapter'
+    | '/demo/print'
     | '/email/unsubscribe'
+    | '/portfolio/rde163'
     | '/admin/'
     | '/blog/'
+    | '/demo/'
     | '/admin/orders/$id'
     | '/catalog/brand/$slug'
     | '/lovable/email/suppression'
@@ -464,9 +513,13 @@ export interface FileRouteTypes {
     | '/admin/refs'
     | '/admin/reviews'
     | '/blog/$slug'
+    | '/demo/$chapter'
+    | '/demo/print'
     | '/email/unsubscribe'
+    | '/portfolio/rde163'
     | '/admin'
     | '/blog'
+    | '/demo'
     | '/admin/orders/$id'
     | '/catalog/brand/$slug'
     | '/lovable/email/suppression'
@@ -485,6 +538,7 @@ export interface FileRouteTypes {
     | '/catalog'
     | '/certificates'
     | '/contacts'
+    | '/demo'
     | '/faq'
     | '/forgot-password'
     | '/login'
@@ -507,9 +561,13 @@ export interface FileRouteTypes {
     | '/admin/refs'
     | '/admin/reviews'
     | '/blog/$slug'
+    | '/demo/$chapter'
+    | '/demo/print'
     | '/email/unsubscribe'
+    | '/portfolio/rde163'
     | '/admin/'
     | '/blog/'
+    | '/demo/'
     | '/admin/orders/$id'
     | '/catalog/brand/$slug'
     | '/lovable/email/suppression'
@@ -529,6 +587,7 @@ export interface RootRouteChildren {
   CatalogRoute: typeof CatalogRouteWithChildren
   CertificatesRoute: typeof CertificatesRoute
   ContactsRoute: typeof ContactsRoute
+  DemoRoute: typeof DemoRouteWithChildren
   FaqRoute: typeof FaqRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   LoginRoute: typeof LoginRoute
@@ -542,6 +601,7 @@ export interface RootRouteChildren {
   UnsubscribeRoute: typeof UnsubscribeRoute
   BlogSlugRoute: typeof BlogSlugRoute
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
+  PortfolioRde163Route: typeof PortfolioRde163Route
   BlogIndexRoute: typeof BlogIndexRoute
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
   ApiPublicHooksSyncCatalogRoute: typeof ApiPublicHooksSyncCatalogRoute
@@ -631,6 +691,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FaqRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/demo': {
+      id: '/demo'
+      path: '/demo'
+      fullPath: '/demo'
+      preLoaderRoute: typeof DemoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/contacts': {
       id: '/contacts'
       path: '/contacts'
@@ -680,6 +747,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/demo/': {
+      id: '/demo/'
+      path: '/'
+      fullPath: '/demo/'
+      preLoaderRoute: typeof DemoIndexRouteImport
+      parentRoute: typeof DemoRoute
+    }
     '/blog/': {
       id: '/blog/'
       path: '/blog'
@@ -694,12 +768,33 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/portfolio/rde163': {
+      id: '/portfolio/rde163'
+      path: '/portfolio/rde163'
+      fullPath: '/portfolio/rde163'
+      preLoaderRoute: typeof PortfolioRde163RouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/email/unsubscribe': {
       id: '/email/unsubscribe'
       path: '/email/unsubscribe'
       fullPath: '/email/unsubscribe'
       preLoaderRoute: typeof EmailUnsubscribeRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/demo/print': {
+      id: '/demo/print'
+      path: '/print'
+      fullPath: '/demo/print'
+      preLoaderRoute: typeof DemoPrintRouteImport
+      parentRoute: typeof DemoRoute
+    }
+    '/demo/$chapter': {
+      id: '/demo/$chapter'
+      path: '/$chapter'
+      fullPath: '/demo/$chapter'
+      preLoaderRoute: typeof DemoChapterRouteImport
+      parentRoute: typeof DemoRoute
     }
     '/blog/$slug': {
       id: '/blog/$slug'
@@ -897,6 +992,20 @@ const CatalogRouteChildren: CatalogRouteChildren = {
 const CatalogRouteWithChildren =
   CatalogRoute._addFileChildren(CatalogRouteChildren)
 
+interface DemoRouteChildren {
+  DemoChapterRoute: typeof DemoChapterRoute
+  DemoPrintRoute: typeof DemoPrintRoute
+  DemoIndexRoute: typeof DemoIndexRoute
+}
+
+const DemoRouteChildren: DemoRouteChildren = {
+  DemoChapterRoute: DemoChapterRoute,
+  DemoPrintRoute: DemoPrintRoute,
+  DemoIndexRoute: DemoIndexRoute,
+}
+
+const DemoRouteWithChildren = DemoRoute._addFileChildren(DemoRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AccountRoute: AccountRoute,
@@ -905,6 +1014,7 @@ const rootRouteChildren: RootRouteChildren = {
   CatalogRoute: CatalogRouteWithChildren,
   CertificatesRoute: CertificatesRoute,
   ContactsRoute: ContactsRoute,
+  DemoRoute: DemoRouteWithChildren,
   FaqRoute: FaqRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
   LoginRoute: LoginRoute,
@@ -918,6 +1028,7 @@ const rootRouteChildren: RootRouteChildren = {
   UnsubscribeRoute: UnsubscribeRoute,
   BlogSlugRoute: BlogSlugRoute,
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
+  PortfolioRde163Route: PortfolioRde163Route,
   BlogIndexRoute: BlogIndexRoute,
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
   ApiPublicHooksSyncCatalogRoute: ApiPublicHooksSyncCatalogRoute,
